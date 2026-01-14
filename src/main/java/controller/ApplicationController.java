@@ -10,6 +10,9 @@ import view.LoginView.LoginView;
 import view.HomeView.HomeView;
 import view.OrganizeMatchView.OrganizeMatchView;
 import view.BookFieldView.BookFieldView;
+import view.PaymentView.PaymentView;
+import view.RecapView.RecapView;
+
 import view.View;
 
 import java.util.Scanner;
@@ -119,6 +122,21 @@ public class ApplicationController {
         BookFieldView bookFieldView = viewFactory.createBookFieldView(bookFieldController);
         bookFieldView.setApplicationController(this);
         pushAndDisplay(bookFieldView);
+    }
+
+    public void navigateToPayment(MatchBean matchBean) {
+        PaymentController paymentController = new PaymentController(this);
+        paymentController.setMatchBean(matchBean);
+        PaymentView paymentView = viewFactory.createPaymentView(paymentController);
+        paymentView.setApplicationController(this);
+        pushAndDisplay(paymentView);
+    }
+
+    public void navigateToRecap(MatchBean matchBean) {
+        RecapView recapView = viewFactory.createRecapView();
+        recapView.setApplicationController(this);
+        recapView.setMatchBean(matchBean);
+        pushAndDisplay(recapView);
     }
 
     private void pushAndDisplay(View view) {

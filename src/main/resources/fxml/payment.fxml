@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            styleClass="root-container" prefWidth="600" prefHeight="500">
+
+    <top>
+        <VBox spacing="10" styleClass="header-container">
+            <padding>
+                <Insets top="20" right="30" bottom="15" left="30"/>
+            </padding>
+
+            <HBox alignment="CENTER_LEFT" spacing="15">
+                <Label text="💳 SECURE PAYMENT" styleClass="title-label">
+                    <font>
+                        <Font name="System Bold" size="24"/>
+                    </font>
+                </Label>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="← Back" onAction="#handleBack" styleClass="secondary-button" />
+            </HBox>
+        </VBox>
+    </top>
+
+    <center>
+        <VBox spacing="15" alignment="CENTER_LEFT">
+            <padding>
+                <Insets top="20" right="40" bottom="20" left="40"/>
+            </padding>
+            
+            <Label fx:id="matchInfoLabel" text="Match Info" styleClass="info-label"/>
+            
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label text="Number of shares to pay:"/>
+                <ComboBox fx:id="sharesComboBox" prefWidth="80"/>
+            </HBox>
+            
+            <Label fx:id="amountLabel" text="Total: € 0.00" style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
+            
+            <Separator />
+            
+            <Label text="Card Details" styleClass="section-header"/>
+            
+            <GridPane hgap="10" vgap="10">
+                 <Label text="Card Number" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                 <TextField fx:id="cardNumberField" promptText="0000 0000 0000 0000" GridPane.columnIndex="1" GridPane.rowIndex="0" GridPane.columnSpan="2"/>
+                 
+                 <Label text="Card Holder" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                 <TextField fx:id="cardHolderField" promptText="NAME SURNAME" GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.columnSpan="2"/>
+                 
+                 <Label text="Expiry Date" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                 <TextField fx:id="expiryField" promptText="MM/YY" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                 
+                 <Label text="CVV" GridPane.columnIndex="2" GridPane.rowIndex="2"/>
+                 <TextField fx:id="cvvField" promptText="123" GridPane.columnIndex="3" GridPane.rowIndex="2" prefWidth="60"/>
+            </GridPane>
+            
+            <Label fx:id="errorLabel" text="" style="-fx-text-fill: red;"/>
+        </VBox>
+    </center>
+    
+    <bottom>
+        <HBox alignment="CENTER" styleClass="footer-container">
+            <padding>
+                 <Insets top="20" right="20" bottom="20" left="20"/>
+            </padding>
+            <Button fx:id="payButton" text="Pay Now" onAction="#handlePay" styleClass="primary-button" prefWidth="200" prefHeight="40"/>
+        </HBox>
+    </bottom>
+
+</BorderPane>

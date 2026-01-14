@@ -33,7 +33,7 @@ public class GraphicBookFieldView implements BookFieldView {
     @FXML
     private Label matchInfoLabel;
     @FXML
-    private ComboBox<BookFieldController.SortCriteria> sortComboBox;
+    private ComboBox<model.service.FieldService.SortCriteria> sortComboBox;
     @FXML
     private Button refreshButton;
     @FXML
@@ -91,19 +91,19 @@ public class GraphicBookFieldView implements BookFieldView {
         displayMatchInfo();
 
         // Initialize sort combo box
-        sortComboBox.getItems().addAll(BookFieldController.SortCriteria.values());
-        sortComboBox.setConverter(new StringConverter<BookFieldController.SortCriteria>() {
+        sortComboBox.getItems().addAll(model.service.FieldService.SortCriteria.values());
+        sortComboBox.setConverter(new StringConverter<model.service.FieldService.SortCriteria>() {
             @Override
-            public String toString(BookFieldController.SortCriteria criteria) {
+            public String toString(model.service.FieldService.SortCriteria criteria) {
                 return criteria != null ? criteria.getDisplayName() : "";
             }
 
             @Override
-            public BookFieldController.SortCriteria fromString(String string) {
+            public model.service.FieldService.SortCriteria fromString(String string) {
                 return null;
             }
         });
-        sortComboBox.setValue(BookFieldController.SortCriteria.PRICE_ASC);
+        sortComboBox.setValue(model.service.FieldService.SortCriteria.PRICE_ASC);
 
         // Load fields
         searchFields();
@@ -113,12 +113,11 @@ public class GraphicBookFieldView implements BookFieldView {
         MatchBean match = bookFieldController.getCurrentMatchBean();
         if (match != null) {
             String info = String.format("%s - %s - %s %s - %d players",
-                match.getSport().getDisplayName(),
-                match.getCity(),
-                match.getMatchDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
-                match.getMatchTime().format(DateTimeFormatter.ofPattern("HH:mm")),
-                match.getRequiredParticipants()
-            );
+                    match.getSport().getDisplayName(),
+                    match.getCity(),
+                    match.getMatchDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
+                    match.getMatchTime().format(DateTimeFormatter.ofPattern("HH:mm")),
+                    match.getRequiredParticipants());
             matchInfoLabel.setText("Match: " + info);
         }
     }
@@ -179,7 +178,7 @@ public class GraphicBookFieldView implements BookFieldView {
 
         Label indoorLabel = new Label(field.isIndoor() ? "🏠 Indoor" : "🌤️ Outdoor");
         indoorLabel.setStyle("-fx-background-color: " + (field.isIndoor() ? "#17a2b8" : "#ffc107") +
-                            "; -fx-text-fill: white; -fx-padding: 3 8; -fx-background-radius: 3; -fx-font-size: 10px;");
+                "; -fx-text-fill: white; -fx-padding: 3 8; -fx-background-radius: 3; -fx-font-size: 10px;");
 
         header.getChildren().addAll(nameLabel, indoorLabel);
         card.getChildren().add(header);
@@ -197,9 +196,8 @@ public class GraphicBookFieldView implements BookFieldView {
         // Distance (if coordinates available)
         if (field.getLatitude() != null && field.getLongitude() != null) {
             double distance = MapService.calculateDistance(
-                MapService.getDefaultLat(), MapService.getDefaultLon(),
-                field.getLatitude(), field.getLongitude()
-            );
+                    MapService.getDefaultLat(), MapService.getDefaultLon(),
+                    field.getLatitude(), field.getLongitude());
             Label distanceLabel = new Label(String.format("🚗 %.1f km from center", distance));
             distanceLabel.getStyleClass().add("field-detail");
             distanceLabel.setStyle("-fx-text-fill: #28a745; -fx-font-weight: bold;");
@@ -255,7 +253,7 @@ public class GraphicBookFieldView implements BookFieldView {
 
         // Update UI
         selectedFieldLabel.setText("Selected: " + field.getName() + " - €" +
-                                   String.format("%.2f", field.getPricePerPerson()) + "/person");
+                String.format("%.2f", field.getPricePerPerson()) + "/person");
         confirmButton.setDisable(false);
     }
 
@@ -263,13 +261,12 @@ public class GraphicBookFieldView implements BookFieldView {
 
     @FXML
     private void handleSort() {
-        BookFieldController.SortCriteria criteria = sortComboBox.getValue();
+        model.service.FieldService.SortCriteria criteria = sortComboBox.getValue();
         if (criteria != null) {
             List<FieldBean> sortedFields = bookFieldController.sortFields(criteria);
             displayFieldsList(sortedFields);
         }
     }
-
 
     @FXML
     private void handleRefresh() {
@@ -291,10 +288,9 @@ public class GraphicBookFieldView implements BookFieldView {
         alert.setTitle("Confirm Booking");
         alert.setHeaderText("Confirm Field Booking");
         alert.setContentText(String.format(
-            "Field: %s%nPrice: €%.2f per person%n%nProceed with booking?",
-            selectedField.getName(),
-            selectedField.getPricePerPerson()
-        ));
+                "Field: %s%nPrice: €%.2f per person%n%nProceed with booking?",
+                selectedField.getName(),
+                selectedField.getPricePerPerson()));
 
         alert.showAndWait().ifPresent(response -> {
             if (response == ButtonType.OK) {
@@ -305,21 +301,11 @@ public class GraphicBookFieldView implements BookFieldView {
 
     private void confirmBooking() {
         try {
-            bookFieldController.confirmBooking();
-
-            // Show success
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Success");
-            alert.setHeaderText("Booking Confirmed!");
-            alert.setContentText("Your match has been created successfully.");
-            alert.showAndWait();
-
-            // Close and go back
-            stage.close();
-            bookFieldController.navigateBack();
+            // Navigate to payment
+            bookFieldController.proceedToPayment();
 
         } catch (Exception e) {
-            showError("Error confirming booking: " + e.getMessage());
+            showError("Error proceeding to payment: " + e.getMessage());
         }
     }
 
@@ -385,4 +371,3 @@ public class GraphicBookFieldView implements BookFieldView {
         alert.showAndWait();
     }
 }
-

@@ -12,6 +12,11 @@ import view.OrganizeMatchView.OrganizeMatchView;
 import view.OrganizeMatchView.CLIOrganizeMatchView;
 import view.BookFieldView.BookFieldView;
 import view.BookFieldView.CLIBookFieldView;
+import view.PaymentView.CLIPaymentView;
+import view.PaymentView.PaymentView;
+import view.RecapView.CLIRecapView;
+import view.RecapView.RecapView;
+import controller.PaymentController;
 
 public class CLIViewFactory implements ViewFactory {
 
@@ -33,5 +38,15 @@ public class CLIViewFactory implements ViewFactory {
     @Override
     public BookFieldView createBookFieldView(BookFieldController bookFieldController) {
         return new CLIBookFieldView(bookFieldController);
+    }
+
+    @Override
+    public PaymentView createPaymentView(PaymentController paymentController) {
+        return new CLIPaymentView(paymentController);
+    }
+
+    @Override
+    public RecapView createRecapView() {
+        return new CLIRecapView();
     }
 }

@@ -75,7 +75,7 @@ public class CLIBookFieldView implements BookFieldView {
             System.out.printf("   Sport: %s\n", field.getSport().getDisplayName());
             System.out.printf("   Address: %s\n", field.getAddress());
             System.out.printf("   Price: €%.2f/hour (€%.2f/person)\n",
-                field.getPricePerHour(), field.getPricePerPerson());
+                    field.getPricePerHour(), field.getPricePerPerson());
             System.out.printf("   Type: %s\n", field.isIndoor() ? "Indoor" : "Outdoor");
 
             if (field.getLatitude() != null && field.getLongitude() != null) {
@@ -123,11 +123,11 @@ public class CLIBookFieldView implements BookFieldView {
         System.out.print("Choose sorting option: ");
 
         String choice = scanner.nextLine().trim();
-        BookFieldController.SortCriteria criteria = switch (choice) {
-            case "1" -> BookFieldController.SortCriteria.PRICE_ASC;
-            case "2" -> BookFieldController.SortCriteria.PRICE_DESC;
-            case "3" -> BookFieldController.SortCriteria.NAME;
-            case "4" -> BookFieldController.SortCriteria.DISTANCE;
+        model.service.FieldService.SortCriteria criteria = switch (choice) {
+            case "1" -> model.service.FieldService.SortCriteria.PRICE_ASC;
+            case "2" -> model.service.FieldService.SortCriteria.PRICE_DESC;
+            case "3" -> model.service.FieldService.SortCriteria.NAME;
+            case "4" -> model.service.FieldService.SortCriteria.DISTANCE;
             default -> null;
         };
 
@@ -243,7 +243,7 @@ public class CLIBookFieldView implements BookFieldView {
         System.out.println(SEPARATOR);
         System.out.println("Field: " + selectedField.getName());
         System.out.printf("Total cost: €%.2f (€%.2f per person)\n",
-            selectedField.getPricePerHour(), selectedField.getPricePerPerson());
+                selectedField.getPricePerHour(), selectedField.getPricePerPerson());
         System.out.println(SEPARATOR);
 
         System.out.print("\nConfirm selection? (y/n): ");
@@ -273,7 +273,7 @@ public class CLIBookFieldView implements BookFieldView {
                 displayError("No fields found in this price range.");
             } else {
                 displaySuccess("Found " + filtered.size() + " fields in price range €" +
-                    minPrice + " - €" + maxPrice);
+                        minPrice + " - €" + maxPrice);
             }
         } catch (NumberFormatException e) {
             displayError("Invalid price format.");
@@ -295,11 +295,10 @@ public class CLIBookFieldView implements BookFieldView {
                 displayError("No " + (indoor ? "indoor" : "outdoor") + " fields found.");
             } else {
                 displaySuccess("Found " + filtered.size() + " " +
-                    (indoor ? "indoor" : "outdoor") + " fields.");
+                        (indoor ? "indoor" : "outdoor") + " fields.");
             }
         } else {
             displayError("Invalid choice.");
         }
     }
 }
-

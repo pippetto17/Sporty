@@ -4,6 +4,7 @@ import controller.LoginController;
 import controller.HomeController;
 import controller.OrganizeMatchController;
 import controller.BookFieldController;
+import controller.PaymentController;
 import view.LoginView.LoginView;
 import view.LoginView.GraphicLoginView;
 import view.HomeView.HomeView;
@@ -12,6 +13,10 @@ import view.OrganizeMatchView.OrganizeMatchView;
 import view.OrganizeMatchView.GraphicOrganizeMatchView;
 import view.BookFieldView.BookFieldView;
 import view.BookFieldView.GraphicBookFieldView;
+import view.PaymentView.GraphicPaymentView;
+import view.PaymentView.PaymentView;
+import view.RecapView.GraphicRecapView;
+import view.RecapView.RecapView;
 
 public class GraphicViewFactory implements ViewFactory {
 
@@ -35,5 +40,15 @@ public class GraphicViewFactory implements ViewFactory {
     @Override
     public BookFieldView createBookFieldView(BookFieldController bookFieldController) {
         return new GraphicBookFieldView(bookFieldController);
+    }
+
+    @Override
+    public PaymentView createPaymentView(PaymentController paymentController) {
+        return new GraphicPaymentView(paymentController);
+    }
+
+    @Override
+    public RecapView createRecapView() {
+        return new GraphicRecapView();
     }
 }

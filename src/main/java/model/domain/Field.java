@@ -12,7 +12,8 @@ public class Field {
     private String availability; // JSON or structured data of available time slots
     private boolean indoor;
 
-    public Field() {}
+    public Field() {
+    }
 
     public Field(String fieldId, String name, Sport sport, String address, String city) {
         this.fieldId = fieldId;
@@ -103,9 +104,12 @@ public class Field {
         this.indoor = indoor;
     }
 
-    // Behavioral methods - operations instead of just getters
+    /**
+     * Verifica se il campo ha disponibilità definite.
+     * In una implementazione completa, questo metodo verificherebbe gli slot
+     * temporali disponibili.
+     */
     public boolean isAvailable() {
-        // TODO: implement actual availability check based on availability field
         return this.availability != null && !this.availability.isEmpty();
     }
 
@@ -139,4 +143,3 @@ public class Field {
                 city);
     }
 }
-

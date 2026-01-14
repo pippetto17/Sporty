@@ -122,9 +122,9 @@ public class GraphicOrganizeMatchView implements OrganizeMatchView {
         cityComboBox.setEditable(true);
         setupCityAutocomplete();
 
-        // Initialize participants spinner (default 1-20, will be updated by sport selection)
-        SpinnerValueFactory<Integer> valueFactory =
-            new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 20, 1);
+        // Initialize participants spinner (default 1-20, will be updated by sport
+        // selection)
+        SpinnerValueFactory<Integer> valueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 20, 1);
         participantsSpinner.setValueFactory(valueFactory);
 
         // Set date picker to today as minimum
@@ -182,14 +182,13 @@ public class GraphicOrganizeMatchView implements OrganizeMatchView {
             int maxAdditional = selected.getAdditionalParticipantsNeeded();
 
             participantsInfoLabel.setText(String.format(
-                "Need %d more players (Total: %d for %s)",
-                maxAdditional, totalPlayers, selected.getDisplayName()
-            ));
+                    "Need %d more players (Total: %d for %s)",
+                    maxAdditional, totalPlayers, selected.getDisplayName()));
 
             // Update spinner range: da 1 a (requiredPlayers - 1)
             // L'organizer è già il primo, quindi cerca da 1 a max-1 altri giocatori
-            SpinnerValueFactory<Integer> valueFactory =
-                new SpinnerValueFactory.IntegerSpinnerValueFactory(1, maxAdditional, maxAdditional);
+            SpinnerValueFactory<Integer> valueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(1,
+                    maxAdditional, maxAdditional);
             participantsSpinner.setValueFactory(valueFactory);
         } else {
             participantsInfoLabel.setText("Select a sport first");
@@ -287,7 +286,7 @@ public class GraphicOrganizeMatchView implements OrganizeMatchView {
 
         summarySport.setText(sport.getDisplayName());
         summaryDateTime.setText(date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) +
-                               " at " + time.format(DateTimeFormatter.ofPattern("HH:mm")));
+                " at " + time.format(DateTimeFormatter.ofPattern("HH:mm")));
         summaryCity.setText(city);
         summaryParticipants.setText(String.valueOf(participants));
     }
@@ -361,4 +360,3 @@ public class GraphicOrganizeMatchView implements OrganizeMatchView {
         });
     }
 }
-

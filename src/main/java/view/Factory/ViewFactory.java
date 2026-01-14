@@ -8,10 +8,20 @@ import view.LoginView.LoginView;
 import view.HomeView.HomeView;
 import view.OrganizeMatchView.OrganizeMatchView;
 import view.BookFieldView.BookFieldView;
+import view.PaymentView.PaymentView;
+import view.RecapView.RecapView;
+import controller.PaymentController;
 
 public interface ViewFactory {
     LoginView createLoginView(LoginController loginController);
+
     HomeView createHomeView(HomeController homeController);
+
     OrganizeMatchView createOrganizeMatchView(OrganizeMatchController organizeMatchController);
+
     BookFieldView createBookFieldView(BookFieldController bookFieldController);
+
+    PaymentView createPaymentView(PaymentController paymentController);
+
+    RecapView createRecapView();
 }

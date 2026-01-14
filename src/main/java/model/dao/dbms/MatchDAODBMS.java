@@ -19,18 +19,18 @@ public class MatchDAODBMS implements MatchDAO {
     @Override
     public void save(Match match) {
         String sql = """
-            INSERT INTO matches (organizer_username, sport, match_date, match_time, city, 
-                                required_participants, field_id, status)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            ON DUPLICATE KEY UPDATE
-                sport = VALUES(sport),
-                match_date = VALUES(match_date),
-                match_time = VALUES(match_time),
-                city = VALUES(city),
-                required_participants = VALUES(required_participants),
-                field_id = VALUES(field_id),
-                status = VALUES(status)
-            """;
+                INSERT INTO matches (organizer_username, sport, match_date, match_time, city,
+                                    required_participants, field_id, status)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                ON DUPLICATE KEY UPDATE
+                    sport = VALUES(sport),
+                    match_date = VALUES(match_date),
+                    match_time = VALUES(match_time),
+                    city = VALUES(city),
+                    required_participants = VALUES(required_participants),
+                    field_id = VALUES(field_id),
+                    status = VALUES(status)
+                """;
 
         try (PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, match.getOrganizerUsername());
@@ -152,4 +152,3 @@ public class MatchDAODBMS implements MatchDAO {
         return match;
     }
 }
-

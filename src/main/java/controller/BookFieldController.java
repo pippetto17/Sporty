@@ -2,52 +2,29 @@ package controller;
 
 import model.bean.FieldBean;
 import model.bean.MatchBean;
-import model.converter.FieldConverter;
-import model.converter.MatchConverter;
-import model.dao.DAOFactory;
-import model.dao.FieldDAO;
-import model.dao.MatchDAO;
-import model.domain.Field;
-import model.domain.Match;
-import model.service.MapService;
+import model.service.FieldService;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
+/**
+ * Controller per la gestione della selezione del campo sportivo.
+ * Si occupa dell'orchestrazione tra la view e il service layer,
+ * delegando la logica di business a FieldService.
+ */
 public class BookFieldController {
     private final ApplicationController applicationController;
-    private final FieldDAO fieldDAO;
-    private final MatchDAO matchDAO;
+    private final FieldService fieldService;
     private MatchBean currentMatchBean;
     private List<FieldBean> availableFields;
     private FieldBean selectedField;
 
-    public enum SortCriteria {
-        PRICE_ASC("Price (Low to High)"),
-        PRICE_DESC("Price (High to Low)"),
-        DISTANCE("Distance"),
-        NAME("Name");
-
-        private final String displayName;
-
-        SortCriteria(String displayName) {
-            this.displayName = displayName;
-        }
-
-        public String getDisplayName() {
-            return displayName;
-        }
-    }
-
     public BookFieldController(ApplicationController applicationController) {
         this.applicationController = applicationController;
         try {
-            this.fieldDAO = DAOFactory.getFieldDAO(applicationController.getPersistenceType());
-            this.matchDAO = DAOFactory.getMatchDAO(applicationController.getPersistenceType());
+            this.fieldService = new FieldService(applicationController.getPersistenceType());
         } catch (SQLException e) {
-            throw new RuntimeException("Failed to initialize DAOs: " + e.getMessage(), e);
+            throw new RuntimeException("Errore nell'inizializzazione di FieldService: " + e.getMessage(), e);
         }
     }
 
@@ -65,7 +42,6 @@ public class BookFieldController {
 
     public void setSelectedField(FieldBean field) {
         this.selectedField = field;
-        // Update match bean with field info
         if (currentMatchBean != null && field != null) {
             currentMatchBean.setFieldId(field.getFieldId());
             currentMatchBean.setPricePerPerson(field.getPricePerPerson());
@@ -73,155 +49,49 @@ public class BookFieldController {
     }
 
     /**
-     * Search for available fields based on match criteria
+     * Cerca i campi disponibili in base ai criteri del match corrente.
+     * Delega la ricerca e il calcolo dei prezzi a FieldService.
      */
     public List<FieldBean> searchAvailableFields() {
-        if (currentMatchBean == null) {
-            return new ArrayList<>();
-        }
-
-        try {
-            // Get fields from DAO
-            List<Field> fields = fieldDAO.findAvailableFields(
-                currentMatchBean.getSport(),
-                currentMatchBean.getCity(),
-                currentMatchBean.getMatchDate(),
-                currentMatchBean.getMatchTime()
-            );
-
-            // Convert to beans and calculate price per person
-            availableFields = fields.stream()
-                .map(field -> {
-                    FieldBean bean = FieldConverter.toBean(field);
-                    // Calculate price per person (assuming 2 hours booking)
-                    double pricePerPerson = field.calculatePricePerPerson(
-                        currentMatchBean.getRequiredParticipants(),
-                        2.0 // Default 2 hours
-                    );
-                    bean.setPricePerPerson(pricePerPerson);
-                    return bean;
-                })
-                .toList();
-
-            return availableFields;
-        } catch (Exception e) {
-            throw new RuntimeException("Error searching fields: " + e.getMessage(), e);
-        }
+        availableFields = fieldService.searchAvailableFields(currentMatchBean);
+        return availableFields;
     }
 
     /**
-     * Sort available fields by given criteria
+     * Ordina i campi disponibili secondo il criterio specificato.
      */
-    public List<FieldBean> sortFields(SortCriteria criteria) {
-        if (availableFields == null || availableFields.isEmpty()) {
-            return availableFields;
-        }
-
-        List<FieldBean> sortedFields = new ArrayList<>(availableFields);
-
-        switch (criteria) {
-            case PRICE_ASC:
-                sortedFields.sort(Comparator.comparing(FieldBean::getPricePerPerson,
-                    Comparator.nullsLast(Comparator.naturalOrder())));
-                break;
-            case PRICE_DESC:
-                sortedFields.sort(Comparator.comparing(FieldBean::getPricePerPerson,
-                    Comparator.nullsFirst(Comparator.reverseOrder())));
-                break;
-            case NAME:
-                sortedFields.sort(Comparator.comparing(FieldBean::getName,
-                    Comparator.nullsLast(Comparator.naturalOrder())));
-                break;
-            case DISTANCE:
-                // Ordina per distanza dalla posizione di default (Milano centro)
-                sortedFields.sort((f1, f2) -> {
-                    double dist1 = calculateDistance(f1);
-                    double dist2 = calculateDistance(f2);
-                    return Double.compare(dist1, dist2);
-                });
-                break;
-            default:
-                break;
-        }
-
-        availableFields = sortedFields;
-        return sortedFields;
-    }
-
-    private double calculateDistance(FieldBean field) {
-        if (field.getLatitude() == null || field.getLongitude() == null) {
-            return Double.MAX_VALUE;
-        }
-        // Usa posizione di default (Milano centro) - in futuro si può usare la posizione dell'utente
-        return MapService.calculateDistance(
-            MapService.getDefaultLat(),
-            MapService.getDefaultLon(),
-            field.getLatitude(),
-            field.getLongitude()
-        );
+    public List<FieldBean> sortFields(FieldService.SortCriteria criteria) {
+        availableFields = fieldService.sortFields(availableFields, criteria);
+        return availableFields;
     }
 
     /**
-     * Filter fields by price range
+     * Filtra i campi in base a un range di prezzo.
      */
     public List<FieldBean> filterByPriceRange(double minPrice, double maxPrice) {
-        if (availableFields == null) {
-            return new ArrayList<>();
-        }
-
-        return availableFields.stream()
-            .filter(field -> field.getPricePerPerson() != null)
-            .filter(field -> field.getPricePerPerson() >= minPrice && field.getPricePerPerson() <= maxPrice)
-            .toList();
+        return fieldService.filterByPriceRange(availableFields, minPrice, maxPrice);
     }
 
     /**
-     * Filter fields by indoor/outdoor
+     * Filtra i campi in base al tipo (indoor/outdoor).
      */
     public List<FieldBean> filterByIndoor(boolean indoor) {
-        if (availableFields == null) {
-            return new ArrayList<>();
-        }
-
-        return availableFields.stream()
-            .filter(field -> field.isIndoor() == indoor)
-            .toList();
-    }
-
-    public void proceedToPayment() {
-        if (selectedField == null) {
-            throw new IllegalStateException("No field selected");
-        }
-        // TODO: Navigate to payment view
-        System.out.println("Proceeding to payment (to be implemented)...");
-        // applicationController.navigateToPayment(currentMatchBean);
+        return fieldService.filterByIndoor(availableFields, indoor);
     }
 
     /**
-     * Confirm booking and save match to database
+     * Procede alla schermata di pagamento dopo la selezione del campo.
      */
-    public void confirmBooking() {
+    public void proceedToPayment() {
         if (selectedField == null) {
-            throw new IllegalStateException("No field selected");
-        }
-        if (currentMatchBean == null) {
-            throw new IllegalStateException("No match data");
+            throw new IllegalStateException("Nessun campo selezionato");
         }
 
-        try {
-            // Convert bean to entity
-            Match match = MatchConverter.toEntity(currentMatchBean);
-
-            // Save match
-            matchDAO.save(match);
-
-            // Update bean with generated ID if any
-            if (match.getMatchId() != null) {
-                currentMatchBean.setMatchId(match.getMatchId());
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Error saving match: " + e.getMessage(), e);
+        if (currentMatchBean.getPricePerPerson() == null) {
+            currentMatchBean.setPricePerPerson(selectedField.getPricePerPerson());
         }
+
+        applicationController.navigateToPayment(currentMatchBean);
     }
 
     public void navigateBack() {
@@ -229,7 +99,6 @@ public class BookFieldController {
     }
 
     public List<FieldBean> getAvailableFields() {
-        return availableFields != null ? availableFields : new ArrayList<>();
+        return availableFields != null ? availableFields : List.of();
     }
 }
-

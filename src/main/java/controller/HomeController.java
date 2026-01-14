@@ -30,13 +30,16 @@ public class HomeController {
         return currentUser.isPlayer();
     }
 
-    // Metodo per ottenere la lista di partite (stub per ora)
+    /**
+     * Restituisce la lista di match per l'utente corrente.
+     * Attualmente restituisce dati di esempio statici.
+     * In una implementazione completa, recupererebbe i match dal database.
+     */
     public String[] getMatches() {
-        // TODO: implementare quando avremo la gestione delle partite
-        return new String[]{
-            "Match 1 - Football - 15/01/2026",
-            "Match 2 - Basketball - 16/01/2026",
-            "Match 3 - Tennis - 17/01/2026"
+        return new String[] {
+                "Match 1 - Football - 15/01/2026",
+                "Match 2 - Basketball - 16/01/2026",
+                "Match 3 - Tennis - 17/01/2026"
         };
     }
 
@@ -45,4 +48,3 @@ public class HomeController {
         applicationController.navigateToOrganizeMatch(currentUser);
     }
 }
-
