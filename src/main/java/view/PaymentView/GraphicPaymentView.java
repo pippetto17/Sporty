@@ -20,8 +20,7 @@ import java.io.IOException;
  * Gestisce l'input dei dati di pagamento e l'interazione con l'utente.
  */
 public class GraphicPaymentView implements PaymentView {
-    private ApplicationController applicationController;
-    private PaymentController paymentController;
+    private final PaymentController paymentController;
     private Stage stage;
 
     @FXML
@@ -49,7 +48,7 @@ public class GraphicPaymentView implements PaymentView {
 
     @Override
     public void setApplicationController(ApplicationController applicationController) {
-        this.applicationController = applicationController;
+        // Non utilizzato in questa view
     }
 
     @Override

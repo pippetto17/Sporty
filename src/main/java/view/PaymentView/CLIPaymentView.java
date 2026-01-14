@@ -9,8 +9,7 @@ import controller.PaymentController;
  * estensioni.
  */
 public class CLIPaymentView implements PaymentView {
-    private ApplicationController applicationController;
-    private PaymentController paymentController;
+    private final PaymentController paymentController;
 
     public CLIPaymentView(PaymentController paymentController) {
         this.paymentController = paymentController;
@@ -18,7 +17,7 @@ public class CLIPaymentView implements PaymentView {
 
     @Override
     public void setApplicationController(ApplicationController applicationController) {
-        this.applicationController = applicationController;
+        // Non utilizzato in questa view
     }
 
     @Override
@@ -30,8 +29,6 @@ public class CLIPaymentView implements PaymentView {
     public void display() {
         System.out.println("=== PAGAMENTO (CLI NON IMPLEMENTATA) ===");
         System.out.println("La funzionalità di pagamento è disponibile solo nell'interfaccia grafica.");
-        System.out.println("Premi INVIO per tornare indietro...");
-        new java.util.Scanner(System.in).nextLine();
         paymentController.back();
     }
 

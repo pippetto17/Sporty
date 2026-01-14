@@ -64,7 +64,8 @@ public class MatchDAODBMS implements MatchDAO {
 
     @Override
     public Match findById(int matchId) {
-        String sql = "SELECT * FROM matches WHERE match_id = ?";
+        String sql = "SELECT match_id, organizer_username, sport, match_date, match_time, " +
+                "city, required_participants, field_id, status FROM matches WHERE match_id = ?";
 
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, matchId);
@@ -81,7 +82,9 @@ public class MatchDAODBMS implements MatchDAO {
 
     @Override
     public List<Match> findByOrganizer(String organizerUsername) {
-        String sql = "SELECT * FROM matches WHERE organizer_username = ? ORDER BY match_date DESC, match_time DESC";
+        String sql = "SELECT match_id, organizer_username, sport, match_date, match_time, " +
+                "city, required_participants, field_id, status FROM matches " +
+                "WHERE organizer_username = ? ORDER BY match_date DESC, match_time DESC";
         List<Match> matches = new ArrayList<>();
 
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
@@ -100,7 +103,9 @@ public class MatchDAODBMS implements MatchDAO {
 
     @Override
     public List<Match> findAllAvailable() {
-        String sql = "SELECT * FROM matches WHERE status = ? AND match_date >= CURDATE() ORDER BY match_date, match_time";
+        String sql = "SELECT match_id, organizer_username, sport, match_date, match_time, " +
+                "city, required_participants, field_id, status FROM matches " +
+                "WHERE status = ? AND match_date >= CURDATE() ORDER BY match_date, match_time";
         List<Match> matches = new ArrayList<>();
 
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {

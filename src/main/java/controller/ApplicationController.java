@@ -15,8 +15,9 @@ import view.RecapView.RecapView;
 
 import view.View;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.Scanner;
-import java.util.Stack;
 
 public class ApplicationController {
 
@@ -35,7 +36,7 @@ public class ApplicationController {
         GUI
     }
 
-    private final Stack<View> viewStack = new Stack<>();
+    private final Deque<View> viewStack = new ArrayDeque<>();
     private ViewFactory viewFactory;
     private final DAOFactory.PersistenceType persistenceType;
     private final AppVersion appVersion;
@@ -141,17 +142,17 @@ public class ApplicationController {
 
     private void pushAndDisplay(View view) {
         if (!viewStack.isEmpty()) {
-            viewStack.peek().close();
+            viewStack.peekFirst().close();
         }
-        viewStack.push(view);
+        viewStack.addFirst(view);
         view.display();
     }
 
     public void back() {
         if (viewStack.size() > 1) {
-            View currentView = viewStack.pop();
+            View currentView = viewStack.removeFirst();
             currentView.close();
-            View previousView = viewStack.peek();
+            View previousView = viewStack.peekFirst();
             previousView.display();
         } else {
             System.out.println("Cannot go back from login screen.");
@@ -161,12 +162,12 @@ public class ApplicationController {
     public void logout() {
         // Svuota lo stack e torna al login
         while (viewStack.size() > 1) {
-            View view = viewStack.pop();
+            View view = viewStack.removeFirst();
             view.close();
         }
         // Ricrea la view di login
         if (!viewStack.isEmpty()) {
-            viewStack.pop().close();
+            viewStack.removeFirst().close();
         }
         navigateToLogin();
     }

@@ -25,7 +25,6 @@ import java.util.List;
 
 public class GraphicBookFieldView implements BookFieldView {
     private final BookFieldController bookFieldController;
-    private ApplicationController applicationController;
     private Stage stage;
 
     @FXML
@@ -53,7 +52,7 @@ public class GraphicBookFieldView implements BookFieldView {
 
     @Override
     public void setApplicationController(ApplicationController applicationController) {
-        this.applicationController = applicationController;
+        // Non utilizzato in questa view
     }
 
     @Override
