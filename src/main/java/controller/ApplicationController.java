@@ -1,0 +1,167 @@
+package controller;
+
+import model.bean.MatchBean;
+import model.dao.DAOFactory;
+import model.domain.User;
+import view.Factory.ViewFactory;
+import view.Factory.CLIViewFactory;
+import view.Factory.GraphicViewFactory;
+import view.LoginView.LoginView;
+import view.HomeView.HomeView;
+import view.OrganizeMatchView.OrganizeMatchView;
+import view.BookFieldView.BookFieldView;
+import view.View;
+
+import java.util.Scanner;
+import java.util.Stack;
+
+public class ApplicationController {
+
+    public enum AppVersion {
+        DEMO,
+        FULL
+    }
+
+    public enum PersistenceMode {
+        FILESYSTEM,
+        DBMS
+    }
+
+    public enum InterfaceType {
+        CLI,
+        GUI
+    }
+
+    private final Stack<View> viewStack = new Stack<>();
+    private ViewFactory viewFactory;
+    private final DAOFactory.PersistenceType persistenceType;
+    private final AppVersion appVersion;
+    private final PersistenceMode persistenceMode;
+    private InterfaceType currentInterface;
+
+    public ApplicationController(AppVersion version, PersistenceMode persistenceMode) {
+        this.appVersion = version;
+        this.persistenceMode = persistenceMode;
+
+        // Determina il tipo di persistenza
+        if (version == AppVersion.DEMO) {
+            this.persistenceType = DAOFactory.PersistenceType.MEMORY;
+        } else {
+            this.persistenceType = switch (persistenceMode) {
+                case FILESYSTEM -> DAOFactory.PersistenceType.FILESYSTEM;
+                case DBMS -> DAOFactory.PersistenceType.DBMS;
+            };
+        }
+    }
+
+    public void start() {
+        chooseInterface();
+        viewFactory = currentInterface == InterfaceType.GUI
+                ? new GraphicViewFactory()
+                : new CLIViewFactory();
+
+        navigateToLogin();
+    }
+
+    private void chooseInterface() {
+        Scanner scanner = new Scanner(System.in);
+        boolean validChoice = false;
+
+        while (!validChoice) {
+            System.out.println("Choose interface:");
+            System.out.println("1) Graphic (JavaFX)");
+            System.out.println("2) CLI (Command Line)");
+            System.out.print("Your choice: ");
+
+            String choice = scanner.nextLine().trim();
+            switch (choice) {
+                case "1" -> {
+                    currentInterface = InterfaceType.GUI;
+                    validChoice = true;
+                }
+                case "2" -> {
+                    currentInterface = InterfaceType.CLI;
+                    validChoice = true;
+                }
+                default -> System.out.println("Invalid choice. Please try again.");
+            }
+        }
+
+        System.out.println("\n" + getConfigurationInfo());
+        System.out.println("Interface selected: " + currentInterface + "\n");
+    }
+
+    public void navigateToLogin() {
+        LoginController loginController;
+        loginController = new LoginController(persistenceType);
+        LoginView loginView = viewFactory.createLoginView(loginController);
+        loginView.setApplicationController(this);
+        pushAndDisplay(loginView);
+    }
+
+    public void navigateToHome(User user) {
+        HomeController homeController = new HomeController(user, this);
+        HomeView homeView = viewFactory.createHomeView(homeController);
+        homeView.setApplicationController(this);
+        pushAndDisplay(homeView);
+    }
+
+    public void navigateToOrganizeMatch(User organizer) {
+        OrganizeMatchController organizeMatchController = new OrganizeMatchController(organizer, this);
+        OrganizeMatchView organizeMatchView = viewFactory.createOrganizeMatchView(organizeMatchController);
+        organizeMatchView.setApplicationController(this);
+        pushAndDisplay(organizeMatchView);
+    }
+
+    public void navigateToBookField(MatchBean matchBean) {
+        BookFieldController bookFieldController = new BookFieldController(this);
+        bookFieldController.setMatchBean(matchBean);
+        BookFieldView bookFieldView = viewFactory.createBookFieldView(bookFieldController);
+        bookFieldView.setApplicationController(this);
+        pushAndDisplay(bookFieldView);
+    }
+
+    private void pushAndDisplay(View view) {
+        if (!viewStack.isEmpty()) {
+            viewStack.peek().close();
+        }
+        viewStack.push(view);
+        view.display();
+    }
+
+    public void back() {
+        if (viewStack.size() > 1) {
+            View currentView = viewStack.pop();
+            currentView.close();
+            View previousView = viewStack.peek();
+            previousView.display();
+        } else {
+            System.out.println("Cannot go back from login screen.");
+        }
+    }
+
+    public void logout() {
+        // Svuota lo stack e torna al login
+        while (viewStack.size() > 1) {
+            View view = viewStack.pop();
+            view.close();
+        }
+        // Ricrea la view di login
+        if (!viewStack.isEmpty()) {
+            viewStack.pop().close();
+        }
+        navigateToLogin();
+    }
+
+    public String getConfigurationInfo() {
+        if (appVersion == AppVersion.DEMO) {
+            return "Running DEMO version (data will not be persisted)";
+        } else {
+            return "Running FULL version with " + persistenceMode + " persistence";
+        }
+    }
+
+    public DAOFactory.PersistenceType getPersistenceType() {
+        return persistenceType;
+    }
+}

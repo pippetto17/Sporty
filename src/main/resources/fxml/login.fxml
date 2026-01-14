@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      alignment="CENTER" spacing="20" styleClass="root-container">
+    <padding>
+        <Insets top="40" right="40" bottom="40" left="40"/>
+    </padding>
+
+    <!-- Title -->
+    <Label text="SPORTY" styleClass="title-label">
+        <font>
+            <Font name="System Bold" size="32"/>
+        </font>
+    </Label>
+
+    <Label text="Welcome back! Please login to continue." styleClass="subtitle-label">
+        <font>
+            <Font size="14"/>
+        </font>
+    </Label>
+
+    <!-- Login Form -->
+    <VBox spacing="15" alignment="CENTER" styleClass="form-container">
+        <padding>
+            <Insets top="20" right="20" bottom="20" left="20"/>
+        </padding>
+
+        <!-- Username -->
+        <VBox spacing="5">
+            <Label text="Username" styleClass="field-label"/>
+            <TextField fx:id="usernameField" promptText="Enter your username"
+                      styleClass="custom-text-field" prefWidth="300"/>
+        </VBox>
+
+        <!-- Password -->
+        <VBox spacing="5">
+            <Label text="Password" styleClass="field-label"/>
+            <PasswordField fx:id="passwordField" promptText="Enter your password"
+                          styleClass="custom-text-field" prefWidth="300"/>
+        </VBox>
+
+        <!-- Buttons -->
+        <HBox spacing="10" alignment="CENTER">
+            <padding>
+                <Insets top="10"/>
+            </padding>
+            <Button fx:id="loginButton" text="Login" onAction="#handleLogin"
+                   styleClass="primary-button" prefWidth="140"/>
+            <Button fx:id="registerButton" text="Register" onAction="#handleRegister"
+                   styleClass="secondary-button" prefWidth="140"/>
+        </HBox>
+
+        <!-- Message Label -->
+        <Label fx:id="messageLabel" styleClass="message-label" wrapText="true"
+               maxWidth="300" alignment="CENTER"/>
+    </VBox>
+</VBox>
+

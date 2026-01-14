@@ -1,0 +1,365 @@
+/* Sporty Application - Main Stylesheet */
+
+/* Root Container */
+.root-container {
+    -fx-background-color: linear-gradient(to bottom, #f0f8f0, #d4edda);
+}
+
+/* Title Label */
+.title-label {
+    -fx-text-fill: #1e7e34;
+    -fx-font-weight: bold;
+}
+
+/* Subtitle Label */
+.subtitle-label {
+    -fx-text-fill: #6c757d;
+}
+
+/* Form Container */
+.form-container {
+    -fx-background-color: white;
+    -fx-background-radius: 10;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 5);
+}
+
+/* Field Label */
+.field-label {
+    -fx-text-fill: #34495e;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+}
+
+/* Custom Text Field */
+.custom-text-field {
+    -fx-background-color: #f8f9fa;
+    -fx-border-color: #d4edda;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-padding: 10;
+    -fx-font-size: 13px;
+}
+
+.custom-text-field:focused {
+    -fx-border-color: #28a745;
+    -fx-border-width: 2;
+    -fx-background-color: white;
+}
+
+/* Custom ComboBox */
+.custom-combo-box {
+    -fx-background-color: #f8f9fa;
+    -fx-border-color: #d4edda;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-font-size: 13px;
+}
+
+.custom-combo-box:focused {
+    -fx-border-color: #28a745;
+    -fx-border-width: 2;
+}
+
+/* Primary Button */
+.primary-button {
+    -fx-background-color: #28a745;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-padding: 10 20 10 20;
+    -fx-background-radius: 5;
+    -fx-cursor: hand;
+}
+
+.primary-button:hover {
+    -fx-background-color: #218838;
+}
+
+.primary-button:pressed {
+    -fx-background-color: #1e7e34;
+}
+
+/* Secondary Button */
+.secondary-button {
+    -fx-background-color: white;
+    -fx-text-fill: #28a745;
+    -fx-border-color: #28a745;
+    -fx-border-width: 2;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-padding: 10 20 10 20;
+    -fx-cursor: hand;
+}
+
+.secondary-button:hover {
+    -fx-background-color: #f0f8f0;
+}
+
+.secondary-button:pressed {
+    -fx-background-color: #d4edda;
+}
+
+/* Message Label */
+.message-label {
+    -fx-font-size: 12px;
+    -fx-padding: 5;
+}
+
+.message-label.error {
+    -fx-text-fill: #e74c3c;
+}
+
+.message-label.success {
+    -fx-text-fill: #27ae60;
+}
+
+/* ============================================ */
+/* HOME VIEW STYLES */
+/* ============================================ */
+
+/* Header Container */
+.header-container {
+    -fx-background-color: white;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);
+}
+
+/* Welcome Label */
+.welcome-label {
+    -fx-text-fill: #2d3436;
+    -fx-font-weight: bold;
+}
+
+/* Role Label */
+.role-label {
+    -fx-text-fill: #28a745;
+    -fx-font-style: italic;
+}
+
+/* Content Container */
+.content-container {
+    -fx-background-color: transparent;
+}
+
+/* Actions Container */
+.actions-container {
+    -fx-background-color: white;
+    -fx-background-radius: 8;
+    -fx-padding: 15;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 3);
+}
+
+/* Section Title */
+.section-title {
+    -fx-text-fill: #1e7e34;
+}
+
+/* Matches Scroll Pane */
+.matches-scroll {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+.matches-scroll .viewport {
+    -fx-background-color: transparent;
+}
+
+/* Matches List */
+.matches-list {
+    -fx-background-color: white;
+    -fx-background-radius: 8;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 3);
+}
+
+/* Match Card */
+.match-card {
+    -fx-background-color: #f8f9fa;
+    -fx-background-radius: 6;
+    -fx-border-color: #d4edda;
+    -fx-border-radius: 6;
+    -fx-border-width: 1;
+    -fx-padding: 15;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 5, 0, 0, 2);
+}
+
+.match-card:hover {
+    -fx-background-color: #e8f5e9;
+    -fx-border-color: #28a745;
+    -fx-cursor: hand;
+}
+
+/* Match Title */
+.match-title {
+    -fx-text-fill: #1e7e34;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+}
+
+/* Match Info */
+.match-info {
+    -fx-text-fill: #6c757d;
+    -fx-font-size: 12px;
+}
+
+/* Match Status Badge */
+.status-badge {
+    -fx-background-color: #28a745;
+    -fx-text-fill: white;
+    -fx-background-radius: 3;
+    -fx-padding: 3 8 3 8;
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+}
+
+/* Footer Container */
+.footer-container {
+    -fx-background-color: white;
+    -fx-border-color: #d4edda;
+    -fx-border-width: 1 0 0 0;
+}
+
+/* Status Label */
+.status-label {
+    -fx-text-fill: #6c757d;
+}
+
+/* ============================================ */
+/* ORGANIZE MATCH & BOOK FIELD STYLES */
+/* ============================================ */
+
+/* Content Scroll */
+.content-scroll {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+.content-scroll .viewport {
+    -fx-background-color: transparent;
+}
+
+/* Field Label Bold */
+.field-label-bold {
+    -fx-text-fill: #1e7e34;
+    -fx-font-weight: bold;
+}
+
+/* Custom Date Picker */
+.custom-date-picker {
+    -fx-background-color: #f8f9fa;
+    -fx-border-color: #d4edda;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+}
+
+.custom-date-picker:focused {
+    -fx-border-color: #28a745;
+    -fx-border-width: 2;
+}
+
+/* Custom Spinner */
+.custom-spinner {
+    -fx-background-color: #f8f9fa;
+    -fx-border-color: #d4edda;
+    -fx-border-radius: 5;
+}
+
+.custom-spinner:focused {
+    -fx-border-color: #28a745;
+}
+
+/* Info Label */
+.info-label {
+    -fx-text-fill: #6c757d;
+    -fx-font-size: 11px;
+    -fx-font-style: italic;
+}
+
+/* Summary Box */
+.summary-box {
+    -fx-background-color: #e8f5e9;
+    -fx-background-radius: 8;
+    -fx-border-color: #28a745;
+    -fx-border-radius: 8;
+    -fx-border-width: 1;
+    -fx-padding: 15;
+}
+
+/* Summary Labels */
+.summary-label {
+    -fx-text-fill: #6c757d;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+.summary-value {
+    -fx-text-fill: #1e7e34;
+    -fx-font-size: 12px;
+}
+
+/* Field Card (for book field list) */
+.field-card {
+    -fx-background-color: white;
+    -fx-background-radius: 8;
+    -fx-border-color: #d4edda;
+    -fx-border-radius: 8;
+    -fx-border-width: 1;
+    -fx-padding: 15;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 3);
+}
+
+.field-card:hover {
+    -fx-border-color: #28a745;
+    -fx-border-width: 2;
+    -fx-cursor: hand;
+    -fx-background-color: #f0f8f0;
+}
+
+.field-card.selected {
+    -fx-background-color: #e8f5e9;
+    -fx-border-color: #28a745;
+    -fx-border-width: 2;
+}
+
+/* Field Info Labels */
+.field-name {
+    -fx-text-fill: #1e7e34;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+}
+
+.field-detail {
+    -fx-text-fill: #6c757d;
+    -fx-font-size: 12px;
+}
+
+.field-price {
+    -fx-text-fill: #28a745;
+    -fx-font-weight: bold;
+    -fx-font-size: 15px;
+}
+
+/* Sort Controls */
+.sort-container {
+    -fx-background-color: white;
+    -fx-background-radius: 6;
+    -fx-border-color: #d4edda;
+    -fx-border-radius: 6;
+    -fx-border-width: 1;
+    -fx-padding: 10;
+}
+
+/* Match Info Box */
+.match-info-box {
+    -fx-background-color: #e8f5e9;
+    -fx-background-radius: 6;
+    -fx-border-color: #28a745;
+    -fx-border-radius: 6;
+    -fx-border-width: 1;
+}
+
+.match-info-text {
+    -fx-text-fill: #1e7e34;
+    -fx-font-weight: bold;
+}
+

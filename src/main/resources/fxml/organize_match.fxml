@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            styleClass="root-container" prefWidth="650" prefHeight="700">
+
+    <top>
+        <VBox spacing="10" styleClass="header-container">
+            <padding>
+                <Insets top="20" right="30" bottom="15" left="30"/>
+            </padding>
+
+            <HBox alignment="CENTER_LEFT" spacing="15">
+                <Label text="📅 ORGANIZE MATCH" styleClass="title-label">
+                    <font>
+                        <Font name="System Bold" size="24"/>
+                    </font>
+                </Label>
+
+                <Region HBox.hgrow="ALWAYS"/>
+
+                <Button fx:id="backButton" text="← Back" onAction="#handleBack"
+                       styleClass="secondary-button" prefWidth="90"/>
+            </HBox>
+        </VBox>
+    </top>
+
+    <center>
+        <ScrollPane fitToWidth="true" styleClass="content-scroll">
+            <VBox spacing="20" styleClass="form-container">
+                <padding>
+                    <Insets top="25" right="35" bottom="25" left="35"/>
+                </padding>
+
+                <!-- Sport Selection -->
+                <VBox spacing="8">
+                    <Label text="Sport *" styleClass="field-label-bold">
+                        <font>
+                            <Font name="System Bold" size="13"/>
+                        </font>
+                    </Label>
+                    <ComboBox fx:id="sportComboBox" promptText="Select sport type"
+                             styleClass="custom-combo-box" prefWidth="580"/>
+                </VBox>
+
+                <!-- Date and Time -->
+                <HBox spacing="15">
+                    <VBox spacing="8" HBox.hgrow="ALWAYS">
+                        <Label text="Date *" styleClass="field-label-bold">
+                            <font>
+                                <Font name="System Bold" size="13"/>
+                            </font>
+                        </Label>
+                        <DatePicker fx:id="datePicker" promptText="Select date"
+                                   styleClass="custom-date-picker" prefWidth="280"/>
+                    </VBox>
+
+                    <VBox spacing="8" HBox.hgrow="ALWAYS">
+                        <Label text="Time *" styleClass="field-label-bold">
+                            <font>
+                                <Font name="System Bold" size="13"/>
+                            </font>
+                        </Label>
+                        <TextField fx:id="timeField" promptText="HH:MM (e.g., 18:30)"
+                                  styleClass="custom-text-field" prefWidth="280"/>
+                    </VBox>
+                </HBox>
+
+                <!-- City -->
+                <VBox spacing="8">
+                    <Label text="City *" styleClass="field-label-bold">
+                        <font>
+                            <Font name="System Bold" size="13"/>
+                        </font>
+                    </Label>
+                    <ComboBox fx:id="cityComboBox" promptText="Select or type city name"
+                             styleClass="custom-combo-box" prefWidth="580" editable="true"/>
+                </VBox>
+
+                <!-- Participants -->
+                <VBox spacing="8">
+                    <Label text="Additional Participants Needed *" styleClass="field-label-bold">
+                        <font>
+                            <Font name="System Bold" size="13"/>
+                        </font>
+                    </Label>
+                    <Label text="(You are already counted as the first player)" styleClass="info-label"/>
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Spinner fx:id="participantsSpinner" prefWidth="150"
+                                styleClass="custom-spinner" editable="true"/>
+                        <Label fx:id="participantsInfoLabel" text="Select a sport first"
+                              styleClass="info-label"/>
+                    </HBox>
+                </VBox>
+
+                <!-- Match Summary (hidden initially) -->
+                <VBox fx:id="summaryBox" spacing="12" styleClass="summary-box"
+                     visible="false" managed="false">
+                    <Label text="Match Summary" styleClass="section-title">
+                        <font>
+                            <Font name="System Bold" size="15"/>
+                        </font>
+                    </Label>
+
+                    <VBox spacing="8">
+                        <HBox spacing="10">
+                            <Label text="Sport:" styleClass="summary-label" prefWidth="100"/>
+                            <Label fx:id="summarySport" text="-" styleClass="summary-value"/>
+                        </HBox>
+
+                        <HBox spacing="10">
+                            <Label text="Date &amp; Time:" styleClass="summary-label" prefWidth="100"/>
+                            <Label fx:id="summaryDateTime" text="-" styleClass="summary-value"/>
+                        </HBox>
+
+                        <HBox spacing="10">
+                            <Label text="City:" styleClass="summary-label" prefWidth="100"/>
+                            <Label fx:id="summaryCity" text="-" styleClass="summary-value"/>
+                        </HBox>
+
+                        <HBox spacing="10">
+                            <Label text="Participants:" styleClass="summary-label" prefWidth="100"/>
+                            <Label fx:id="summaryParticipants" text="-" styleClass="summary-value"/>
+                        </HBox>
+                    </VBox>
+                </VBox>
+
+                <!-- Error/Success Message -->
+                <Label fx:id="messageLabel" wrapText="true" styleClass="message-label"/>
+
+                <!-- Action Buttons -->
+                <HBox spacing="12" alignment="CENTER">
+                    <padding>
+                        <Insets top="10"/>
+                    </padding>
+                    <Button fx:id="searchFieldsButton" text="🔍 Search Available Fields"
+                           onAction="#handleSearchFields" styleClass="primary-button"
+                           prefWidth="220" prefHeight="40"/>
+                    <Button fx:id="clearButton" text="Clear Form" onAction="#handleClear"
+                           styleClass="secondary-button" prefWidth="150" prefHeight="40"/>
+                </HBox>
+            </VBox>
+        </ScrollPane>
+    </center>
+</BorderPane>
+

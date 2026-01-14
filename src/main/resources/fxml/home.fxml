@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            styleClass="root-container" prefWidth="700" prefHeight="600">
+
+    <top>
+        <VBox spacing="10" styleClass="header-container">
+            <padding>
+                <Insets top="20" right="30" bottom="20" left="30"/>
+            </padding>
+
+            <HBox alignment="CENTER_LEFT" spacing="20">
+                <Label text="SPORTY" styleClass="title-label">
+                    <font>
+                        <Font name="System Bold" size="28"/>
+                    </font>
+                </Label>
+
+                <Region HBox.hgrow="ALWAYS"/>
+
+                <VBox alignment="CENTER_RIGHT" spacing="5">
+                    <Label fx:id="welcomeLabel" text="Welcome, User!" styleClass="welcome-label">
+                        <font>
+                            <Font size="14"/>
+                        </font>
+                    </Label>
+                    <Label fx:id="roleLabel" text="Player" styleClass="role-label">
+                        <font>
+                            <Font size="12"/>
+                        </font>
+                    </Label>
+                </VBox>
+
+                <Button fx:id="logoutButton" text="Logout" onAction="#handleLogout"
+                       styleClass="secondary-button" prefWidth="100"/>
+            </HBox>
+        </VBox>
+    </top>
+
+    <center>
+        <VBox spacing="15" styleClass="content-container">
+            <padding>
+                <Insets top="10" right="30" bottom="20" left="30"/>
+            </padding>
+
+            <VBox fx:id="organizerActionsBox" spacing="10" styleClass="actions-container" visible="false" managed="false">
+                <Label text="Quick Actions" styleClass="section-title">
+                    <font>
+                        <Font name="System Bold" size="16"/>
+                    </font>
+                </Label>
+
+                <HBox spacing="10">
+                    <Button fx:id="organizeMatchButton" text="Organize New Match"
+                           onAction="#handleOrganizeMatch" styleClass="primary-button"
+                           prefWidth="200" prefHeight="40"/>
+                    <Button fx:id="bookFieldButton" text="Book a Field"
+                           onAction="#handleBookField" styleClass="secondary-button"
+                           prefWidth="180" prefHeight="40"/>
+                </HBox>
+            </VBox>
+
+            <VBox spacing="10" VBox.vgrow="ALWAYS">
+                <HBox alignment="CENTER_LEFT" spacing="10">
+                    <Label fx:id="matchesTitle" text="Available Matches" styleClass="section-title">
+                        <font>
+                            <Font name="System Bold" size="16"/>
+                        </font>
+                    </Label>
+
+                    <Region HBox.hgrow="ALWAYS"/>
+
+                    <Button fx:id="refreshButton" text="Refresh" onAction="#handleRefresh"
+                           styleClass="secondary-button" prefWidth="100"/>
+                </HBox>
+
+                <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" styleClass="matches-scroll">
+                    <VBox fx:id="matchesContainer" spacing="10" styleClass="matches-list">
+                        <padding>
+                            <Insets top="10" right="10" bottom="10" left="10"/>
+                        </padding>
+                    </VBox>
+                </ScrollPane>
+            </VBox>
+        </VBox>
+    </center>
+
+    <bottom>
+        <HBox alignment="CENTER" styleClass="footer-container">
+            <padding>
+                <Insets top="10" right="20" bottom="10" left="20"/>
+            </padding>
+            <Label fx:id="statusLabel" text="Ready" styleClass="status-label">
+                <font>
+                    <Font size="11"/>
+                </font>
+            </Label>
+        </HBox>
+    </bottom>
+</BorderPane>
+

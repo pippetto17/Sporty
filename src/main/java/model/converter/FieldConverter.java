@@ -1,0 +1,69 @@
+package model.converter;
+
+import model.bean.FieldBean;
+import model.domain.Field;
+
+public class FieldConverter {
+
+    private FieldConverter() {
+        // Private constructor to prevent instantiation
+    }
+
+    public static Field toField(FieldBean fieldBean) {
+        if (fieldBean == null) {
+            return null;
+        }
+
+        Field field = new Field();
+        field.setFieldId(fieldBean.getFieldId());
+        field.setName(fieldBean.getName());
+        field.setSport(fieldBean.getSport());
+        field.setAddress(fieldBean.getAddress());
+        field.setCity(fieldBean.getCity());
+        field.setLatitude(fieldBean.getLatitude());
+        field.setLongitude(fieldBean.getLongitude());
+        field.setPricePerHour(fieldBean.getPricePerHour());
+        field.setIndoor(fieldBean.isIndoor());
+
+        return field;
+    }
+
+    public static FieldBean toFieldBean(Field field) {
+        if (field == null) {
+            return null;
+        }
+
+        FieldBean fieldBean = new FieldBean();
+        fieldBean.setFieldId(field.getFieldId());
+        fieldBean.setName(field.getName());
+        fieldBean.setSport(field.getSport());
+        fieldBean.setAddress(field.getAddress());
+        fieldBean.setCity(field.getCity());
+        fieldBean.setLatitude(field.getLatitude());
+        fieldBean.setLongitude(field.getLongitude());
+        fieldBean.setPricePerHour(field.getPricePerHour());
+        fieldBean.setIndoor(field.isIndoor());
+
+        return fieldBean;
+    }
+
+    public static FieldBean toFieldBeanWithPricePerPerson(Field field, int participants) {
+        FieldBean fieldBean = toFieldBean(field);
+        if (fieldBean != null && field.getPricePerHour() != null) {
+            // Calculate price per person for 2 hours booking
+            double pricePerPerson = field.calculatePricePerPerson(participants, 2.0);
+            fieldBean.setPricePerPerson(pricePerPerson);
+        }
+        return fieldBean;
+    }
+
+    // Alias methods for consistency
+    public static Field toEntity(FieldBean bean) {
+        return toField(bean);
+    }
+
+    public static FieldBean toBean(Field entity) {
+        return toFieldBean(entity);
+    }
+}
+

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      alignment="CENTER" spacing="20" styleClass="root-container">
+    <padding>
+        <Insets top="30" right="40" bottom="30" left="40"/>
+    </padding>
+
+    <!-- Title -->
+    <Label text="Create New Account" styleClass="title-label">
+        <font>
+            <Font name="System Bold" size="28"/>
+        </font>
+    </Label>
+
+    <Label text="Fill in the details to register" styleClass="subtitle-label">
+        <font>
+            <Font size="13"/>
+        </font>
+    </Label>
+
+    <!-- Register Form -->
+    <VBox spacing="12" alignment="CENTER" styleClass="form-container">
+        <padding>
+            <Insets top="20" right="20" bottom="20" left="20"/>
+        </padding>
+
+        <!-- Username -->
+        <VBox spacing="5">
+            <Label text="Username" styleClass="field-label"/>
+            <TextField fx:id="usernameField" promptText="Choose a username"
+                      styleClass="custom-text-field" prefWidth="320"/>
+        </VBox>
+
+        <!-- Password -->
+        <VBox spacing="5">
+            <Label text="Password" styleClass="field-label"/>
+            <PasswordField fx:id="passwordField" promptText="Choose a password"
+                          styleClass="custom-text-field" prefWidth="320"/>
+        </VBox>
+
+        <!-- Name -->
+        <VBox spacing="5">
+            <Label text="First Name" styleClass="field-label"/>
+            <TextField fx:id="nameField" promptText="Enter your first name"
+                      styleClass="custom-text-field" prefWidth="320"/>
+        </VBox>
+
+        <!-- Surname -->
+        <VBox spacing="5">
+            <Label text="Last Name" styleClass="field-label"/>
+            <TextField fx:id="surnameField" promptText="Enter your last name"
+                      styleClass="custom-text-field" prefWidth="320"/>
+        </VBox>
+
+        <!-- Role -->
+        <VBox spacing="5">
+            <Label text="I want to register as" styleClass="field-label"/>
+            <ComboBox fx:id="roleComboBox" promptText="Select your role"
+                     styleClass="custom-combo-box" prefWidth="320"/>
+        </VBox>
+
+        <!-- Buttons -->
+        <HBox spacing="10" alignment="CENTER">
+            <padding>
+                <Insets top="15"/>
+            </padding>
+            <Button fx:id="registerButton" text="Register" onAction="#handleRegisterSubmit"
+                   styleClass="primary-button" prefWidth="150"/>
+            <Button fx:id="cancelButton" text="Cancel" onAction="#handleCancel"
+                   styleClass="secondary-button" prefWidth="150"/>
+        </HBox>
+
+        <!-- Message Label -->
+        <Label fx:id="messageLabel" styleClass="message-label" wrapText="true"
+               maxWidth="320" alignment="CENTER"/>
+    </VBox>
+</VBox>
+

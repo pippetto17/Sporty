@@ -1,0 +1,23 @@
+[
+  {
+    "username": "jsonuser",
+    "password": "test123",
+    "name": "Mario",
+    "surname": "Rossi",
+    "role": 1
+  },
+  {
+    "username": "pippetto17",
+    "password": "pippetto123",
+    "name": "Filippo",
+    "surname": "Carletti",
+    "role": 1
+  },
+  {
+    "username": "organizer1",
+    "password": "org123",
+    "name": "Luca",
+    "surname": "Verdi",
+    "role": 2
+  }
+]
