@@ -1,22 +1,22 @@
-package view.Factory;
+package view.factory;
 
 import controller.LoginController;
 import controller.HomeController;
 import controller.OrganizeMatchController;
 import controller.BookFieldController;
 import controller.PaymentController;
-import view.LoginView.LoginView;
-import view.LoginView.GraphicLoginView;
-import view.HomeView.HomeView;
-import view.HomeView.GraphicHomeView;
-import view.OrganizeMatchView.OrganizeMatchView;
-import view.OrganizeMatchView.GraphicOrganizeMatchView;
-import view.BookFieldView.BookFieldView;
-import view.BookFieldView.GraphicBookFieldView;
-import view.PaymentView.GraphicPaymentView;
-import view.PaymentView.PaymentView;
-import view.RecapView.GraphicRecapView;
-import view.RecapView.RecapView;
+import view.loginview.LoginView;
+import view.loginview.GraphicLoginView;
+import view.homeview.HomeView;
+import view.homeview.GraphicHomeView;
+import view.organizematchview.OrganizeMatchView;
+import view.organizematchview.GraphicOrganizeMatchView;
+import view.bookfieldview.BookFieldView;
+import view.bookfieldview.GraphicBookFieldView;
+import view.paymentview.GraphicPaymentView;
+import view.paymentview.PaymentView;
+import view.recapview.GraphicRecapView;
+import view.recapview.RecapView;
 
 public class GraphicViewFactory implements ViewFactory {
 

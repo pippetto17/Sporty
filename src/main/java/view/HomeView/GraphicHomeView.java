@@ -1,4 +1,4 @@
-package view.HomeView;
+package view.homeview;
 
 import controller.ApplicationController;
 import controller.HomeController;

@@ -20,7 +20,7 @@ public class FieldDAODBMS implements FieldDAO {
 
     @Override
     public List<Field> findAll() {
-        String sql = "SELECT * FROM fields ORDER BY name";
+        String sql = "SELECT field_id, name, sport, address, city, latitude, longitude, price_per_hour, availability, indoor FROM fields ORDER BY name";
         List<Field> fields = new ArrayList<>();
 
         try (PreparedStatement stmt = connection.prepareStatement(sql);
@@ -38,7 +38,7 @@ public class FieldDAODBMS implements FieldDAO {
 
     @Override
     public Field findById(String fieldId) {
-        String sql = "SELECT * FROM fields WHERE field_id = ?";
+        String sql = "SELECT field_id, name, sport, address, city, latitude, longitude, price_per_hour, availability, indoor FROM fields WHERE field_id = ?";
 
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, fieldId);
@@ -55,7 +55,7 @@ public class FieldDAODBMS implements FieldDAO {
 
     @Override
     public List<Field> findByCity(String city) {
-        String sql = "SELECT * FROM fields WHERE city = ? ORDER BY name";
+        String sql = "SELECT field_id, name, sport, address, city, latitude, longitude, price_per_hour, availability, indoor FROM fields WHERE city = ? ORDER BY name";
         List<Field> fields = new ArrayList<>();
 
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
@@ -74,7 +74,7 @@ public class FieldDAODBMS implements FieldDAO {
 
     @Override
     public List<Field> findBySport(Sport sport) {
-        String sql = "SELECT * FROM fields WHERE sport = ? ORDER BY name";
+        String sql = "SELECT field_id, name, sport, address, city, latitude, longitude, price_per_hour, availability, indoor FROM fields WHERE sport = ? ORDER BY name";
         List<Field> fields = new ArrayList<>();
 
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
@@ -95,7 +95,7 @@ public class FieldDAODBMS implements FieldDAO {
     public List<Field> findAvailableFields(Sport sport, String city, LocalDate date, LocalTime time) {
         // For now, we return all fields matching sport and city
         // TODO: implement actual availability check based on bookings
-        String sql = "SELECT * FROM fields WHERE sport = ? AND city = ? ORDER BY price_per_hour";
+        String sql = "SELECT field_id, name, sport, address, city, latitude, longitude, price_per_hour, availability, indoor FROM fields WHERE sport = ? AND city = ? ORDER BY price_per_hour";
         List<Field> fields = new ArrayList<>();
 
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {

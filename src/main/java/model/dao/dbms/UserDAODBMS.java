@@ -33,7 +33,7 @@ public class UserDAODBMS implements UserDAO {
             return userCache.get(username);
         }
 
-        String query = "SELECT * FROM users WHERE username = ?";
+        String query = "SELECT username, password, name, surname, role FROM users WHERE username = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, username);
             ResultSet rs = stmt.executeQuery();

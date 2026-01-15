@@ -1,4 +1,4 @@
-package view.OrganizeMatchView;
+package view.organizematchview;
 
 import controller.ApplicationController;
 import view.View;

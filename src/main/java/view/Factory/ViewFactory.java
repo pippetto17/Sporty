@@ -1,15 +1,15 @@
-package view.Factory;
+package view.factory;
 
 import controller.LoginController;
 import controller.HomeController;
 import controller.OrganizeMatchController;
 import controller.BookFieldController;
-import view.LoginView.LoginView;
-import view.HomeView.HomeView;
-import view.OrganizeMatchView.OrganizeMatchView;
-import view.BookFieldView.BookFieldView;
-import view.PaymentView.PaymentView;
-import view.RecapView.RecapView;
+import view.loginview.LoginView;
+import view.homeview.HomeView;
+import view.organizematchview.OrganizeMatchView;
+import view.bookfieldview.BookFieldView;
+import view.paymentview.PaymentView;
+import view.recapview.RecapView;
 import controller.PaymentController;
 
 public interface ViewFactory {

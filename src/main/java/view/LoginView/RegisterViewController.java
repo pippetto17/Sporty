@@ -1,4 +1,4 @@
-package view.LoginView;
+package view.loginview;
 
 import controller.LoginController;
 import javafx.fxml.FXML;

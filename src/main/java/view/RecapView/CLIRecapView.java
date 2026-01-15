@@ -1,4 +1,4 @@
-package view.RecapView;
+package view.recapview;
 
 import controller.ApplicationController;
 import model.bean.MatchBean;

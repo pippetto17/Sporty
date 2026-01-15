@@ -1,4 +1,4 @@
-package view.RecapView;
+package view.recapview;
 
 import controller.ApplicationController;
 import javafx.application.Platform;
@@ -64,7 +64,7 @@ public class GraphicRecapView implements RecapView {
 
                 initialize();
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.log(Level.SEVERE, "Errore caricamento view", e);
             }
         });
     }

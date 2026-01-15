@@ -1,21 +1,21 @@
-package view.Factory;
+package view.factory;
 
 import controller.LoginController;
 import controller.HomeController;
 import controller.OrganizeMatchController;
 import controller.BookFieldController;
-import view.LoginView.LoginView;
-import view.LoginView.CLILoginView;
-import view.HomeView.HomeView;
-import view.HomeView.CLIHomeView;
-import view.OrganizeMatchView.OrganizeMatchView;
-import view.OrganizeMatchView.CLIOrganizeMatchView;
-import view.BookFieldView.BookFieldView;
-import view.BookFieldView.CLIBookFieldView;
-import view.PaymentView.CLIPaymentView;
-import view.PaymentView.PaymentView;
-import view.RecapView.CLIRecapView;
-import view.RecapView.RecapView;
+import view.loginview.LoginView;
+import view.loginview.CLILoginView;
+import view.homeview.HomeView;
+import view.homeview.CLIHomeView;
+import view.organizematchview.OrganizeMatchView;
+import view.organizematchview.CLIOrganizeMatchView;
+import view.bookfieldview.BookFieldView;
+import view.bookfieldview.CLIBookFieldView;
+import view.paymentview.CLIPaymentView;
+import view.paymentview.PaymentView;
+import view.recapview.CLIRecapView;
+import view.recapview.RecapView;
 import controller.PaymentController;
 
 public class CLIViewFactory implements ViewFactory {

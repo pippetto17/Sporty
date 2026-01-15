@@ -1,4 +1,4 @@
-package view.BookFieldView;
+package view.bookfieldview;
 
 import controller.ApplicationController;
 import view.View;

@@ -1,4 +1,4 @@
-package view.PaymentView;
+package view.paymentview;
 
 import controller.ApplicationController;
 import controller.PaymentController;

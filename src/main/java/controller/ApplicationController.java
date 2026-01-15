@@ -3,15 +3,15 @@ package controller;
 import model.bean.MatchBean;
 import model.dao.DAOFactory;
 import model.domain.User;
-import view.Factory.ViewFactory;
-import view.Factory.CLIViewFactory;
-import view.Factory.GraphicViewFactory;
-import view.LoginView.LoginView;
-import view.HomeView.HomeView;
-import view.OrganizeMatchView.OrganizeMatchView;
-import view.BookFieldView.BookFieldView;
-import view.PaymentView.PaymentView;
-import view.RecapView.RecapView;
+import view.factory.ViewFactory;
+import view.factory.CLIViewFactory;
+import view.factory.GraphicViewFactory;
+import view.loginview.LoginView;
+import view.homeview.HomeView;
+import view.organizematchview.OrganizeMatchView;
+import view.bookfieldview.BookFieldView;
+import view.paymentview.PaymentView;
+import view.recapview.RecapView;
 
 import view.View;
 
