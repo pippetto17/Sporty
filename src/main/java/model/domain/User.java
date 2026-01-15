@@ -72,15 +72,6 @@ public class User {
         return this.role == Role.ORGANIZER.getCode();
     }
 
-    public String getFullName() {
-        return name + " " + surname;
-    }
-
-    public boolean hasValidCredentials() {
-        return username != null && !username.isEmpty() &&
-               password != null && !password.isEmpty();
-    }
-
     public boolean matchesPassword(String passwordToCheck) {
         return this.password != null && this.password.equals(passwordToCheck);
     }

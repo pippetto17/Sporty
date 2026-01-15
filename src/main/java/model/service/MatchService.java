@@ -7,6 +7,7 @@ import model.dao.MatchDAO;
 import model.domain.Match;
 import model.domain.MatchStatus;
 import model.domain.Sport;
+import exception.ServiceInitializationException;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -59,7 +60,7 @@ public class MatchService {
                 matchBean.setMatchId(match.getMatchId());
             }
         } catch (Exception e) {
-            throw new RuntimeException("Errore durante il salvataggio del match: " + e.getMessage(), e);
+            throw new ServiceInitializationException("Errore durante il salvataggio del match: " + e.getMessage(), e);
         }
     }
 

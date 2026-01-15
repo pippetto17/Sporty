@@ -4,6 +4,7 @@ import model.dao.MatchDAO;
 import model.domain.Match;
 import model.domain.MatchStatus;
 import model.domain.Sport;
+import exception.DataAccessException;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -58,7 +59,7 @@ public class MatchDAODBMS implements MatchDAO {
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException("Error saving match: " + e.getMessage(), e);
+            throw new DataAccessException("Error saving match: " + e.getMessage(), e);
         }
     }
 
@@ -76,7 +77,7 @@ public class MatchDAODBMS implements MatchDAO {
             }
             return null;
         } catch (SQLException e) {
-            throw new RuntimeException("Error finding match: " + e.getMessage(), e);
+            throw new DataAccessException("Error finding match: " + e.getMessage(), e);
         }
     }
 
@@ -95,7 +96,7 @@ public class MatchDAODBMS implements MatchDAO {
                 matches.add(extractMatchFromResultSet(rs));
             }
         } catch (SQLException e) {
-            throw new RuntimeException("Error finding matches by organizer: " + e.getMessage(), e);
+            throw new DataAccessException("Error finding matches by organizer: " + e.getMessage(), e);
         }
 
         return matches;
@@ -116,7 +117,7 @@ public class MatchDAODBMS implements MatchDAO {
                 matches.add(extractMatchFromResultSet(rs));
             }
         } catch (SQLException e) {
-            throw new RuntimeException("Error finding available matches: " + e.getMessage(), e);
+            throw new DataAccessException("Error finding available matches: " + e.getMessage(), e);
         }
 
         return matches;
@@ -130,7 +131,7 @@ public class MatchDAODBMS implements MatchDAO {
             stmt.setInt(1, matchId);
             stmt.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException("Error deleting match: " + e.getMessage(), e);
+            throw new DataAccessException("Error deleting match: " + e.getMessage(), e);
         }
     }
 

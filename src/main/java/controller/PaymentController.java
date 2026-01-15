@@ -4,6 +4,7 @@ import model.bean.MatchBean;
 import model.bean.PaymentBean;
 import model.service.PaymentService;
 import model.service.MatchService;
+import exception.ServiceInitializationException;
 
 import java.sql.SQLException;
 
@@ -24,7 +25,8 @@ public class PaymentController {
         try {
             this.matchService = new MatchService(applicationController.getPersistenceType());
         } catch (SQLException e) {
-            throw new RuntimeException("Errore nell'inizializzazione di MatchService: " + e.getMessage(), e);
+            throw new ServiceInitializationException("Errore nell'inizializzazione di MatchService: " + e.getMessage(),
+                    e);
         }
     }
 

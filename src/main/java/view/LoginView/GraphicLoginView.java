@@ -61,10 +61,24 @@ public class GraphicLoginView extends Application implements LoginView {
 
     @Override
     public void display() {
-        // Salva i controller nelle variabili statiche prima di launch()
-        staticLoginController = this.loginController;
-        staticApplicationController = this.applicationController;
-        launch();
+        // Controlla se JavaFX è già inizializzato
+        try {
+            // Se Platform è già inizializzato, possiamo usare runLater direttamente
+            Platform.runLater(() -> {
+                try {
+                    Stage stage = new Stage();
+                    this.primaryStage = stage;
+                    start(stage);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
+        } catch (IllegalStateException e) {
+            // Se JavaFX non è inizializzato, dobbiamo usare launch()
+            staticLoginController = this.loginController;
+            staticApplicationController = this.applicationController;
+            new Thread(() -> Application.launch(GraphicLoginView.class)).start();
+        }
     }
 
     @Override

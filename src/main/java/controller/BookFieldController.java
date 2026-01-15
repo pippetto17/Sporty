@@ -3,6 +3,7 @@ package controller;
 import model.bean.FieldBean;
 import model.bean.MatchBean;
 import model.service.FieldService;
+import exception.ServiceInitializationException;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -24,7 +25,8 @@ public class BookFieldController {
         try {
             this.fieldService = new FieldService(applicationController.getPersistenceType());
         } catch (SQLException e) {
-            throw new RuntimeException("Errore nell'inizializzazione di FieldService: " + e.getMessage(), e);
+            throw new ServiceInitializationException("Errore nell'inizializzazione di FieldService: " + e.getMessage(),
+                    e);
         }
     }
 

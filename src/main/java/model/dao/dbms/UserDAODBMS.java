@@ -1,7 +1,9 @@
 package model.dao.dbms;
 
 import model.dao.UserDAO;
+import model.domain.Role;
 import model.domain.User;
+import exception.DataAccessException;
 
 import java.sql.*;
 import java.util.HashMap;
@@ -50,7 +52,7 @@ public class UserDAODBMS implements UserDAO {
                 return user;
             }
         } catch (SQLException e) {
-            throw new RuntimeException("Error finding user by username", e);
+            throw new DataAccessException("Error finding user by username", e);
         }
         return null;
     }
@@ -74,7 +76,7 @@ public class UserDAODBMS implements UserDAO {
             // Invalidate cache for this user since data has changed
             invalidateCache(user.getUsername());
         } catch (SQLException e) {
-            throw new RuntimeException("Error saving user", e);
+            throw new DataAccessException("Error saving user", e);
         }
     }
 

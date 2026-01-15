@@ -4,6 +4,7 @@ import model.bean.MatchBean;
 import model.domain.Sport;
 import model.domain.User;
 import model.service.MatchService;
+import exception.ServiceInitializationException;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -26,7 +27,8 @@ public class OrganizeMatchController {
         try {
             this.matchService = new MatchService(applicationController.getPersistenceType());
         } catch (SQLException e) {
-            throw new RuntimeException("Errore nell'inizializzazione di MatchService: " + e.getMessage(), e);
+            throw new ServiceInitializationException("Errore nell'inizializzazione di MatchService: " + e.getMessage(),
+                    e);
         }
     }
 
