@@ -13,8 +13,11 @@ import javafx.stage.Stage;
 import model.bean.MatchBean;
 
 import java.io.IOException;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
 public class GraphicRecapView implements RecapView {
+    private static final Logger logger = Logger.getLogger(GraphicRecapView.class.getName());
     private ApplicationController applicationController;
     private MatchBean matchBean;
     private Stage stage;
@@ -106,7 +109,7 @@ public class GraphicRecapView implements RecapView {
                         applicationController.back();
                     }
                 } catch (Exception e) {
-                    System.err.println("Errore tornando alla home: " + e.getMessage());
+                    logger.log(Level.SEVERE, "Errore tornando alla home", e);
                 }
             });
         }

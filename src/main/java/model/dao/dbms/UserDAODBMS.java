@@ -1,7 +1,6 @@
 package model.dao.dbms;
 
 import model.dao.UserDAO;
-import model.domain.Role;
 import model.domain.User;
 import exception.DataAccessException;
 
