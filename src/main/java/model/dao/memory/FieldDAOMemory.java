@@ -13,6 +13,7 @@ import java.util.Map;
 
 public class FieldDAOMemory implements FieldDAO {
     private static final Map<String, Field> fields = new HashMap<>();
+    private static final String DEMO_CITY = "Milano";
 
     static {
         // Initialize with some demo data
@@ -32,44 +33,47 @@ public class FieldDAOMemory implements FieldDAO {
 
     private static void initializeDemoFields() {
         // Football 5 fields - Zona Centro
-        createAndAddField("F001", "City Sports Center", Sport.FOOTBALL_5, "Via Roma 123", "Milano", 50.0, false);
-        createAndAddField("F002", "Arena Calcetto Centrale", Sport.FOOTBALL_5, "Corso Buenos Aires 88", "Milano", 55.0,
+        createAndAddField("F001", "City Sports Center", Sport.FOOTBALL_5, "Via Roma 123", DEMO_CITY, 50.0, false);
+        createAndAddField("F002", "Arena Calcetto Centrale", Sport.FOOTBALL_5, "Corso Buenos Aires 88", DEMO_CITY, 55.0,
                 true);
-        createAndAddField("F003", "San Siro Five", Sport.FOOTBALL_5, "Via dei Missaglia 151", "Milano", 45.0, false);
+        createAndAddField("F003", "San Siro Five", Sport.FOOTBALL_5, "Via dei Missaglia 151", DEMO_CITY, 45.0, false);
 
         // Football 8 fields
-        createAndAddField("F004", "Campo 8 Navigli", Sport.FOOTBALL_8, "Via Gola 20", "Milano", 70.0, false);
+        createAndAddField("F004", "Campo 8 Navigli", Sport.FOOTBALL_8, "Via Gola 20", DEMO_CITY, 70.0, false);
 
         // Football 11 fields
-        createAndAddField("F005", "Green Stadium", Sport.FOOTBALL_11, "Via Dante 45", "Milano", 120.0, false);
-        createAndAddField("F006", "Stadio Bicocca", Sport.FOOTBALL_11, "Viale Sarca 202", "Milano", 110.0, false);
+        createAndAddField("F005", "Green Stadium", Sport.FOOTBALL_11, "Via Dante 45", DEMO_CITY, 120.0, false);
+        createAndAddField("F006", "Stadio Bicocca", Sport.FOOTBALL_11, "Viale Sarca 202", DEMO_CITY, 110.0, false);
 
         // Basketball fields
-        createAndAddField("B001", "Indoor Basketball Arena", Sport.BASKETBALL, "Corso Italia 78", "Milano", 40.0, true);
-        createAndAddField("B002", "Basket City Loreto", Sport.BASKETBALL, "Piazzale Loreto 5", "Milano", 35.0, true);
-        createAndAddField("B003", "PlayBasket Porta Romana", Sport.BASKETBALL, "Via Orti 10", "Milano", 38.0, false);
+        createAndAddField("B001", "Indoor Basketball Arena", Sport.BASKETBALL, "Corso Italia 78", DEMO_CITY, 40.0,
+                true);
+        createAndAddField("B002", "Basket City Loreto", Sport.BASKETBALL, "Piazzale Loreto 5", DEMO_CITY, 35.0, true);
+        createAndAddField("B003", "PlayBasket Porta Romana", Sport.BASKETBALL, "Via Orti 10", DEMO_CITY, 38.0, false);
 
         // Tennis fields
-        createAndAddField("T001", "Tennis Club Milano", Sport.TENNIS_SINGLE, "Via Sempione 200", "Milano", 25.0, false);
-        createAndAddField("T002", "Tennis Forlanini", Sport.TENNIS_SINGLE, "Via Corelli 136", "Milano", 22.0, false);
-        createAndAddField("T003", "Tennis Double Garibaldi", Sport.TENNIS_DOUBLE, "Via Farini 70", "Milano", 30.0,
+        createAndAddField("T001", "Tennis Club Milano", Sport.TENNIS_SINGLE, "Via Sempione 200", DEMO_CITY, 25.0,
+                false);
+        createAndAddField("T002", "Tennis Forlanini", Sport.TENNIS_SINGLE, "Via Corelli 136", DEMO_CITY, 22.0, false);
+        createAndAddField("T003", "Tennis Double Garibaldi", Sport.TENNIS_DOUBLE, "Via Farini 70", DEMO_CITY, 30.0,
                 true);
 
         // Padel fields
-        createAndAddField("P001", "Padel Center", Sport.PADEL_DOUBLE, "Via Tortona 56", "Milano", 40.0, true);
-        createAndAddField("P002", "Padel Arena Citylife", Sport.PADEL_DOUBLE, "Via Stanislao Cannizzaro 2", "Milano",
+        createAndAddField("P001", "Padel Center", Sport.PADEL_DOUBLE, "Via Tortona 56", DEMO_CITY, 40.0, true);
+        createAndAddField("P002", "Padel Arena Citylife", Sport.PADEL_DOUBLE, "Via Stanislao Cannizzaro 2", DEMO_CITY,
                 45.0, true);
-        createAndAddField("P003", "Padel Club Lambrate", Sport.PADEL_SINGLE, "Via Conte Rosso 12", "Milano", 28.0,
+        createAndAddField("P003", "Padel Club Lambrate", Sport.PADEL_SINGLE, "Via Conte Rosso 12", DEMO_CITY, 28.0,
                 true);
 
         // Campi più lontani dal centro per testare distanze
-        createAndAddField("F007", "Campo Nord Milano", Sport.FOOTBALL_5, "Via Fulvio Testi 123", "Milano", 45.0, false);
-        createAndAddField("B004", "Basket Sud Milano", Sport.BASKETBALL, "Via Ripamonti 300", "Milano", 35.0, false);
-        createAndAddField("T004", "Tennis Ovest", Sport.TENNIS_SINGLE, "Via Novara 350", "Milano", 20.0, false);
-        createAndAddField("F008", "Campo Est Milano", Sport.FOOTBALL_8, "Via Mecenate 76", "Milano", 65.0, false);
+        createAndAddField("F007", "Campo Nord Milano", Sport.FOOTBALL_5, "Via Fulvio Testi 123", DEMO_CITY, 45.0,
+                false);
+        createAndAddField("B004", "Basket Sud Milano", Sport.BASKETBALL, "Via Ripamonti 300", DEMO_CITY, 35.0, false);
+        createAndAddField("T004", "Tennis Ovest", Sport.TENNIS_SINGLE, "Via Novara 350", DEMO_CITY, 20.0, false);
+        createAndAddField("F008", "Campo Est Milano", Sport.FOOTBALL_8, "Via Mecenate 76", DEMO_CITY, 65.0, false);
 
         // Campo economico lontano
-        Field field20 = new Field("F009", "Budget Field Barona", Sport.FOOTBALL_5, "Via Lorenteggio 255", "Milano");
+        Field field20 = new Field("F009", "Budget Field Barona", Sport.FOOTBALL_5, "Via Lorenteggio 255", DEMO_CITY);
         field20.setPricePerHour(30.0);
         field20.setIndoor(false);
         field20.setLatitude(45.4408);

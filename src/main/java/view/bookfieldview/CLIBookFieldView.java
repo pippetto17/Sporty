@@ -9,10 +9,10 @@ import java.util.Scanner;
 
 public class CLIBookFieldView implements BookFieldView {
     private final BookFieldController bookFieldController;
-    private ApplicationController applicationController;
     private final Scanner scanner;
     private boolean running;
     private static final String SEPARATOR = "=================================";
+    private static final String FOUND_PREFIX = "Found ";
 
     public CLIBookFieldView(BookFieldController bookFieldController) {
         this.bookFieldController = bookFieldController;
@@ -22,7 +22,7 @@ public class CLIBookFieldView implements BookFieldView {
 
     @Override
     public void setApplicationController(ApplicationController applicationController) {
-        this.applicationController = applicationController;
+        // Not needed for CLI version
     }
 
     @Override
@@ -40,7 +40,7 @@ public class CLIBookFieldView implements BookFieldView {
             return;
         }
 
-        displaySuccess("Found " + fields.size() + " available fields!");
+        displaySuccess(FOUND_PREFIX + fields.size() + " available fields!");
 
         while (running) {
             displayAvailableFields();
@@ -272,7 +272,7 @@ public class CLIBookFieldView implements BookFieldView {
             if (filtered.isEmpty()) {
                 displayError("No fields found in this price range.");
             } else {
-                displaySuccess("Found " + filtered.size() + " fields in price range €" +
+                displaySuccess(FOUND_PREFIX + filtered.size() + " fields in price range €" +
                         minPrice + " - €" + maxPrice);
             }
         } catch (NumberFormatException e) {
@@ -294,7 +294,7 @@ public class CLIBookFieldView implements BookFieldView {
             if (filtered.isEmpty()) {
                 displayError("No " + (indoor ? "indoor" : "outdoor") + " fields found.");
             } else {
-                displaySuccess("Found " + filtered.size() + " " +
+                displaySuccess(FOUND_PREFIX + filtered.size() + " " +
                         (indoor ? "indoor" : "outdoor") + " fields.");
             }
         } else {

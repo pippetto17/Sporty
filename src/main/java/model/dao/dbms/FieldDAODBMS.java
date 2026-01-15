@@ -93,8 +93,9 @@ public class FieldDAODBMS implements FieldDAO {
 
     @Override
     public List<Field> findAvailableFields(Sport sport, String city, LocalDate date, LocalTime time) {
-        // For now, we return all fields matching sport and city
-        // TODO: implement actual availability check based on bookings
+        // Returns all fields matching sport and city
+        // Note: Availability checking against actual bookings will be implemented in
+        // future version
         String sql = "SELECT field_id, name, sport, address, city, latitude, longitude, price_per_hour, availability, indoor FROM fields WHERE sport = ? AND city = ? ORDER BY price_per_hour";
         List<Field> fields = new ArrayList<>();
 

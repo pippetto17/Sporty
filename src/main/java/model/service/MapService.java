@@ -13,12 +13,17 @@ public class MapService {
     private static final double DEFAULT_LAT = 45.4642;
     private static final double DEFAULT_LON = 9.1900;
 
+    // HTML constants
+    private static final String HTML_DIV_END = "</div>";
+    private static final String HTML_DIV_INFO_ROW = "<div class='info-row'>";
+
     private MapService() {
         // Private constructor to prevent instantiation
     }
 
     /**
      * Calcola la distanza tra due punti geografici usando la formula di Haversine
+     * 
      * @return distanza in kilometri
      */
     public static double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
@@ -29,7 +34,7 @@ public class MapService {
 
         double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
                 + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
-                * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
+                        * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
 
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
@@ -96,8 +101,10 @@ public class MapService {
         html.append("text-align:center;text-decoration:none;border-radius:8px;margin-bottom:20px;");
         html.append("font-size:16px;font-weight:bold;}");
         html.append(".map-link:hover{background:#218838;}");
-        html.append(".field-list{background:white;border-radius:8px;padding:15px;box-shadow:0 2px 4px rgba(0,0,0,0.1);}");
-        html.append(".field-item{padding:12px;border-bottom:1px solid #eee;display:flex;justify-content:space-between;align-items:center;}");
+        html.append(
+                ".field-list{background:white;border-radius:8px;padding:15px;box-shadow:0 2px 4px rgba(0,0,0,0.1);}");
+        html.append(
+                ".field-item{padding:12px;border-bottom:1px solid #eee;display:flex;justify-content:space-between;align-items:center;}");
         html.append(".field-item:last-child{border-bottom:none;}");
         html.append(".field-name{font-weight:bold;color:#333;}");
         html.append(".field-info{color:#666;font-size:14px;}");
@@ -155,7 +162,7 @@ public class MapService {
     public static String generateSingleFieldMapHtml(Field field) {
         if (!field.hasCoordinates()) {
             return "<html><body style='font-family:Arial;padding:20px;'>" +
-                   "<h3>⚠️ Coordinate non disponibili</h3></body></html>";
+                    "<h3>⚠️ Coordinate non disponibili</h3></body></html>";
         }
 
         String osmUrl = String.format(java.util.Locale.US,
@@ -167,7 +174,8 @@ public class MapService {
         html.append("<meta charset='utf-8'/>");
         html.append("<style>");
         html.append("body{font-family:Arial,sans-serif;margin:0;padding:20px;background:#f5f5f5;}");
-        html.append(".container{background:white;border-radius:8px;padding:20px;max-width:600px;margin:0 auto;box-shadow:0 2px 8px rgba(0,0,0,0.1);}");
+        html.append(
+                ".container{background:white;border-radius:8px;padding:20px;max-width:600px;margin:0 auto;box-shadow:0 2px 8px rgba(0,0,0,0.1);}");
         html.append("h2{color:#28a745;margin-top:0;}");
         html.append(".info-row{margin:15px 0;padding:10px;background:#f8f9fa;border-radius:4px;}");
         html.append(".label{font-weight:bold;color:#666;font-size:14px;}");
@@ -182,28 +190,28 @@ public class MapService {
 
         html.append(String.format("<h2>📍 %s</h2>", escapeHtml(field.getName())));
 
-        html.append("<div class='info-row'>");
+        html.append(HTML_DIV_INFO_ROW);
         html.append("<div class='label'>Sport</div>");
         html.append(String.format("<div class='value'>%s</div>", escapeHtml(field.getSport().getDisplayName())));
-        html.append("</div>");
+        html.append(HTML_DIV_END);
 
-        html.append("<div class='info-row'>");
+        html.append(HTML_DIV_INFO_ROW);
         html.append("<div class='label'>Indirizzo</div>");
         html.append(String.format("<div class='value'>%s, %s</div>",
                 escapeHtml(field.getAddress()), escapeHtml(field.getCity())));
-        html.append("</div>");
+        html.append(HTML_DIV_END);
 
-        html.append("<div class='info-row'>");
+        html.append(HTML_DIV_INFO_ROW);
         html.append("<div class='label'>Prezzo</div>");
         html.append(String.format("<div class='value' style='color:#28a745;font-size:20px;'>€%.2f/ora</div>",
                 field.getPricePerHour()));
-        html.append("</div>");
+        html.append(HTML_DIV_END);
 
-        html.append("<div class='info-row'>");
+        html.append(HTML_DIV_INFO_ROW);
         html.append("<div class='label'>Coordinate GPS</div>");
         html.append(String.format(java.util.Locale.US, "<div class='value'>%.6f, %.6f</div>",
                 field.getLatitude(), field.getLongitude()));
-        html.append("</div>");
+        html.append(HTML_DIV_END);
 
         html.append(String.format("<a href='%s' class='map-btn' target='_blank'>", escapeHtml(osmUrl)));
         html.append("🗺️ APRI SU OPENSTREETMAP</a>");
@@ -214,12 +222,13 @@ public class MapService {
     }
 
     private static String escapeHtml(String text) {
-        if (text == null) return "";
+        if (text == null)
+            return "";
         return text.replace("&", "&amp;")
-                   .replace("<", "&lt;")
-                   .replace(">", "&gt;")
-                   .replace("\"", "&quot;")
-                   .replace("'", "&#39;");
+                .replace("<", "&lt;")
+                .replace(">", "&gt;")
+                .replace("\"", "&quot;")
+                .replace("'", "&#39;");
     }
 
     public static double getDefaultLat() {
@@ -230,4 +239,3 @@ public class MapService {
         return DEFAULT_LON;
     }
 }
-

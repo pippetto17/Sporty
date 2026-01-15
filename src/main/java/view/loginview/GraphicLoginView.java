@@ -47,15 +47,18 @@ public class GraphicLoginView extends Application implements LoginView {
         this.loginController = loginController;
     }
 
-    public void setLoginController(LoginController loginController) {
-        this.loginController = loginController;
+    public static void setStaticLoginController(LoginController loginController) {
         staticLoginController = loginController;
+    }
+
+    public static void setStaticApplicationController(ApplicationController appController) {
+        staticApplicationController = appController;
     }
 
     @Override
     public void setApplicationController(ApplicationController applicationController) {
         this.applicationController = applicationController;
-        staticApplicationController = applicationController;
+        setStaticApplicationController(applicationController);
     }
 
     @Override
@@ -74,8 +77,8 @@ public class GraphicLoginView extends Application implements LoginView {
             });
         } catch (IllegalStateException e) {
             // Se JavaFX non è inizializzato, dobbiamo usare launch()
-            staticLoginController = this.loginController;
-            staticApplicationController = this.applicationController;
+            setStaticLoginController(this.loginController);
+            setStaticApplicationController(this.applicationController);
             new Thread(() -> Application.launch(GraphicLoginView.class)).start();
         }
     }

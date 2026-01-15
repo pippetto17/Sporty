@@ -22,8 +22,8 @@ public class GraphicViewFactory implements ViewFactory {
 
     @Override
     public LoginView createLoginView(LoginController loginController) {
-        GraphicLoginView graphicView = new GraphicLoginView();
-        graphicView.setLoginController(loginController);
+        GraphicLoginView graphicView = new GraphicLoginView(loginController);
+        GraphicLoginView.setStaticLoginController(loginController);
         return graphicView;
     }
 
