@@ -212,7 +212,7 @@ public class MatchDAODBMS implements MatchDAO {
         String[] parts = content.split(",");
         for (String part : parts) {
             // Remove quotes and whitespace
-            String username = part.trim().replaceAll("^\"|\"$", "");
+            String username = part.trim().replaceAll("(^\")|(\"$)", "");
             if (!username.isEmpty()) {
                 participants.add(username);
             }

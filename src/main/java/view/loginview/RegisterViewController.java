@@ -84,8 +84,6 @@ public class RegisterViewController {
 
         } catch (IllegalArgumentException e) {
             showError(e.getMessage());
-        } catch (Exception e) {
-            showError("Registration failed: " + e.getMessage());
         }
     }
 

@@ -58,7 +58,7 @@ public class GraphicLoginView extends Application implements LoginView {
     @Override
     public void setApplicationController(ApplicationController applicationController) {
         this.applicationController = applicationController;
-        setStaticApplicationController(applicationController);
+        // Note: static fields are set only when needed by JavaFX launch
     }
 
     @Override
@@ -126,9 +126,9 @@ public class GraphicLoginView extends Application implements LoginView {
                     applicationController.navigateToHome(user);
                 });
             } else {
-                displayLoginError("Invalid username or password");
+                displayLoginError(Constants.ERROR_INVALID_CREDENTIALS);
             }
-        } catch (Exception e) {
+        } catch (IllegalArgumentException e) {
             displayLoginError(e.getMessage());
         }
     }

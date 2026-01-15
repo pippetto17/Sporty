@@ -111,7 +111,7 @@ public class ApplicationController {
             HomeView homeView = viewFactory.createHomeView(homeController);
             homeView.setApplicationController(this);
             pushAndDisplay(homeView);
-        } catch (Exception e) {
+        } catch (ServiceInitializationException | java.sql.SQLException e) {
             System.err.println("Error creating MatchService: " + e.getMessage());
             e.printStackTrace();
         }
@@ -140,7 +140,7 @@ public class ApplicationController {
                 detailView.display();
                 matchController.showMatchDetail(matchId);
             }
-        } catch (Exception e) {
+        } catch (ServiceInitializationException | java.sql.SQLException e) {
             System.err.println("Error navigating to match detail: " + e.getMessage());
             e.printStackTrace();
         }

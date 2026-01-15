@@ -1,5 +1,7 @@
 package model.service;
 
+import exception.DataAccessException;
+import exception.ServiceInitializationException;
 import model.bean.FieldBean;
 import model.bean.MatchBean;
 import model.converter.FieldConverter;
@@ -52,8 +54,8 @@ public class FieldService {
                         return bean;
                     })
                     .toList();
-        } catch (Exception e) {
-            throw new RuntimeException("Errore durante la ricerca dei campi: " + e.getMessage(), e);
+        } catch (DataAccessException e) {
+            throw new ServiceInitializationException("Errore durante la ricerca dei campi: " + e.getMessage(), e);
         }
     }
 

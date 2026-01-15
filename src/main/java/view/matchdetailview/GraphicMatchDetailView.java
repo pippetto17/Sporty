@@ -14,6 +14,7 @@ import model.service.MapService;
 import model.dao.FieldDAO;
 import model.dao.DAOFactory;
 import model.domain.Field;
+import model.utils.Constants;
 
 /**
  * JavaFX implementation of Match Detail View.
@@ -71,7 +72,7 @@ public class GraphicMatchDetailView implements MatchDetailView {
         headerBox.setPadding(new Insets(0, 0, 20, 0));
 
         Button backButton = new Button("← Back");
-        backButton.getStyleClass().add("secondary-button");
+        backButton.getStyleClass().add(Constants.CSS_SECONDARY_BUTTON);
         backButton.setOnAction(e -> handleBack());
 
         Label titleLabel = new Label("Match Details");
@@ -102,11 +103,11 @@ public class GraphicMatchDetailView implements MatchDetailView {
         joinButton.setManaged(false);
 
         Button inviteButton = new Button("Invite Players");
-        inviteButton.getStyleClass().add("secondary-button");
+        inviteButton.getStyleClass().add(Constants.CSS_SECONDARY_BUTTON);
         inviteButton.setOnAction(e -> matchController.invitePlayers(0)); // ID will be set later
 
         Button cancelButton = new Button("Cancel Match");
-        cancelButton.getStyleClass().add("secondary-button");
+        cancelButton.getStyleClass().add(Constants.CSS_SECONDARY_BUTTON);
         cancelButton.setStyle("-fx-background-color: #dc3545; -fx-text-fill: white;");
         cancelButton.setOnAction(e -> handleCancel());
 

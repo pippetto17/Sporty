@@ -13,6 +13,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import model.utils.Constants;
 
 import java.io.IOException;
 
@@ -134,8 +135,8 @@ public class GraphicHomeView implements HomeView {
         playerToggle.setToggleGroup(group);
         organizerToggle.setToggleGroup(group);
 
-        playerToggle.getStyleClass().add("secondary-button");
-        organizerToggle.getStyleClass().add("secondary-button");
+        playerToggle.getStyleClass().add(Constants.CSS_SECONDARY_BUTTON);
+        organizerToggle.getStyleClass().add(Constants.CSS_SECONDARY_BUTTON);
 
         // Set initial selection
         if (homeController.isViewingAsPlayer()) {
@@ -202,7 +203,7 @@ public class GraphicHomeView implements HomeView {
         applyFilters.setOnAction(e -> applyFilters());
 
         Button clearFilters = new Button("Clear");
-        clearFilters.getStyleClass().add("secondary-button");
+        clearFilters.getStyleClass().add(Constants.CSS_SECONDARY_BUTTON);
         clearFilters.setOnAction(e -> clearFilters());
 
         filterBox.getChildren().addAll(filterLabel, sportFilter, cityFilter, dateFilter, applyFilters, clearFilters);

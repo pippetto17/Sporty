@@ -3,6 +3,7 @@ package view.homeview;
 import controller.ApplicationController;
 import controller.HomeController;
 import model.domain.User;
+import model.utils.Constants;
 
 import java.util.Scanner;
 
@@ -29,9 +30,9 @@ public class CLIHomeView implements HomeView {
         displayWelcome();
 
         while (running) {
-            System.out.println("\n=================================");
+            System.out.println("\n" + Constants.SEPARATOR);
             displayMenu();
-            System.out.print("Choose an option: ");
+            System.out.print(Constants.PROMPT_CHOOSE_OPTION);
 
             String choice = scanner.nextLine();
 
@@ -52,12 +53,12 @@ public class CLIHomeView implements HomeView {
     @Override
     public void displayWelcome() {
         User user = homeController.getCurrentUser();
-        System.out.println("\n=================================");
+        System.out.println("\n" + Constants.SEPARATOR);
         System.out.println("    HOME - SPORTY");
-        System.out.println("=================================");
+        System.out.println(Constants.SEPARATOR);
         System.out.println("Welcome, " + user.getName() + " " + user.getSurname() + "!");
         System.out.println("Role: " + homeController.getUserRole());
-        System.out.println("=================================");
+        System.out.println(Constants.SEPARATOR);
     }
 
     @Override
@@ -102,7 +103,7 @@ public class CLIHomeView implements HomeView {
                 applicationController.logout();
                 return false; // Ferma il loop
             }
-            default -> System.out.println("Invalid option. Please try again.");
+            default -> System.out.println(Constants.ERROR_INVALID_OPTION);
         }
         return true;
     }
@@ -121,7 +122,7 @@ public class CLIHomeView implements HomeView {
                 applicationController.logout();
                 return false; // Ferma il loop
             }
-            default -> System.out.println("Invalid option. Please try again.");
+            default -> System.out.println(Constants.ERROR_INVALID_OPTION);
         }
         return true;
     }

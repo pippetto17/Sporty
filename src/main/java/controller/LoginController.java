@@ -4,6 +4,7 @@ import model.bean.UserBean;
 import model.dao.DAOFactory;
 import model.dao.UserDAO;
 import model.domain.User;
+import model.utils.Constants;
 
 import java.sql.SQLException;
 
@@ -24,10 +25,10 @@ public class LoginController {
 
         // Validazione input
         if (username == null || username.isEmpty()) {
-            throw new IllegalArgumentException("Username cannot be empty");
+            throw new IllegalArgumentException(Constants.ERROR_USERNAME_EMPTY);
         }
         if (password == null || password.isEmpty()) {
-            throw new IllegalArgumentException("Password cannot be empty");
+            throw new IllegalArgumentException(Constants.ERROR_PASSWORD_EMPTY);
         }
 
         // Autenticazione - usa UserDAO.authenticate()
@@ -40,10 +41,10 @@ public class LoginController {
 
         // Validazione
         if (username == null || username.isEmpty()) {
-            throw new IllegalArgumentException("Username cannot be empty");
+            throw new IllegalArgumentException(Constants.ERROR_USERNAME_EMPTY);
         }
         if (password == null || password.isEmpty()) {
-            throw new IllegalArgumentException("Password cannot be empty");
+            throw new IllegalArgumentException(Constants.ERROR_PASSWORD_EMPTY);
         }
         if (name == null || name.isEmpty()) {
             throw new IllegalArgumentException("Name cannot be empty");

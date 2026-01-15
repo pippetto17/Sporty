@@ -1,5 +1,7 @@
 package model.service;
 
+import exception.DataAccessException;
+import exception.ServiceInitializationException;
 import model.bean.MatchBean;
 import model.converter.MatchConverter;
 import model.dao.DAOFactory;
@@ -7,7 +9,6 @@ import model.dao.MatchDAO;
 import model.domain.Match;
 import model.domain.MatchStatus;
 import model.domain.Sport;
-import exception.ServiceInitializationException;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -60,7 +61,7 @@ public class MatchService {
             if (match.getMatchId() != null) {
                 matchBean.setMatchId(match.getMatchId());
             }
-        } catch (Exception e) {
+        } catch (DataAccessException e) {
             throw new ServiceInitializationException("Errore durante il salvataggio del match: " + e.getMessage(), e);
         }
     }

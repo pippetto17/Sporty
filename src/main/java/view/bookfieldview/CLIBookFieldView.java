@@ -3,6 +3,7 @@ package view.bookfieldview;
 import controller.ApplicationController;
 import controller.BookFieldController;
 import model.bean.FieldBean;
+import model.utils.Constants;
 
 import java.util.List;
 import java.util.Scanner;
@@ -11,8 +12,6 @@ public class CLIBookFieldView implements BookFieldView {
     private final BookFieldController bookFieldController;
     private final Scanner scanner;
     private boolean running;
-    private static final String SEPARATOR = "=================================";
-    private static final String FOUND_PREFIX = "Found ";
 
     public CLIBookFieldView(BookFieldController bookFieldController) {
         this.bookFieldController = bookFieldController;

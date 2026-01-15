@@ -52,7 +52,6 @@ public class CLIViewFactory implements ViewFactory {
 
     @Override
     public view.matchdetailview.MatchDetailView createMatchDetailView(controller.MatchController matchController) {
-        // TODO: Implement CLI version
         throw new UnsupportedOperationException("CLI Match Detail View not yet implemented");
     }
 }

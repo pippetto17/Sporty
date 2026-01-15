@@ -42,7 +42,7 @@ public class CLILoginView implements LoginView {
                     System.out.println("Goodbye!");
                     System.exit(0);
                 }
-                default -> System.out.println("Invalid option. Please try again.");
+                default -> System.out.println(Constants.ERROR_INVALID_OPTION);
             }
         }
     }
@@ -53,13 +53,13 @@ public class CLILoginView implements LoginView {
     }
 
     private void displayHeader() {
-        System.out.println("\n=================================");
+        System.out.println("\n" + Constants.SEPARATOR);
         System.out.println("    SPORTY APPLICATION");
-        System.out.println("=================================");
+        System.out.println(Constants.SEPARATOR);
         System.out.println(applicationController.getConfigurationInfo());
-        System.out.println("=================================");
+        System.out.println(Constants.SEPARATOR);
         System.out.println("    Login System");
-        System.out.println("=================================");
+        System.out.println(Constants.SEPARATOR);
     }
 
     private void displayMainMenu() {
@@ -84,9 +84,9 @@ public class CLILoginView implements LoginView {
                 running = false; // Ferma il loop corrente
                 applicationController.navigateToHome(user);
             } else {
-                displayLoginError("Invalid username or password");
+                displayLoginError(Constants.ERROR_INVALID_CREDENTIALS);
             }
-        } catch (Exception e) {
+        } catch (IllegalArgumentException e) {
             displayLoginError(e.getMessage());
         }
     }
@@ -117,7 +117,7 @@ public class CLILoginView implements LoginView {
         try {
             loginController.register(userBean, name, surname, role);
             System.out.println("✓ Registration successful! You can now login.");
-        } catch (Exception e) {
+        } catch (IllegalArgumentException e) {
             displayLoginError(e.getMessage());
         }
     }
