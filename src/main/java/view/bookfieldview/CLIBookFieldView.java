@@ -8,6 +8,9 @@ import model.utils.Constants;
 import java.util.List;
 import java.util.Scanner;
 
+import static model.utils.Constants.FOUND_PREFIX;
+import static model.utils.Constants.SEPARATOR;
+
 public class CLIBookFieldView implements BookFieldView {
     private final BookFieldController bookFieldController;
     private final Scanner scanner;

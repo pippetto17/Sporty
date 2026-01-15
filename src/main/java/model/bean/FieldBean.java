@@ -14,7 +14,14 @@ public class FieldBean {
     private Double pricePerPerson; // Calculated based on match participants
     private boolean indoor;
 
-    public FieldBean() {}
+    /**
+     * Default no-arg constructor required for JavaBeans specification.
+     * This constructor is needed for serialization/deserialization frameworks
+     * (e.g., Jackson, JAXB) and for JavaFX property binding.
+     */
+    public FieldBean() {
+        // Empty constructor required by JavaBeans specification for reflection-based instantiation
+    }
 
     // Getters and Setters
     public String getFieldId() {

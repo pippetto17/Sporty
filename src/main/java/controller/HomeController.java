@@ -8,7 +8,6 @@ import model.service.MatchService;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class HomeController {
     private final User currentUser;
@@ -81,7 +80,7 @@ public class HomeController {
                 .filter(match -> city == null || city.trim().isEmpty() ||
                         match.getCity().equalsIgnoreCase(city.trim()))
                 .filter(match -> date == null || match.getMatchDate().equals(date))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**

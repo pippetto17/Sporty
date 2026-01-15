@@ -13,6 +13,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import model.bean.UserBean;
 import model.domain.User;
+import model.utils.Constants;
 
 import java.io.IOException;
 

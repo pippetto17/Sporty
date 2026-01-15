@@ -4,6 +4,7 @@ import controller.ApplicationController;
 import controller.LoginController;
 import model.bean.UserBean;
 import model.domain.User;
+import model.utils.Constants;
 
 import java.util.Scanner;
 

@@ -1,5 +1,6 @@
 package controller;
 
+import exception.ServiceInitializationException;
 import model.bean.MatchBean;
 import model.dao.DAOFactory;
 import model.domain.User;
