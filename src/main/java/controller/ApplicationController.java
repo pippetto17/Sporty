@@ -20,8 +20,11 @@ import view.View;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Scanner;
+import java.util.logging.Logger;
 
 public class ApplicationController {
+
+    private static final Logger logger = Logger.getLogger(ApplicationController.class.getName());
 
     public enum AppVersion {
         DEMO,
@@ -89,12 +92,12 @@ public class ApplicationController {
                     currentInterface = InterfaceType.CLI;
                     validChoice = true;
                 }
-                default -> System.out.println("Invalid choice. Please try again.");
+                default -> logger.warning("Invalid choice. Please try again.");
             }
         }
 
-        System.out.println("\n" + getConfigurationInfo());
-        System.out.println("Interface selected: " + currentInterface + "\n");
+        logger.info(() -> "\n" + getConfigurationInfo());
+        logger.info(() -> "Interface selected: " + currentInterface + "\n");
     }
 
     public void navigateToLogin() {
@@ -113,8 +116,10 @@ public class ApplicationController {
             homeView.setApplicationController(this);
             pushAndDisplay(homeView);
         } catch (ServiceInitializationException | java.sql.SQLException e) {
-            System.err.println("Error creating MatchService: " + e.getMessage());
-            e.printStackTrace();
+            logger.severe("Error creating MatchService: " + e.getMessage());
+            for (StackTraceElement element : e.getStackTrace()) {
+                logger.severe("\tat " + element.toString());
+            }
         }
     }
 
@@ -142,8 +147,10 @@ public class ApplicationController {
                 matchController.showMatchDetail(matchId);
             }
         } catch (ServiceInitializationException | java.sql.SQLException e) {
-            System.err.println("Error navigating to match detail: " + e.getMessage());
-            e.printStackTrace();
+            logger.severe("Error navigating to match detail: " + e.getMessage());
+            for (StackTraceElement element : e.getStackTrace()) {
+                logger.severe("\tat " + element.toString());
+            }
         }
     }
 
@@ -191,8 +198,8 @@ public class ApplicationController {
             currentView.close();
             View previousView = viewStack.peekFirst();
             previousView.display();
-        } else {
             System.out.println("Cannot go back from login screen.");
+            logger.info("Cannot go back from login screen.");
         }
     }
 
