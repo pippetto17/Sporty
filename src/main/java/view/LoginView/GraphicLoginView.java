@@ -12,7 +12,6 @@ import javafx.scene.control.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import model.bean.UserBean;
-import model.domain.Role;
 import model.domain.User;
 
 import java.io.IOException;
