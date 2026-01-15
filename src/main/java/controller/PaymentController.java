@@ -7,6 +7,8 @@ import model.service.MatchService;
 import exception.ServiceInitializationException;
 
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Controller per la gestione del pagamento.
@@ -14,6 +16,7 @@ import java.sql.SQLException;
  * delegando la logica di business ai service appropriati.
  */
 public class PaymentController {
+    private static final Logger logger = Logger.getLogger(PaymentController.class.getName());
     private final ApplicationController applicationController;
     private final PaymentService paymentService;
     private final MatchService matchService;
@@ -50,7 +53,7 @@ public class PaymentController {
                 matchService.confirmMatch(matchBean);
                 applicationController.navigateToRecap(matchBean);
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.log(Level.SEVERE, "Errore durante la conferma del match", e);
                 return false;
             }
         }
