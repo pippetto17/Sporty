@@ -4,6 +4,8 @@ import model.domain.Sport;
 import model.domain.MatchStatus;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MatchBean {
     private Integer matchId;
@@ -16,8 +18,11 @@ public class MatchBean {
     private String fieldId;
     private Double pricePerPerson;
     private MatchStatus status;
+    private List<String> participants;
 
-    public MatchBean() {}
+    public MatchBean() {
+        this.participants = new ArrayList<>();
+    }
 
     public MatchBean(Sport sport, LocalDate matchDate, LocalTime matchTime, String city, int requiredParticipants) {
         this.sport = sport;
@@ -25,6 +30,7 @@ public class MatchBean {
         this.matchTime = matchTime;
         this.city = city;
         this.requiredParticipants = requiredParticipants;
+        this.participants = new ArrayList<>();
     }
 
     // Getters and Setters
@@ -107,5 +113,12 @@ public class MatchBean {
     public void setPricePerPerson(Double pricePerPerson) {
         this.pricePerPerson = pricePerPerson;
     }
-}
 
+    public List<String> getParticipants() {
+        return participants;
+    }
+
+    public void setParticipants(List<String> participants) {
+        this.participants = participants;
+    }
+}

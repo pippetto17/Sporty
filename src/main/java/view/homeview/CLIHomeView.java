@@ -61,13 +61,21 @@ public class CLIHomeView implements HomeView {
     }
 
     @Override
-    public void displayMatches(String[] matches) {
+    public void displayMatches(java.util.List<model.bean.MatchBean> matches) {
         System.out.println("\n--- AVAILABLE MATCHES ---");
-        if (matches == null || matches.length == 0) {
+        if (matches == null || matches.isEmpty()) {
             System.out.println("No matches available at the moment.");
         } else {
-            for (int i = 0; i < matches.length; i++) {
-                System.out.println((i + 1) + ". " + matches[i]);
+            for (int i = 0; i < matches.size(); i++) {
+                model.bean.MatchBean match = matches.get(i);
+                String matchStr = String.format("%d. %s - %s - %s at %s (%d players)",
+                        i + 1,
+                        match.getSport().getDisplayName(),
+                        match.getCity(),
+                        match.getMatchDate(),
+                        match.getMatchTime(),
+                        match.getParticipants() != null ? match.getParticipants().size() : 0);
+                System.out.println(matchStr);
             }
         }
     }
@@ -87,7 +95,7 @@ public class CLIHomeView implements HomeView {
     private boolean handlePlayerChoice(String choice) {
         switch (choice) {
             case "1" -> {
-                String[] matches = homeController.getMatches();
+                java.util.List<model.bean.MatchBean> matches = homeController.getMatches();
                 displayMatches(matches);
             }
             case "2" -> {
@@ -102,7 +110,7 @@ public class CLIHomeView implements HomeView {
     private boolean handleOrganizerChoice(String choice) {
         switch (choice) {
             case "1" -> {
-                String[] matches = homeController.getMatches();
+                java.util.List<model.bean.MatchBean> matches = homeController.getMatches();
                 displayMatches(matches);
             }
             case "2" -> {
@@ -118,4 +126,3 @@ public class CLIHomeView implements HomeView {
         return true;
     }
 }
-

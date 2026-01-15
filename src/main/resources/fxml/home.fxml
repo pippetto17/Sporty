@@ -43,7 +43,7 @@
     </top>
 
     <center>
-        <VBox spacing="15" styleClass="content-container">
+        <VBox fx:id="mainContentBox" spacing="15" styleClass="content-container">
             <padding>
                 <Insets top="10" right="30" bottom="20" left="30"/>
             </padding>

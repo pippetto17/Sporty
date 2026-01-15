@@ -26,6 +26,11 @@ public class MatchConverter {
         match.setPricePerPerson(matchBean.getPricePerPerson());
         match.setStatus(matchBean.getStatus());
 
+        // Convert participants
+        if (matchBean.getParticipants() != null) {
+            match.setParticipants(matchBean.getParticipants());
+        }
+
         return match;
     }
 
@@ -46,6 +51,11 @@ public class MatchConverter {
         matchBean.setPricePerPerson(match.getPricePerPerson());
         matchBean.setStatus(match.getStatus());
 
+        // Convert participants
+        if (match.getParticipants() != null) {
+            matchBean.setParticipants(match.getParticipants());
+        }
+
         return matchBean;
     }
 
@@ -58,4 +68,3 @@ public class MatchConverter {
         return toMatchBean(entity);
     }
 }
-

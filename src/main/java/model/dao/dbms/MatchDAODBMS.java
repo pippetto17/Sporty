@@ -21,8 +21,8 @@ public class MatchDAODBMS implements MatchDAO {
     public void save(Match match) {
         String sql = """
                 INSERT INTO matches (organizer_username, sport, match_date, match_time, city,
-                                    required_participants, field_id, status)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                                    required_participants, field_id, status, participants)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON DUPLICATE KEY UPDATE
                     sport = VALUES(sport),
                     match_date = VALUES(match_date),
@@ -30,7 +30,8 @@ public class MatchDAODBMS implements MatchDAO {
                     city = VALUES(city),
                     required_participants = VALUES(required_participants),
                     field_id = VALUES(field_id),
-                    status = VALUES(status)
+                    status = VALUES(status),
+                    participants = VALUES(participants)
                 """;
 
         try (PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -48,6 +49,11 @@ public class MatchDAODBMS implements MatchDAO {
             }
 
             stmt.setInt(8, match.getStatus().getCode());
+
+            // Serialize participants list to JSON
+            String participantsJson = serializeParticipantsToJson(match.getParticipants());
+            stmt.setString(9, participantsJson);
+
             stmt.executeUpdate();
 
             // Se è un nuovo match, recupera l'ID generato
@@ -65,26 +71,30 @@ public class MatchDAODBMS implements MatchDAO {
 
     @Override
     public Match findById(int matchId) {
-        String sql = "SELECT match_id, organizer_username, sport, match_date, match_time, " +
-                "city, required_participants, field_id, status FROM matches WHERE match_id = ?";
+        String sql = """
+                SELECT match_id, organizer_username, sport, match_date, match_time,
+                       city, required_participants, field_id, status, participants
+                FROM matches
+                WHERE match_id = ?
+                """;
 
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, matchId);
-            ResultSet rs = stmt.executeQuery();
-
-            if (rs.next()) {
-                return extractMatchFromResultSet(rs);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return extractMatchFromResultSet(rs);
+                }
             }
-            return null;
         } catch (SQLException e) {
-            throw new DataAccessException("Error finding match: " + e.getMessage(), e);
+            throw new DataAccessException("Error finding match by ID: " + e.getMessage(), e);
         }
+        return null;
     }
 
     @Override
     public List<Match> findByOrganizer(String organizerUsername) {
         String sql = "SELECT match_id, organizer_username, sport, match_date, match_time, " +
-                "city, required_participants, field_id, status FROM matches " +
+                "city, required_participants, field_id, status, participants FROM matches " +
                 "WHERE organizer_username = ? ORDER BY match_date DESC, match_time DESC";
         List<Match> matches = new ArrayList<>();
 
@@ -105,7 +115,7 @@ public class MatchDAODBMS implements MatchDAO {
     @Override
     public List<Match> findAllAvailable() {
         String sql = "SELECT match_id, organizer_username, sport, match_date, match_time, " +
-                "city, required_participants, field_id, status FROM matches " +
+                "city, required_participants, field_id, status, participants FROM matches " +
                 "WHERE status = ? AND match_date >= CURDATE() ORDER BY match_date, match_time";
         List<Match> matches = new ArrayList<>();
 
@@ -155,6 +165,109 @@ public class MatchDAODBMS implements MatchDAO {
 
         match.setStatus(MatchStatus.fromCode(rs.getInt("status")));
 
+        // Deserialize participants from JSON
+        String participantsJson = rs.getString("participants");
+        List<String> participants = deserializeParticipantsFromJson(participantsJson);
+        match.setParticipants(participants);
+
         return match;
+    }
+
+    /**
+     * Serialize a list of participants to JSON array format.
+     * Example: ["user1", "user2", "user3"]
+     */
+    private String serializeParticipantsToJson(List<String> participants) {
+        if (participants == null || participants.isEmpty()) {
+            return "[]";
+        }
+
+        StringBuilder json = new StringBuilder("[");
+        for (int i = 0; i < participants.size(); i++) {
+            if (i > 0) {
+                json.append(",");
+            }
+            json.append("\"").append(escapeJson(participants.get(i))).append("\"");
+        }
+        json.append("]");
+        return json.toString();
+    }
+
+    /**
+     * Deserialize JSON array to list of participants.
+     * Example: ["user1", "user2"] -> List.of("user1", "user2")
+     */
+    private List<String> deserializeParticipantsFromJson(String json) {
+        if (json == null || json.trim().isEmpty() || "[]".equals(json.trim())) {
+            return new ArrayList<>();
+        }
+
+        List<String> participants = new ArrayList<>();
+        // Remove brackets and split by comma
+        String content = json.trim().substring(1, json.trim().length() - 1);
+        if (content.isEmpty()) {
+            return participants;
+        }
+
+        String[] parts = content.split(",");
+        for (String part : parts) {
+            // Remove quotes and whitespace
+            String username = part.trim().replaceAll("^\"|\"$", "");
+            if (!username.isEmpty()) {
+                participants.add(username);
+            }
+        }
+        return participants;
+    }
+
+    /**
+     * Escape special JSON characters in a string.
+     */
+    private String escapeJson(String str) {
+        if (str == null) {
+            return "";
+        }
+        return str.replace("\\", "\\\\")
+                .replace("\"", "\\\"")
+                .replace("\n", "\\n")
+                .replace("\r", "\\r")
+                .replace("\t", "\\t");
+    }
+
+    @Override
+    public boolean addParticipant(int matchId, String username) {
+        Match match = findById(matchId);
+        if (match == null) {
+            return false;
+        }
+
+        boolean added = match.addParticipant(username);
+        if (added) {
+            save(match); // Save will now persist participants to JSON column
+        }
+        return added;
+    }
+
+    @Override
+    public boolean removeParticipant(int matchId, String username) {
+        Match match = findById(matchId);
+        if (match == null) {
+            return false;
+        }
+
+        boolean removed = match.removeParticipant(username);
+        if (removed) {
+            save(match); // Save will now persist participants to JSON column
+        }
+        return removed;
+    }
+
+    @Override
+    public List<String> getParticipants(int matchId) {
+        Match match = findById(matchId);
+        if (match == null) {
+            return List.of();
+        }
+        return match.getParticipants();
     }
 }

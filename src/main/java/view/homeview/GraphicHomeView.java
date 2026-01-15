@@ -29,6 +29,8 @@ public class GraphicHomeView implements HomeView {
     @FXML
     private Button logoutButton;
     @FXML
+    private VBox mainContentBox;
+    @FXML
     private VBox organizerActionsBox;
     @FXML
     private Button organizeMatchButton;
@@ -88,21 +90,144 @@ public class GraphicHomeView implements HomeView {
         // Set welcome message
         displayWelcome();
 
-        // Show/hide organizer actions based on role
+        // Add role switch toggle if user is organizer
         if (homeController.isOrganizer()) {
-            organizerActionsBox.setVisible(true);
-            organizerActionsBox.setManaged(true);
-            matchesTitle.setText("My Organized Matches");
-        } else {
-            organizerActionsBox.setVisible(false);
-            organizerActionsBox.setManaged(false);
-            matchesTitle.setText("Available Matches");
+            addRoleSwitchToggle();
         }
+
+        // Add filter UI
+        addFilterUI();
+
+        // Show/hide organizer actions based on role
+        updateViewMode();
 
         // Load matches
         displayMatches(homeController.getMatches());
 
         updateStatus("Ready");
+    }
+
+    private void updateViewMode() {
+        if (homeController.isViewingAsPlayer()) {
+            organizerActionsBox.setVisible(false);
+            organizerActionsBox.setManaged(false);
+            matchesTitle.setText("Available Matches");
+        } else {
+            organizerActionsBox.setVisible(true);
+            organizerActionsBox.setManaged(true);
+            matchesTitle.setText("My Organized Matches");
+        }
+    }
+
+    private void addRoleSwitchToggle() {
+        HBox toggleContainer = new HBox(10);
+        toggleContainer.setAlignment(Pos.CENTER_LEFT);
+        toggleContainer.setPadding(new Insets(10, 0, 10, 0));
+
+        Label toggleLabel = new Label("View as:");
+        toggleLabel.setStyle("-fx-font-size: 13px; -fx-font-weight: bold;");
+
+        javafx.scene.control.ToggleButton playerToggle = new javafx.scene.control.ToggleButton("Player");
+        javafx.scene.control.ToggleButton organizerToggle = new javafx.scene.control.ToggleButton("Organizer");
+
+        ToggleGroup group = new ToggleGroup();
+        playerToggle.setToggleGroup(group);
+        organizerToggle.setToggleGroup(group);
+
+        playerToggle.getStyleClass().add("secondary-button");
+        organizerToggle.getStyleClass().add("secondary-button");
+
+        // Set initial selection
+        if (homeController.isViewingAsPlayer()) {
+            playerToggle.setSelected(true);
+        } else {
+            organizerToggle.setSelected(true);
+        }
+
+        // Handle toggle
+        playerToggle.setOnAction(e -> {
+            if (playerToggle.isSelected() && !homeController.isViewingAsPlayer()) {
+                homeController.switchRole();
+                updateViewMode();
+                displayMatches(homeController.getMatches());
+            }
+        });
+
+        organizerToggle.setOnAction(e -> {
+            if (organizerToggle.isSelected() && homeController.isViewingAsPlayer()) {
+                homeController.switchRole();
+                updateViewMode();
+                displayMatches(homeController.getMatches());
+            }
+        });
+
+        toggleContainer.getChildren().addAll(toggleLabel, playerToggle, organizerToggle);
+
+        // Insert before matches section
+        mainContentBox.getChildren().add(0, toggleContainer);
+    }
+
+    private javafx.scene.control.ComboBox<model.domain.Sport> sportFilter;
+    private javafx.scene.control.TextField cityFilter;
+    private javafx.scene.control.DatePicker dateFilter;
+
+    private void addFilterUI() {
+        HBox filterBox = new HBox(10);
+        filterBox.setAlignment(Pos.CENTER_LEFT);
+        filterBox.setPadding(new Insets(10, 0, 10, 0));
+
+        Label filterLabel = new Label("Filters:");
+        filterLabel.setStyle("-fx-font-size: 13px; -fx-font-weight: bold;");
+
+        // Sport filter
+        sportFilter = new javafx.scene.control.ComboBox<>();
+        sportFilter.setPromptText("Sport");
+        sportFilter.setPrefWidth(120);
+        sportFilter.getItems().add(null); // "All" option
+        sportFilter.getItems().addAll(model.domain.Sport.values());
+        sportFilter.setValue(null);
+
+        // City filter
+        cityFilter = new javafx.scene.control.TextField();
+        cityFilter.setPromptText("City");
+        cityFilter.setPrefWidth(120);
+
+        // Date filter
+        dateFilter = new javafx.scene.control.DatePicker();
+        dateFilter.setPromptText("Date");
+        dateFilter.setPrefWidth(140);
+
+        Button applyFilters = new Button("Apply");
+        applyFilters.getStyleClass().add("primary-button");
+        applyFilters.setOnAction(e -> applyFilters());
+
+        Button clearFilters = new Button("Clear");
+        clearFilters.getStyleClass().add("secondary-button");
+        clearFilters.setOnAction(e -> clearFilters());
+
+        filterBox.getChildren().addAll(filterLabel, sportFilter, cityFilter, dateFilter, applyFilters, clearFilters);
+
+        // Insert after role toggle (if exists) or at beginning
+        int insertIndex = homeController.isOrganizer() ? 1 : 0;
+        mainContentBox.getChildren().add(insertIndex, filterBox);
+    }
+
+    private void applyFilters() {
+        model.domain.Sport sport = sportFilter.getValue();
+        String city = cityFilter.getText();
+        java.time.LocalDate date = dateFilter.getValue();
+
+        java.util.List<model.bean.MatchBean> filtered = homeController.filterMatches(sport, city, date);
+        displayMatches(filtered);
+        updateStatus("Filters applied - " + filtered.size() + " matches found");
+    }
+
+    private void clearFilters() {
+        sportFilter.setValue(null);
+        cityFilter.clear();
+        dateFilter.setValue(null);
+        displayMatches(homeController.getMatches());
+        updateStatus("Filters cleared");
     }
 
     @Override
@@ -115,10 +240,10 @@ public class GraphicHomeView implements HomeView {
     }
 
     @Override
-    public void displayMatches(String[] matches) {
+    public void displayMatches(java.util.List<model.bean.MatchBean> matches) {
         matchesContainer.getChildren().clear();
 
-        if (matches == null || matches.length == 0) {
+        if (matches == null || matches.isEmpty()) {
             Label emptyLabel = new Label("No matches available");
             emptyLabel.setStyle("-fx-text-fill: #6c757d; -fx-font-size: 14px;");
             matchesContainer.getChildren().add(emptyLabel);
@@ -126,68 +251,62 @@ public class GraphicHomeView implements HomeView {
         }
 
         // Create match cards
-        for (String match : matches) {
+        for (model.bean.MatchBean match : matches) {
             VBox matchCard = createMatchCard(match);
             matchesContainer.getChildren().add(matchCard);
         }
 
-        updateStatus(matches.length + " matches loaded");
+        updateStatus(matches.size() + " matches loaded");
     }
 
-    private VBox createMatchCard(String matchInfo) {
+    private VBox createMatchCard(model.bean.MatchBean match) {
         VBox card = new VBox(8);
         card.getStyleClass().add("match-card");
         card.setPadding(new Insets(15));
 
-        // Parse match info (format: "Match X - Sport - Date")
-        String[] parts = matchInfo.split(" - ");
-        String title = parts.length > 1 ? parts[1] : "Match";
-        String date = parts.length > 2 ? parts[2] : "Date TBD";
-
-        // Title
-        Label titleLabel = new Label("⚽ " + title);
+        // Title with sport
+        Label titleLabel = new Label("⚽ " + match.getSport().getDisplayName());
         titleLabel.getStyleClass().add("match-title");
 
-        // Date info
-        Label dateLabel = new Label("📅 " + date);
+        // Date and time
+        Label dateLabel = new Label("📅 " + match.getMatchDate() + " at " + match.getMatchTime());
         dateLabel.getStyleClass().add(MATCH_INFO_STYLE);
 
         // Players info
-        Label playersLabel = new Label("👥 Players: 6/10");
+        int currentPlayers = match.getParticipants() != null ? match.getParticipants().size() : 0;
+        Label playersLabel = new Label("👥 Players: " + currentPlayers + "/" + match.getRequiredParticipants());
         playersLabel.getStyleClass().add(MATCH_INFO_STYLE);
 
         // Location
-        Label locationLabel = new Label("📍 City Center Sports Complex");
+        Label locationLabel = new Label("📍 " + match.getCity());
         locationLabel.getStyleClass().add(MATCH_INFO_STYLE);
 
-        // Status badge
+        // Status and price
         HBox statusBox = new HBox(10);
         statusBox.setAlignment(Pos.CENTER_LEFT);
 
-        Label statusBadge = new Label("OPEN");
+        Label statusBadge = new Label(match.getStatus().name());
         statusBadge.getStyleClass().add("status-badge");
 
-        Label priceLabel = new Label("€15/person");
-        priceLabel.setStyle("-fx-text-fill: #28a745; -fx-font-weight: bold; -fx-font-size: 12px;");
-
-        statusBox.getChildren().addAll(statusBadge, priceLabel);
+        if (match.getPricePerPerson() != null) {
+            Label priceLabel = new Label(String.format("€%.2f/person", match.getPricePerPerson()));
+            priceLabel.setStyle("-fx-text-fill: #28a745; -fx-font-weight: bold; -fx-font-size: 12px;");
+            statusBox.getChildren().addAll(statusBadge, priceLabel);
+        } else {
+            statusBox.getChildren().add(statusBadge);
+        }
 
         // Add all elements
         card.getChildren().addAll(titleLabel, dateLabel, playersLabel, locationLabel, statusBox);
 
-        // Add click handler
-        card.setOnMouseClicked(e -> handleMatchClick(matchInfo));
+        // Add click handler - navigate to detail
+        card.setOnMouseClicked(e -> {
+            if (match.getMatchId() != null) {
+                homeController.viewMatchDetail(match.getMatchId());
+            }
+        });
 
         return card;
-    }
-
-    private void handleMatchClick(String matchInfo) {
-        updateStatus("Selected: " + matchInfo);
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Match Details");
-        alert.setHeaderText(null);
-        alert.setContentText("Detailed match view coming soon!\n\nMatch: " + matchInfo);
-        alert.showAndWait();
     }
 
     @Override

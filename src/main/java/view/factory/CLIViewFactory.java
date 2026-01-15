@@ -49,4 +49,10 @@ public class CLIViewFactory implements ViewFactory {
     public RecapView createRecapView() {
         return new CLIRecapView();
     }
+
+    @Override
+    public view.matchdetailview.MatchDetailView createMatchDetailView(controller.MatchController matchController) {
+        // TODO: Implement CLI version
+        throw new UnsupportedOperationException("CLI Match Detail View not yet implemented");
+    }
 }

@@ -40,14 +40,6 @@
     -fx-font-size: 13px;
 }
 
-/* JavaFX CSS - Commented to avoid SonarCloud bug (pseudo-class not recognized)
-.custom-text-field:focused {
-    -fx-border-color: #28a745;
-    -fx-border-width: 2;
-    -fx-background-color: white;
-}
-*/
-
 /* Custom ComboBox */
 .custom-combo-box {
     -fx-background-color: #f8f9fa;
@@ -56,13 +48,6 @@
     -fx-background-radius: 5;
     -fx-font-size: 13px;
 }
-
-/* JavaFX CSS - Commented to avoid SonarCloud bug
-.custom-combo-box:focused {
-    -fx-border-color: #28a745;
-    -fx-border-width: 2;
-}
-*/
 
 /* Primary Button */
 .primary-button {
@@ -78,12 +63,6 @@
 .primary-button:hover {
     -fx-background-color: #218838;
 }
-
-/* JavaFX CSS - Commented to avoid SonarCloud bug
-.primary-button:pressed {
-    -fx-background-color: #1e7e34;
-}
-*/
 
 /* Secondary Button */
 .secondary-button {
@@ -102,12 +81,6 @@
 .secondary-button:hover {
     -fx-background-color: #f0f8f0;
 }
-
-/* JavaFX CSS - Commented to avoid SonarCloud bug
-.secondary-button:pressed {
-    -fx-background-color: #d4edda;
-}
-*/
 
 /* Message Label */
 .message-label {
@@ -260,25 +233,12 @@
     -fx-background-radius: 5;
 }
 
-/* JavaFX CSS - Commented to avoid SonarCloud bug
-.custom-date-picker:focused {
-    -fx-border-color: #28a745;
-    -fx-border-width: 2;
-}
-*/
-
 /* Custom Spinner */
 .custom-spinner {
     -fx-background-color: #f8f9fa;
     -fx-border-color: #d4edda;
     -fx-border-radius: 5;
 }
-
-/* JavaFX CSS - Commented to avoid SonarCloud bug
-.custom-spinner:focused {
-    -fx-border-color: #28a745;
-}
-*/
 
 /* Info Label */
 .info-label {
@@ -373,4 +333,59 @@
 .match-info-text {
     -fx-text-fill: #1e7e34;
     -fx-font-weight: bold;
+}
+
+/* ============================================ */
+/* MATCH DETAIL VIEW STYLES */
+/* ============================================ */
+
+/* Detail Container */
+.detail-container {
+    -fx-background-color: white;
+    -fx-background-radius: 10;
+    -fx-padding: 20;
+}
+
+/* Detail Header */
+.detail-header {
+    -fx-background-color: white;
+    -fx-padding: 10;
+}
+
+/* Detail Title */
+.detail-title {
+    -fx-text-fill: #1e7e34;
+    -fx-font-weight: bold;
+    -fx-font-size: 24px;
+}
+
+/* Detail Info Labels */
+.detail-info-title {
+    -fx-text-fill: #2d3436;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+}
+
+.detail-info-value {
+    -fx-text-fill: #6c757d;
+    -fx-font-size: 14px;
+}
+
+/* Detail Sport Label */
+.detail-sport {
+    -fx-text-fill: #1e7e34;
+    -fx-font-weight: bold;
+    -fx-font-size: 18px;
+}
+
+/* Map Container */
+.map-container {
+    -fx-background-color: white;
+    -fx-padding: 10;
+}
+
+.map-title {
+    -fx-text-fill: #1e7e34;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
 }

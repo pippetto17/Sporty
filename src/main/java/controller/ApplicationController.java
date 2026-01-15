@@ -3,6 +3,7 @@ package controller;
 import model.bean.MatchBean;
 import model.dao.DAOFactory;
 import model.domain.User;
+import model.service.MatchService;
 import view.factory.ViewFactory;
 import view.factory.CLIViewFactory;
 import view.factory.GraphicViewFactory;
@@ -104,10 +105,45 @@ public class ApplicationController {
     }
 
     public void navigateToHome(User user) {
-        HomeController homeController = new HomeController(user, this);
-        HomeView homeView = viewFactory.createHomeView(homeController);
-        homeView.setApplicationController(this);
-        pushAndDisplay(homeView);
+        try {
+            MatchService matchService = new MatchService(persistenceType);
+            HomeController homeController = new HomeController(user, this, matchService);
+            HomeView homeView = viewFactory.createHomeView(homeController);
+            homeView.setApplicationController(this);
+            pushAndDisplay(homeView);
+        } catch (Exception e) {
+            System.err.println("Error creating MatchService: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    public void navigateToMatchDetail(int matchId, User user) {
+        try {
+            MatchService matchService = new MatchService(persistenceType);
+            MatchController matchController = new MatchController(matchService);
+            matchController.setCurrentUser(user);
+
+            view.matchdetailview.MatchDetailView detailView = viewFactory.createMatchDetailView(matchController);
+
+            // Close current view before displaying new one
+            if (!viewStack.isEmpty()) {
+                viewStack.peekFirst().close();
+            }
+            viewStack.addFirst(detailView);
+
+            // For MatchDetailView, we need to call the specific display method with matchId
+            // This will create the UI and show the details in one go
+            if (detailView instanceof view.matchdetailview.GraphicMatchDetailView graphicView) {
+                graphicView.display(matchId);
+            } else {
+                // Fallback for CLI or other implementations
+                detailView.display();
+                matchController.showMatchDetail(matchId);
+            }
+        } catch (Exception e) {
+            System.err.println("Error navigating to match detail: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     public void navigateToOrganizeMatch(User organizer) {

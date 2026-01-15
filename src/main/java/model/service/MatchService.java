@@ -12,6 +12,7 @@ import exception.ServiceInitializationException;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 /**
  * Service per la gestione della logica di business relativa ai match.
@@ -75,5 +76,55 @@ public class MatchService {
 
         matchBean.setStatus(MatchStatus.CONFIRMED);
         saveMatch(matchBean);
+    }
+
+    /**
+     * Recupera un match per ID.
+     */
+    public MatchBean getMatchById(int matchId) {
+        Match match = matchDAO.findById(matchId);
+        return match != null ? MatchConverter.toBean(match) : null;
+    }
+
+    /**
+     * Recupera tutti i match disponibili (CONFIRMED e non pieni).
+     */
+    public List<MatchBean> getAllAvailableMatches() {
+        return matchDAO.findAllAvailable().stream()
+                .filter(match -> !match.isFull())
+                .map(MatchConverter::toBean)
+                .toList();
+    }
+
+    /**
+     * Recupera tutti i match organizzati da un utente specifico.
+     */
+    public List<MatchBean> getOrganizerMatches(String username) {
+        return matchDAO.findByOrganizer(username).stream()
+                .map(MatchConverter::toBean)
+                .toList();
+    }
+
+    /**
+     * Aggiunge un partecipante a un match.
+     */
+    public boolean joinMatch(int matchId, String username) {
+        return matchDAO.addParticipant(matchId, username);
+    }
+
+    /**
+     * Cancella un match e restituisce la lista dei partecipanti da notificare.
+     */
+    public List<String> cancelMatch(int matchId) {
+        Match match = matchDAO.findById(matchId);
+        if (match == null) {
+            return List.of();
+        }
+
+        List<String> participants = match.getParticipants();
+        match.setStatus(MatchStatus.CANCELLED);
+        matchDAO.save(match);
+
+        return participants;
     }
 }

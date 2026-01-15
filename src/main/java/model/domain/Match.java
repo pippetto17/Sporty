@@ -2,6 +2,8 @@ package model.domain;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Match {
     private Integer matchId;
@@ -14,13 +16,15 @@ public class Match {
     private String fieldId; // Will be set after field selection
     private Double pricePerPerson; // Calculated based on selected field
     private MatchStatus status; // DRAFT, CONFIRMED, CANCELLED
+    private List<String> participants; // Usernames of players who joined
 
     public Match() {
         this.status = MatchStatus.DRAFT;
+        this.participants = new ArrayList<>();
     }
 
     public Match(Sport sport, LocalDate matchDate, LocalTime matchTime, String city,
-                 int requiredParticipants, String organizerUsername) {
+            int requiredParticipants, String organizerUsername) {
         this.sport = sport;
         this.matchDate = matchDate;
         this.matchTime = matchTime;
@@ -28,6 +32,7 @@ public class Match {
         this.requiredParticipants = requiredParticipants;
         this.organizerUsername = organizerUsername;
         this.status = MatchStatus.DRAFT;
+        this.participants = new ArrayList<>();
     }
 
     // Getters and Setters
@@ -111,6 +116,44 @@ public class Match {
         this.pricePerPerson = pricePerPerson;
     }
 
+    public List<String> getParticipants() {
+        return new ArrayList<>(participants); // Return copy for encapsulation
+    }
+
+    public void setParticipants(List<String> participants) {
+        this.participants = participants != null ? new ArrayList<>(participants) : new ArrayList<>();
+    }
+
+    // Participant management methods
+    public boolean addParticipant(String username) {
+        if (username == null || username.trim().isEmpty()) {
+            return false;
+        }
+        if (participants.contains(username)) {
+            return false; // Already joined
+        }
+        if (isFull()) {
+            return false; // Match is full
+        }
+        return participants.add(username);
+    }
+
+    public boolean removeParticipant(String username) {
+        return participants.remove(username);
+    }
+
+    public int getParticipantCount() {
+        return participants.size();
+    }
+
+    public boolean isFull() {
+        return participants.size() >= requiredParticipants;
+    }
+
+    public boolean hasParticipant(String username) {
+        return participants.contains(username);
+    }
+
     // Behavioral methods - operations instead of just getters
     public boolean isDraft() {
         return this.status == MatchStatus.DRAFT;
@@ -165,4 +208,3 @@ public class Match {
                 status);
     }
 }
-

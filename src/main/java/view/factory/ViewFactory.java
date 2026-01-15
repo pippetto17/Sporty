@@ -24,4 +24,6 @@ public interface ViewFactory {
     PaymentView createPaymentView(PaymentController paymentController);
 
     RecapView createRecapView();
+
+    view.matchdetailview.MatchDetailView createMatchDetailView(controller.MatchController matchController);
 }

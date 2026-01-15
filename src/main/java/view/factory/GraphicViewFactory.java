@@ -51,4 +51,9 @@ public class GraphicViewFactory implements ViewFactory {
     public RecapView createRecapView() {
         return new GraphicRecapView();
     }
+
+    @Override
+    public view.matchdetailview.MatchDetailView createMatchDetailView(controller.MatchController matchController) {
+        return new view.matchdetailview.GraphicMatchDetailView(matchController);
+    }
 }
