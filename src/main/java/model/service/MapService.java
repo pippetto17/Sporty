@@ -13,6 +13,10 @@ public class MapService {
     private static final double DEFAULT_LAT = 45.4642;
     private static final double DEFAULT_LON = 9.1900;
 
+    private MapService() {
+        // Private constructor to prevent instantiation
+    }
+
     /**
      * Calcola la distanza tra due punti geografici usando la formula di Haversine
      * @return distanza in kilometri

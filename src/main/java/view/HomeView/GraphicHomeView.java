@@ -43,6 +43,9 @@ public class GraphicHomeView implements HomeView {
     @FXML
     private Label statusLabel;
 
+    // CSS class name constants
+    private static final String MATCH_INFO_STYLE = "match-info";
+
     public GraphicHomeView(HomeController homeController) {
         this.homeController = homeController;
     }
@@ -147,15 +150,15 @@ public class GraphicHomeView implements HomeView {
 
         // Date info
         Label dateLabel = new Label("📅 " + date);
-        dateLabel.getStyleClass().add("match-info");
+        dateLabel.getStyleClass().add(MATCH_INFO_STYLE);
 
         // Players info
         Label playersLabel = new Label("👥 Players: 6/10");
-        playersLabel.getStyleClass().add("match-info");
+        playersLabel.getStyleClass().add(MATCH_INFO_STYLE);
 
         // Location
         Label locationLabel = new Label("📍 City Center Sports Complex");
-        locationLabel.getStyleClass().add("match-info");
+        locationLabel.getStyleClass().add(MATCH_INFO_STYLE);
 
         // Status badge
         HBox statusBox = new HBox(10);
@@ -180,7 +183,11 @@ public class GraphicHomeView implements HomeView {
 
     private void handleMatchClick(String matchInfo) {
         updateStatus("Selected: " + matchInfo);
-        // TODO: Navigate to match details
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Match Details");
+        alert.setHeaderText(null);
+        alert.setContentText("Detailed match view coming soon!\n\nMatch: " + matchInfo);
+        alert.showAndWait();
     }
 
     @Override
@@ -197,7 +204,6 @@ public class GraphicHomeView implements HomeView {
     @FXML
     private void handleBookField() {
         updateStatus("Opening book field...");
-        // TODO: Navigate to book field directly
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Book Field");
         alert.setHeaderText(null);
@@ -250,4 +256,3 @@ public class GraphicHomeView implements HomeView {
         });
     }
 }
-

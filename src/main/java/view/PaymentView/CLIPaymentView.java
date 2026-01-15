@@ -17,7 +17,7 @@ public class CLIPaymentView implements PaymentView {
 
     @Override
     public void setApplicationController(ApplicationController applicationController) {
-        // Non utilizzato in questa view
+        // CLI view does not require application controller reference
     }
 
     @Override
@@ -34,6 +34,6 @@ public class CLIPaymentView implements PaymentView {
 
     @Override
     public void close() {
-        // No-op per CLI
+        // CLI views do not require explicit cleanup
     }
 }
