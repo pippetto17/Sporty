@@ -14,7 +14,6 @@ import javafx.util.StringConverter;
 import model.bean.FieldBean;
 import model.domain.Sport;
 import model.utils.Constants;
-import model.utils.ItalianCities;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -120,8 +119,8 @@ public class GraphicOrganizeMatchView implements OrganizeMatchView {
         // Listen to sport selection to update participants info
         sportComboBox.setOnAction(e -> updateParticipantsInfo());
 
-        // Initialize city combo box with Italian cities
-        cityComboBox.getItems().addAll(ItalianCities.CITIES);
+        // Initialize city combo box with Italian cities from controller
+        cityComboBox.getItems().addAll(organizeMatchController.getCities());
         cityComboBox.setEditable(true);
         setupCityAutocomplete();
 
@@ -154,7 +153,7 @@ public class GraphicOrganizeMatchView implements OrganizeMatchView {
                 if (newValue == null || newValue.isEmpty()) {
                     cityComboBox.hide();
                 } else {
-                    List<String> filtered = ItalianCities.searchByPrefix(newValue);
+                    List<String> filtered = organizeMatchController.searchCitiesByPrefix(newValue);
 
                     // Aggiorna solo se ci sono risultati diversi
                     if (!filtered.equals(cityComboBox.getItems())) {
@@ -246,6 +245,7 @@ public class GraphicOrganizeMatchView implements OrganizeMatchView {
     }
 
     private boolean validateInputs() {
+        // Only basic UI validation - business validation is in controller
         if (sportComboBox.getValue() == null) {
             showError(Constants.ERROR_PLEASE_SELECT_SPORT);
             return false;
@@ -265,10 +265,6 @@ public class GraphicOrganizeMatchView implements OrganizeMatchView {
         }
         if (cityComboBox.getValue() == null || cityComboBox.getValue().trim().isEmpty()) {
             showError(Constants.ERROR_PLEASE_SELECT_CITY);
-            return false;
-        }
-        if (!ItalianCities.isValidCity(cityComboBox.getValue())) {
-            showError(Constants.ERROR_PLEASE_VALID_ITALIAN_CITY);
             return false;
         }
         return true;

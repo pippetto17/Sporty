@@ -145,8 +145,8 @@ public class GraphicLoginView extends Application implements LoginView {
             registerStage.initOwner(primaryStage);
             registerStage.setTitle("Sporty - Register");
 
-            // Create RegisterViewController
-            RegisterViewController registerController = new RegisterViewController(loginController, registerStage);
+            // Create GraphicRegisterView
+            GraphicRegisterView registerController = new GraphicRegisterView(loginController, registerStage);
 
             // Load FXML
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/register.fxml"));
@@ -168,7 +168,10 @@ public class GraphicLoginView extends Application implements LoginView {
 
     @Override
     public UserBean getUserCredentials() {
-        return new UserBean(usernameField.getText(), passwordField.getText());
+        model.domain.User tempUser = new model.domain.User();
+        tempUser.setUsername(usernameField.getText());
+        tempUser.setPassword(passwordField.getText());
+        return model.converter.UserConverter.toUserBean(tempUser);
     }
 
     @Override

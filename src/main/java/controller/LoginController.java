@@ -64,4 +64,18 @@ public class LoginController {
         User newUser = new User(username, password, name, surname, role);
         userDAO.save(newUser);
     }
+
+    /**
+     * Convert role display string to role code
+     * 
+     * @param roleString Role display name (from Constants)
+     * @return Role code
+     */
+    public static int getRoleCodeFromString(String roleString) {
+        if (roleString == null) {
+            throw new IllegalArgumentException("Role cannot be null");
+        }
+        return roleString.equals(Constants.ROLE_PLAYER) ? model.domain.Role.PLAYER.getCode()
+                : model.domain.Role.ORGANIZER.getCode();
+    }
 }

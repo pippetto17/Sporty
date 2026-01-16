@@ -77,6 +77,27 @@ public class OrganizeMatchController {
         return Sport.values();
     }
 
+    /**
+     * Get list of all Italian cities for combo box population.
+     */
+    public java.util.List<String> getCities() {
+        return model.utils.ItalianCities.CITIES;
+    }
+
+    /**
+     * Search cities by prefix for autocomplete functionality.
+     */
+    public java.util.List<String> searchCitiesByPrefix(String prefix) {
+        return model.utils.ItalianCities.searchByPrefix(prefix);
+    }
+
+    /**
+     * Validate if a city is a valid Italian city.
+     */
+    public boolean isValidCity(String city) {
+        return model.utils.ItalianCities.isValidCity(city);
+    }
+
     public User getOrganizer() {
         return organizer;
     }

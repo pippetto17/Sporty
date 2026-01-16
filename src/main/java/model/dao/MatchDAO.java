@@ -31,22 +31,4 @@ public interface MatchDAO {
      * Delete a match
      */
     void delete(int matchId);
-
-    /**
-     * Add a participant to a match
-     * 
-     * @return true if added successfully, false if match is full or participant
-     *         already joined
-     */
-    boolean addParticipant(int matchId, String username);
-
-    /**
-     * Remove a participant from a match
-     */
-    boolean removeParticipant(int matchId, String username);
-
-    /**
-     * Get all participants for a match
-     */
-    List<String> getParticipants(int matchId);
 }

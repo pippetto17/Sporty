@@ -131,6 +131,11 @@ public class ApplicationController {
 
             view.matchdetailview.MatchDetailView detailView = viewFactory.createMatchDetailView(matchController);
 
+            // Set application controller for navigation
+            if (detailView instanceof view.matchdetailview.GraphicMatchDetailView graphicView) {
+                graphicView.setApplicationController(this);
+            }
+
             // Close current view before displaying new one
             if (!viewStack.isEmpty()) {
                 viewStack.peekFirst().close();
@@ -198,6 +203,7 @@ public class ApplicationController {
             currentView.close();
             View previousView = viewStack.peekFirst();
             previousView.display();
+        } else {
             System.out.println("Cannot go back from login screen.");
             logger.info("Cannot go back from login screen.");
         }

@@ -25,6 +25,7 @@ import java.util.logging.Logger;
 public class GraphicMatchDetailView implements MatchDetailView {
     private static final Logger logger = Logger.getLogger(GraphicMatchDetailView.class.getName());
     private final MatchController matchController;
+    private controller.ApplicationController applicationController;
     private Stage stage;
     private VBox infoContainer;
     private Button joinButton;
@@ -40,6 +41,10 @@ public class GraphicMatchDetailView implements MatchDetailView {
         } catch (Exception e) {
             logger.severe("Error initializing FieldDAO: " + e.getMessage());
         }
+    }
+
+    public void setApplicationController(controller.ApplicationController applicationController) {
+        this.applicationController = applicationController;
     }
 
     @Override
@@ -136,7 +141,11 @@ public class GraphicMatchDetailView implements MatchDetailView {
     }
 
     private void handleBack() {
-        close();
+        if (applicationController != null) {
+            applicationController.back();
+        } else {
+            close();
+        }
     }
 
     @Override

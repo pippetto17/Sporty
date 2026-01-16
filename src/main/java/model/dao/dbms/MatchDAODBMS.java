@@ -232,41 +232,4 @@ public class MatchDAODBMS implements MatchDAO {
                 .replace("\r", "\\r")
                 .replace("\t", "\\t");
     }
-
-    @Override
-    public boolean addParticipant(int matchId, String username) {
-        Match match = findById(matchId);
-        if (match == null) {
-            return false;
-        }
-
-        boolean added = match.addParticipant(username);
-        if (added) {
-            save(match); // Save will now persist participants to JSON column
-        }
-        return added;
-    }
-
-    @Override
-    public boolean removeParticipant(int matchId, String username) {
-        Match match = findById(matchId);
-        if (match == null) {
-            return false;
-        }
-
-        boolean removed = match.removeParticipant(username);
-        if (removed) {
-            save(match); // Save will now persist participants to JSON column
-        }
-        return removed;
-    }
-
-    @Override
-    public List<String> getParticipants(int matchId) {
-        Match match = findById(matchId);
-        if (match == null) {
-            return List.of();
-        }
-        return match.getParticipants();
-    }
 }

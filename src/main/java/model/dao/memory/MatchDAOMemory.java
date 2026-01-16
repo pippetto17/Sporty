@@ -44,33 +44,6 @@ public class MatchDAOMemory implements MatchDAO {
         matches.remove(matchId);
     }
 
-    @Override
-    public boolean addParticipant(int matchId, String username) {
-        Match match = findById(matchId);
-        if (match == null) {
-            return false;
-        }
-        return match.addParticipant(username);
-    }
-
-    @Override
-    public boolean removeParticipant(int matchId, String username) {
-        Match match = findById(matchId);
-        if (match == null) {
-            return false;
-        }
-        return match.removeParticipant(username);
-    }
-
-    @Override
-    public List<String> getParticipants(int matchId) {
-        Match match = findById(matchId);
-        if (match == null) {
-            return List.of();
-        }
-        return match.getParticipants();
-    }
-
     // Metodo per testing - pulisce tutti i dati
     public void clearAll() {
         matches.clear();

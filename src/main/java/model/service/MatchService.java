@@ -110,7 +110,16 @@ public class MatchService {
      * Aggiunge un partecipante a un match.
      */
     public boolean joinMatch(int matchId, String username) {
-        return matchDAO.addParticipant(matchId, username);
+        Match match = matchDAO.findById(matchId);
+        if (match == null) {
+            return false;
+        }
+
+        boolean added = match.addParticipant(username);
+        if (added) {
+            matchDAO.save(match);
+        }
+        return added;
     }
 
     /**
