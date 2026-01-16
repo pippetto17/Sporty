@@ -13,6 +13,7 @@ import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import model.bean.FieldBean;
 import model.domain.Sport;
+import model.utils.Constants;
 import model.utils.ItalianCities;
 
 import java.io.IOException;
@@ -92,11 +93,11 @@ public class GraphicOrganizeMatchView implements OrganizeMatchView {
 
                 stage.show();
             } catch (IOException e) {
-                logger.severe("Failed to load organize match view: " + e.getMessage());
-                showErrorDialog("Failed to load organize match view: " + e.getMessage());
+                logger.severe(Constants.ERROR_LOAD_ORGANIZE_MATCH_VIEW + e.getMessage());
+                showErrorDialog(Constants.ERROR_LOAD_ORGANIZE_MATCH_VIEW + e.getMessage());
             } catch (Exception e) {
-                logger.severe("Unexpected error loading organize match view: " + e.getMessage());
-                showErrorDialog("Unexpected error: " + e.getMessage());
+                logger.severe(Constants.ERROR_UNEXPECTED_LOADING_VIEW + e.getMessage());
+                showErrorDialog(Constants.ERROR_UNEXPECTED + e.getMessage());
             }
         });
     }
@@ -193,7 +194,7 @@ public class GraphicOrganizeMatchView implements OrganizeMatchView {
                     maxAdditional, maxAdditional);
             participantsSpinner.setValueFactory(valueFactory);
         } else {
-            participantsInfoLabel.setText("Select a sport first");
+            participantsInfoLabel.setText(Constants.ERROR_SELECT_SPORT_FIRST);
         }
     }
 
@@ -201,7 +202,7 @@ public class GraphicOrganizeMatchView implements OrganizeMatchView {
     private void handleSearchFields() {
         // Clear previous messages
         messageLabel.setText("");
-        messageLabel.getStyleClass().removeAll("error", "success");
+        messageLabel.getStyleClass().removeAll(Constants.CSS_ERROR, Constants.CSS_SUCCESS);
 
         // Validate inputs
         if (!validateInputs()) {
@@ -217,7 +218,7 @@ public class GraphicOrganizeMatchView implements OrganizeMatchView {
 
         // Validate with controller
         if (!organizeMatchController.validateMatchDetails(sport, date, time, city, participants)) {
-            showError("Invalid match details. Please check your inputs.");
+            showError(Constants.ERROR_INVALID_MATCH_DETAILS);
             return;
         }
 
@@ -228,7 +229,7 @@ public class GraphicOrganizeMatchView implements OrganizeMatchView {
         showSummary(sport, date, time, city, participants);
 
         // Show success message
-        showSuccess("Match details saved! Proceeding to field selection...");
+        showSuccess(Constants.SUCCESS_MATCH_DETAILS_FIELD_SELECTION);
 
         // Navigate to field selection after a short delay
         new Thread(() -> {
@@ -246,28 +247,28 @@ public class GraphicOrganizeMatchView implements OrganizeMatchView {
 
     private boolean validateInputs() {
         if (sportComboBox.getValue() == null) {
-            showError("Please select a sport");
+            showError(Constants.ERROR_PLEASE_SELECT_SPORT);
             return false;
         }
         if (datePicker.getValue() == null) {
-            showError("Please select a date");
+            showError(Constants.ERROR_PLEASE_SELECT_DATE);
             return false;
         }
         if (timeField.getText() == null || timeField.getText().trim().isEmpty()) {
-            showError("Please enter a time");
+            showError(Constants.ERROR_PLEASE_ENTER_TIME);
             return false;
         }
         LocalTime time = parseTime(timeField.getText());
         if (time == null) {
-            showError("Invalid time format. Use HH:MM (e.g., 18:30)");
+            showError(Constants.ERROR_INVALID_TIME_FORMAT);
             return false;
         }
         if (cityComboBox.getValue() == null || cityComboBox.getValue().trim().isEmpty()) {
-            showError("Please select a city from the list");
+            showError(Constants.ERROR_PLEASE_SELECT_CITY);
             return false;
         }
         if (!ItalianCities.isValidCity(cityComboBox.getValue())) {
-            showError("Please select a valid Italian city from the list");
+            showError(Constants.ERROR_PLEASE_VALID_ITALIAN_CITY);
             return false;
         }
         return true;
@@ -304,7 +305,7 @@ public class GraphicOrganizeMatchView implements OrganizeMatchView {
         summaryBox.setVisible(false);
         summaryBox.setManaged(false);
         messageLabel.setText("");
-        participantsInfoLabel.setText("Select a sport first");
+        participantsInfoLabel.setText(Constants.ERROR_SELECT_SPORT_FIRST);
     }
 
     @FXML
@@ -341,21 +342,21 @@ public class GraphicOrganizeMatchView implements OrganizeMatchView {
     }
 
     private void showError(String message) {
-        messageLabel.getStyleClass().removeAll("success");
-        messageLabel.getStyleClass().add("error");
+        messageLabel.getStyleClass().removeAll(Constants.CSS_SUCCESS);
+        messageLabel.getStyleClass().add(Constants.CSS_ERROR);
         messageLabel.setText(message);
     }
 
     private void showSuccess(String message) {
-        messageLabel.getStyleClass().removeAll("error");
-        messageLabel.getStyleClass().add("success");
+        messageLabel.getStyleClass().removeAll(Constants.CSS_ERROR);
+        messageLabel.getStyleClass().add(Constants.CSS_SUCCESS);
         messageLabel.setText(message);
     }
 
     private void showErrorDialog(String message) {
         Platform.runLater(() -> {
             Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Error");
+            alert.setTitle(Constants.DIALOG_TITLE_ERROR);
             alert.setHeaderText(null);
             alert.setContentText(message);
             alert.showAndWait();

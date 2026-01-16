@@ -17,6 +17,7 @@ public final class Constants {
     public static final String ERROR_SURNAME_EMPTY = "Surname cannot be empty";
     public static final String ERROR_USERNAME_EXISTS = "Username already exists";
     public static final String ERROR_INVALID_CREDENTIALS = "Invalid username or password";
+    public static final String ERROR_ALL_FIELDS_REQUIRED = "All fields are required";
 
     // Error messages - General
     public static final String ERROR_INVALID_OPTION = "Invalid option. Please try again.";
@@ -26,11 +27,21 @@ public final class Constants {
     public static final String ERROR_SELECT_SPORT_FIRST = "Select a sport first";
     public static final String ERROR_UNEXPECTED = "Unexpected error: ";
 
+    // Error messages - Validation
+    public static final String ERROR_PLEASE_SELECT_SPORT = "Please select a sport";
+    public static final String ERROR_PLEASE_SELECT_DATE = "Please select a date";
+    public static final String ERROR_PLEASE_ENTER_TIME = "Please enter a time";
+    public static final String ERROR_INVALID_TIME_FORMAT = "Invalid time format. Use HH:MM (e.g., 18:30)";
+    public static final String ERROR_PLEASE_SELECT_CITY = "Please select a city from the list";
+    public static final String ERROR_PLEASE_VALID_ITALIAN_CITY = "Please select a valid Italian city from the list";
+
     // Error messages - Initialization
     public static final String ERROR_DAO_INIT = "Failed to initialize DAO: ";
     public static final String ERROR_MATCH_SERVICE_INIT = "Errore nell'inizializzazione di MatchService: ";
     public static final String ERROR_FIELD_SERVICE_INIT = "Errore nell'inizializzazione di FieldService: ";
     public static final String ERROR_MATCHBEAN_NULL = "MatchBean non può essere null";
+    public static final String ERROR_LOAD_ORGANIZE_MATCH_VIEW = "Failed to load organize match view: ";
+    public static final String ERROR_UNEXPECTED_LOADING_VIEW = "Unexpected error loading organize match view: ";
 
     // Error messages - Match/Field
     public static final String ERROR_MATCH_NOT_FOUND = "Match not found";
@@ -60,6 +71,8 @@ public final class Constants {
     public static final String SUCCESS_JOIN_MATCH = "Successfully joined the match!";
     public static final String SUCCESS_MATCH_CANCELLED = "Match cancelled successfully";
     public static final String SUCCESS_MATCH_DETAILS_SAVED = "Match details saved successfully!";
+    public static final String SUCCESS_REGISTRATION = "Registration successful!";
+    public static final String SUCCESS_MATCH_DETAILS_FIELD_SELECTION = "Match details saved! Proceeding to field selection...";
 
     // Info messages
     public static final String INFO_INVITE_COMING_SOON = "Invite players feature coming soon!";
@@ -72,10 +85,19 @@ public final class Constants {
     // UI messages - Match
     public static final String MSG_COULD_NOT_JOIN = "Could not join match. It may be full or you've already joined.";
 
+    // Dialog titles
+    public static final String DIALOG_TITLE_ERROR = "Error";
+
     // CSS class names
     public static final String CSS_SECONDARY_BUTTON = "secondary-button";
     public static final String CSS_MATCH_INFO = "match-info";
     public static final String CSS_FIELD_DETAIL = "field-detail";
+    public static final String CSS_ERROR = "error";
+    public static final String CSS_SUCCESS = "success";
+
+    // Role names
+    public static final String ROLE_PLAYER = "Player";
+    public static final String ROLE_ORGANIZER = "Organizer";
 
     // Separators
     public static final String SEPARATOR = "=================================";

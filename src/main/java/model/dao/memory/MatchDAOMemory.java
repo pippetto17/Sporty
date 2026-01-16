@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.Map;
 
 public class MatchDAOMemory implements MatchDAO {
-    private static final Map<Integer, Match> matches = new HashMap<>();
-    private static int nextId = 1;
+    private final Map<Integer, Match> matches = new HashMap<>();
+    private int nextId = 1;
 
     @Override
     public void save(Match match) {
@@ -72,7 +72,7 @@ public class MatchDAOMemory implements MatchDAO {
     }
 
     // Metodo per testing - pulisce tutti i dati
-    public static void clearAll() {
+    public void clearAll() {
         matches.clear();
         nextId = 1;
     }

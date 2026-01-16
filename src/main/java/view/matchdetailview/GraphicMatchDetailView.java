@@ -16,11 +16,14 @@ import model.dao.DAOFactory;
 import model.domain.Field;
 import model.utils.Constants;
 
+import java.util.logging.Logger;
+
 /**
  * JavaFX implementation of Match Detail View.
  * Displays detailed match information with appropriate actions.
  */
 public class GraphicMatchDetailView implements MatchDetailView {
+    private static final Logger logger = Logger.getLogger(GraphicMatchDetailView.class.getName());
     private final MatchController matchController;
     private Stage stage;
     private VBox infoContainer;
@@ -35,7 +38,7 @@ public class GraphicMatchDetailView implements MatchDetailView {
         try {
             this.fieldDAO = DAOFactory.getFieldDAO(DAOFactory.PersistenceType.MEMORY);
         } catch (Exception e) {
-            System.err.println("Error initializing FieldDAO: " + e.getMessage());
+            logger.severe("Error initializing FieldDAO: " + e.getMessage());
         }
     }
 
@@ -237,18 +240,8 @@ public class GraphicMatchDetailView implements MatchDetailView {
                 infoContainer.getChildren().add(mapSection);
             }
         } catch (Exception e) {
-            System.err.println("Error loading map: " + e.getMessage());
+            logger.severe("Error loading map: " + e.getMessage());
         }
-    }
-
-    private VBox createInfoLabel(String title, String value) {
-        VBox box = new VBox(5);
-        Label titleLabel = new Label(title);
-        titleLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #2d3436;");
-        Label valueLabel = new Label(value);
-        valueLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #6c757d;");
-        box.getChildren().addAll(titleLabel, valueLabel);
-        return box;
     }
 
     @Override

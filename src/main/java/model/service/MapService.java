@@ -131,14 +131,13 @@ public class MapService {
             if (field.hasCoordinates()) {
                 html.append("<div class='field-item'>");
                 html.append("<div>");
-                html.append(String.format("<div class='field-name'>%s</div>", escapeHtml(field.getName())));
-                html.append(String.format("<div class='field-info'>%s - %s</div>",
-                        escapeHtml(field.getSport().getDisplayName()),
-                        escapeHtml(field.getAddress())));
+                html.append("<div class='field-name'>").append(escapeHtml(field.getName())).append(HTML_DIV_END);
+                html.append("<div class='field-info'>").append(escapeHtml(field.getSport().getDisplayName()))
+                        .append(" - ").append(escapeHtml(field.getAddress())).append(HTML_DIV_END);
                 html.append(HTML_DIV_END);
                 html.append("<div style='text-align:right;'>");
-                html.append(String.format("<div class='field-price'>€%.2f/h</div>",
-                        field.getPricePerHour()));
+                html.append(String.format("<div class='field-price'>€%.2f/h",
+                        field.getPricePerHour())).append(HTML_DIV_END);
 
                 // Link diretto al campo su OpenStreetMap
                 String fieldOsmUrl = String.format(java.util.Locale.US,
@@ -191,32 +190,32 @@ public class MapService {
         html.append(String.format("<h2>📍 %s</h2>", escapeHtml(field.getName())));
 
         html.append(HTML_DIV_INFO_ROW);
-        html.append("<div class='label'>Sport</div>");
-        html.append(String.format("<div class='value'>%s</div>", escapeHtml(field.getSport().getDisplayName())));
+        html.append("<div class='label'>Sport").append(HTML_DIV_END);
+        html.append("<div class='value'>").append(escapeHtml(field.getSport().getDisplayName())).append(HTML_DIV_END);
         html.append(HTML_DIV_END);
 
         html.append(HTML_DIV_INFO_ROW);
-        html.append("<div class='label'>Indirizzo</div>");
-        html.append(String.format("<div class='value'>%s, %s</div>",
-                escapeHtml(field.getAddress()), escapeHtml(field.getCity())));
+        html.append("<div class='label'>Indirizzo").append(HTML_DIV_END);
+        html.append("<div class='value'>").append(escapeHtml(field.getAddress())).append(", ")
+                .append(escapeHtml(field.getCity())).append(HTML_DIV_END);
         html.append(HTML_DIV_END);
 
         html.append(HTML_DIV_INFO_ROW);
-        html.append("<div class='label'>Prezzo</div>");
-        html.append(String.format("<div class='value' style='color:#28a745;font-size:20px;'>€%.2f/ora</div>",
-                field.getPricePerHour()));
+        html.append("<div class='label'>Prezzo").append(HTML_DIV_END);
+        html.append(String.format("<div class='value' style='color:#28a745;font-size:20px;'>€%.2f/ora",
+                field.getPricePerHour())).append(HTML_DIV_END);
         html.append(HTML_DIV_END);
 
         html.append(HTML_DIV_INFO_ROW);
-        html.append("<div class='label'>Coordinate GPS</div>");
-        html.append(String.format(java.util.Locale.US, "<div class='value'>%.6f, %.6f</div>",
-                field.getLatitude(), field.getLongitude()));
+        html.append("<div class='label'>Coordinate GPS").append(HTML_DIV_END);
+        html.append(String.format(java.util.Locale.US, "<div class='value'>%.6f, %.6f",
+                field.getLatitude(), field.getLongitude())).append(HTML_DIV_END);
         html.append(HTML_DIV_END);
 
         html.append(String.format("<a href='%s' class='map-btn' target='_blank'>", escapeHtml(osmUrl)));
         html.append("🗺️ APRI SU OPENSTREETMAP</a>");
 
-        html.append("</div>");
+        html.append(HTML_DIV_END);
         html.append("</body></html>");
         return html.toString();
     }

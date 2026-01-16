@@ -3,6 +3,7 @@ package view.organizematchview;
 import controller.ApplicationController;
 import controller.OrganizeMatchController;
 import model.domain.Sport;
+import model.utils.Constants;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -32,9 +33,9 @@ public class CLIOrganizeMatchView implements OrganizeMatchView {
         displayHeader();
 
         while (running) {
-            System.out.println("\n=================================");
+            System.out.println("\n" + Constants.SEPARATOR);
             System.out.println("    ORGANIZE MATCH");
-            System.out.println("=================================");
+            System.out.println(Constants.SEPARATOR);
             System.out.println("1. View my matches (Work in progress)");
             System.out.println("2. Create new match");
             System.out.println("3. Back to home");
@@ -59,9 +60,9 @@ public class CLIOrganizeMatchView implements OrganizeMatchView {
 
     @Override
     public void displayNewMatchForm() {
-        System.out.println("\n=================================");
+        System.out.println("\n" + Constants.SEPARATOR);
         System.out.println("    CREATE NEW MATCH");
-        System.out.println("=================================");
+        System.out.println(Constants.SEPARATOR);
 
         organizeMatchController.startNewMatch();
 
@@ -124,12 +125,12 @@ public class CLIOrganizeMatchView implements OrganizeMatchView {
     }
 
     private void displayHeader() {
-        System.out.println("\n=================================");
+        System.out.println("\n" + Constants.SEPARATOR);
         System.out.println("    MATCH ORGANIZATION");
-        System.out.println("=================================");
+        System.out.println(Constants.SEPARATOR);
         System.out.println("Organizer: " + organizeMatchController.getOrganizer().getName() +
                           " " + organizeMatchController.getOrganizer().getSurname());
-        System.out.println("=================================");
+        System.out.println(Constants.SEPARATOR);
     }
 
     private void handleMenuChoice(String choice) {
@@ -224,15 +225,15 @@ public class CLIOrganizeMatchView implements OrganizeMatchView {
     }
 
     private void displayMatchSummary() {
-        System.out.println("\n=================================");
+        System.out.println("\n" + Constants.SEPARATOR);
         System.out.println("    MATCH SUMMARY");
-        System.out.println("=================================");
+        System.out.println(Constants.SEPARATOR);
         System.out.println("Sport: " + organizeMatchController.getCurrentMatchBean().getSport().getDisplayName());
         System.out.println("Date: " + organizeMatchController.getCurrentMatchBean().getMatchDate());
         System.out.println("Time: " + organizeMatchController.getCurrentMatchBean().getMatchTime());
         System.out.println("City: " + organizeMatchController.getCurrentMatchBean().getCity());
         System.out.println("Participants: " + organizeMatchController.getCurrentMatchBean().getRequiredParticipants());
-        System.out.println("=================================");
+        System.out.println(Constants.SEPARATOR);
     }
 }
 

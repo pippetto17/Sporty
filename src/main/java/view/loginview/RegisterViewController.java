@@ -6,6 +6,7 @@ import javafx.scene.control.*;
 import javafx.stage.Stage;
 import model.bean.UserBean;
 import model.domain.Role;
+import model.utils.Constants;
 
 public class RegisterViewController {
     private final LoginController loginController;
@@ -37,16 +38,16 @@ public class RegisterViewController {
     private void initialize() {
         // Set default role selection
         if (roleComboBox.getItems().isEmpty()) {
-            roleComboBox.getItems().addAll("Player", "Organizer");
+            roleComboBox.getItems().addAll(Constants.ROLE_PLAYER, Constants.ROLE_ORGANIZER);
         }
-        roleComboBox.setValue("Player");
+        roleComboBox.setValue(Constants.ROLE_PLAYER);
     }
 
     @FXML
     private void handleRegisterSubmit() {
         // Clear previous messages
         messageLabel.setText("");
-        messageLabel.getStyleClass().removeAll("error", "success");
+        messageLabel.getStyleClass().removeAll(Constants.CSS_ERROR, Constants.CSS_SUCCESS);
 
         try {
             // Validate inputs
@@ -58,19 +59,19 @@ public class RegisterViewController {
 
             if (username.isEmpty() || password.isEmpty() || name.isEmpty() ||
                 surname.isEmpty() || selectedRole == null) {
-                showError("All fields are required");
+                showError(Constants.ERROR_ALL_FIELDS_REQUIRED);
                 return;
             }
 
             // Map role string to role code
-            int roleCode = selectedRole.equals("Player") ? Role.PLAYER.getCode() : Role.ORGANIZER.getCode();
+            int roleCode = selectedRole.equals(Constants.ROLE_PLAYER) ? Role.PLAYER.getCode() : Role.ORGANIZER.getCode();
 
             // Register user
             UserBean userBean = new UserBean(username, password);
             loginController.register(userBean, name, surname, roleCode);
 
             // Show success message
-            showSuccess("Registration successful!");
+            showSuccess(Constants.SUCCESS_REGISTRATION);
 
             // Close window after 1.5 seconds
             new Thread(() -> {
@@ -93,14 +94,14 @@ public class RegisterViewController {
     }
 
     private void showError(String message) {
-        messageLabel.getStyleClass().removeAll("success");
-        messageLabel.getStyleClass().add("error");
+        messageLabel.getStyleClass().removeAll(Constants.CSS_SUCCESS);
+        messageLabel.getStyleClass().add(Constants.CSS_ERROR);
         messageLabel.setText(message);
     }
 
     private void showSuccess(String message) {
-        messageLabel.getStyleClass().removeAll("error");
-        messageLabel.getStyleClass().add("success");
+        messageLabel.getStyleClass().removeAll(Constants.CSS_ERROR);
+        messageLabel.getStyleClass().add(Constants.CSS_SUCCESS);
         messageLabel.setText(message);
     }
 }
