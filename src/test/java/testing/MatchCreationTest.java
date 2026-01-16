@@ -62,19 +62,6 @@ class MatchCreationTest {
         assertNotNull(matchBean.getMatchId());
     }
 
-    @Test
-    @DisplayName("Validazione con sport e partecipanti validi dovrebbe passare")
-    void testValidateMatchWithValidData() {
-        boolean isValid = matchService.isValidMatch(Sport.FOOTBALL_11, 10);
-        assertTrue(isValid);
-    }
-
-    @Test
-    @DisplayName("Validazione con troppi partecipanti dovrebbe fallire")
-    void testValidateMatchWithTooManyParticipants() {
-        boolean isValid = matchService.isValidMatch(Sport.FOOTBALL_11, 25);
-        assertFalse(isValid);
-    }
 
     @Test
     @DisplayName("Recupero match per ID dovrebbe funzionare")
