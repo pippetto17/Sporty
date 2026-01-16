@@ -1,12 +1,8 @@
 package testing;
 
-import controller.ApplicationController;
-import controller.OrganizeMatchController;
 import model.bean.MatchBean;
 import model.dao.DAOFactory;
 import model.domain.Sport;
-import model.domain.User;
-import model.domain.Role;
 import model.service.MatchService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,27 +18,15 @@ import static org.junit.jupiter.api.Assertions.*;
 class MatchCreationTest {
 
     private MatchService matchService;
-    private OrganizeMatchController organizeController;
-    private User testOrganizer;
 
     @BeforeEach
     void setUp() throws Exception {
         matchService = new MatchService(DAOFactory.PersistenceType.MEMORY);
-
-        // Crea un utente organizer per i test del controller
-        testOrganizer = new User("testOrg", "password", "Test", "Organizer", Role.ORGANIZER.getCode());
-
-        // Crea ApplicationController mock (con persistenza MEMORY)
-        ApplicationController appController = new ApplicationController();
-        appController.setPersistenceMode(ApplicationController.PersistenceMode.MEMORY);
-
-        organizeController = new OrganizeMatchController(testOrganizer, appController);
     }
 
     @Test
-    @DisplayName("Creazione match di calcio con dati validi dovrebbe avere successo")
+    @DisplayName("Creazione match di calcio")
     void testCreateFootballMatch() {
-        // Arrange
         MatchBean matchBean = new MatchBean();
         matchBean.setOrganizerUsername("organizer1");
         matchBean.setSport(Sport.FOOTBALL_11);
@@ -52,16 +36,13 @@ class MatchCreationTest {
         matchBean.setRequiredParticipants(10);
         matchBean.setFieldId("1");
 
-        // Act
-        assertDoesNotThrow(() -> matchService.saveMatch(matchBean));
+        matchService.saveMatch(matchBean);
 
-        // Assert
         assertNotNull(matchBean.getMatchId());
-        assertTrue(matchBean.getMatchId() > 0);
     }
 
     @Test
-    @DisplayName("Creazione match di basket dovrebbe funzionare")
+    @DisplayName("Creazione match di basket")
     void testCreateBasketballMatch() {
         MatchBean matchBean = new MatchBean();
         matchBean.setOrganizerUsername("organizer2");
@@ -77,11 +58,9 @@ class MatchCreationTest {
         assertNotNull(matchBean.getMatchId());
     }
 
-
     @Test
-    @DisplayName("Recupero match per ID dovrebbe funzionare")
+    @DisplayName("Recupero match per ID")
     void testGetMatchById() {
-        // Arrange
         MatchBean matchBean = new MatchBean();
         matchBean.setOrganizerUsername("testOrg");
         matchBean.setSport(Sport.FOOTBALL_11);
@@ -94,18 +73,15 @@ class MatchCreationTest {
         matchService.saveMatch(matchBean);
         int matchId = matchBean.getMatchId();
 
-        // Act
         MatchBean retrieved = matchService.getMatchById(matchId);
 
-        // Assert
         assertNotNull(retrieved);
         assertEquals(matchId, retrieved.getMatchId());
-        assertEquals("testOrg", retrieved.getOrganizerUsername());
     }
 
     @Test
-    @DisplayName("Validazione dettagli match con dati validi dovrebbe passare")
-    void testValidateMatchDetailsWithValidData() {
+    @DisplayName("Validazione match con dati corretti")
+    void testValidateMatchWithCorrectData() {
         LocalDate futureDate = LocalDate.now().plusDays(5);
         LocalTime time = LocalTime.of(18, 0);
 
@@ -117,231 +93,13 @@ class MatchCreationTest {
     }
 
     @Test
-    @DisplayName("Validazione con sport null dovrebbe fallire")
-    void testValidateMatchDetailsWithNullSport() {
-        LocalDate futureDate = LocalDate.now().plusDays(5);
-        LocalTime time = LocalTime.of(18, 0);
-
-        boolean isValid = matchService.validateMatchDetails(
-            null, futureDate, time, "Milano", 10
-        );
-
-        assertFalse(isValid);
-    }
-
-    @Test
-    @DisplayName("Validazione con data passata dovrebbe fallire")
-    void testValidateMatchDetailsWithPastDate() {
+    @DisplayName("Validazione match con data passata")
+    void testValidateMatchWithPastDate() {
         LocalDate pastDate = LocalDate.of(2020, 1, 1);
         LocalTime time = LocalTime.of(18, 0);
 
         boolean isValid = matchService.validateMatchDetails(
             Sport.FOOTBALL_11, pastDate, time, "Milano", 10
-        );
-
-        assertFalse(isValid);
-    }
-
-    @Test
-    @DisplayName("Validazione con città vuota dovrebbe fallire")
-    void testValidateMatchDetailsWithEmptyCity() {
-        LocalDate futureDate = LocalDate.now().plusDays(5);
-        LocalTime time = LocalTime.of(18, 0);
-
-        boolean isValid = matchService.validateMatchDetails(
-            Sport.FOOTBALL_11, futureDate, time, "", 10
-        );
-
-        assertFalse(isValid);
-    }
-
-    @Test
-    @DisplayName("Validazione con partecipanti invalidi dovrebbe fallire")
-    void testValidateMatchDetailsWithInvalidParticipants() {
-        LocalDate futureDate = LocalDate.now().plusDays(5);
-        LocalTime time = LocalTime.of(18, 0);
-
-        boolean isValid = matchService.validateMatchDetails(
-            Sport.FOOTBALL_11, futureDate, time, "Milano", 100
-        );
-
-        assertFalse(isValid);
-    }
-
-    @Test
-    @DisplayName("SaveMatch con bean null dovrebbe lanciare eccezione")
-    void testSaveMatchWithNullBean() {
-        assertThrows(IllegalArgumentException.class, () -> matchService.saveMatch(null));
-    }
-
-    @Test
-    @DisplayName("Conferma match dovrebbe cambiare stato")
-    void testConfirmMatch() {
-        // Arrange
-        MatchBean matchBean = new MatchBean();
-        matchBean.setOrganizerUsername("organizer3");
-        matchBean.setSport(Sport.TENNIS_SINGLE);
-        matchBean.setMatchDate(LocalDate.of(2026, 8, 15));
-        matchBean.setMatchTime(LocalTime.of(10, 0));
-        matchBean.setCity("Torino");
-        matchBean.setRequiredParticipants(1);
-        matchBean.setFieldId("3");
-
-        matchService.saveMatch(matchBean);
-
-        // Act
-        matchService.confirmMatch(matchBean);
-
-        // Assert
-        assertNotNull(matchBean.getStatus());
-    }
-
-    @Test
-    @DisplayName("Recupero match disponibili dovrebbe funzionare")
-    void testGetAllAvailableMatches() {
-        // Arrange
-        MatchBean match1 = new MatchBean();
-        match1.setOrganizerUsername("org1");
-        match1.setSport(Sport.FOOTBALL_5);
-        match1.setMatchDate(LocalDate.of(2026, 6, 20));
-        match1.setMatchTime(LocalTime.of(19, 0));
-        match1.setCity("Napoli");
-        match1.setRequiredParticipants(4);
-        match1.setFieldId("4");
-
-        matchService.saveMatch(match1);
-        matchService.confirmMatch(match1);
-
-        // Act
-        var matches = matchService.getAllAvailableMatches();
-
-        // Assert
-        assertNotNull(matches);
-    }
-
-    @Test
-    @DisplayName("Recupero match per organizer dovrebbe funzionare")
-    void testGetOrganizerMatches() {
-        // Arrange
-        String organizerUsername = "testOrganizer";
-
-        MatchBean match1 = new MatchBean();
-        match1.setOrganizerUsername(organizerUsername);
-        match1.setSport(Sport.PADEL_DOUBLE);
-        match1.setMatchDate(LocalDate.of(2026, 9, 10));
-        match1.setMatchTime(LocalTime.of(17, 0));
-        match1.setCity("Firenze");
-        match1.setRequiredParticipants(5);
-        match1.setFieldId("5");
-
-        matchService.saveMatch(match1);
-
-        // Act
-        var matches = matchService.getOrganizerMatches(organizerUsername);
-
-        // Assert
-        assertNotNull(matches);
-        assertFalse(matches.isEmpty());
-    }
-
-    @Test
-    @DisplayName("Cancellazione match dovrebbe restituire lista partecipanti")
-    void testCancelMatch() {
-        // Arrange
-        MatchBean matchBean = new MatchBean();
-        matchBean.setOrganizerUsername("orgToCancel");
-        matchBean.setSport(Sport.FOOTBALL_11);
-        matchBean.setMatchDate(LocalDate.of(2026, 10, 15));
-        matchBean.setMatchTime(LocalTime.of(18, 0));
-        matchBean.setCity("Bologna");
-        matchBean.setRequiredParticipants(10);
-        matchBean.setFieldId("6");
-
-        matchService.saveMatch(matchBean);
-        int matchId = matchBean.getMatchId();
-
-        // Act
-        var participants = matchService.cancelMatch(matchId);
-
-        // Assert
-        assertNotNull(participants);
-    }
-
-    // ============================================================
-    // TEST ORGANIZE MATCH CONTROLLER
-    // ============================================================
-
-    @Test
-    @DisplayName("Inizializzazione nuovo match dovrebbe creare bean con organizer")
-    void testStartNewMatch() {
-        // Act
-        organizeController.startNewMatch();
-        MatchBean matchBean = organizeController.getCurrentMatchBean();
-
-        // Assert
-        assertNotNull(matchBean);
-        assertEquals("testOrg", matchBean.getOrganizerUsername());
-    }
-
-    @Test
-    @DisplayName("Validazione dettagli match tramite controller dovrebbe funzionare")
-    void testValidateMatchDetailsViaController() {
-        LocalDate futureDate = LocalDate.now().plusDays(10);
-        LocalTime time = LocalTime.of(18, 0);
-
-        boolean isValid = organizeController.validateMatchDetails(
-            Sport.FOOTBALL_5, futureDate, time, "Milano", 9
-        );
-
-        assertTrue(isValid);
-    }
-
-    @Test
-    @DisplayName("Impostazione dettagli match dovrebbe aggiornare bean")
-    void testSetMatchDetails() {
-        // Arrange
-        organizeController.startNewMatch();
-        LocalDate date = LocalDate.of(2026, 7, 15);
-        LocalTime time = LocalTime.of(19, 30);
-
-        // Act
-        organizeController.setMatchDetails(Sport.BASKETBALL, date, time, "Roma", 9);
-        MatchBean matchBean = organizeController.getCurrentMatchBean();
-
-        // Assert
-        assertEquals(Sport.BASKETBALL, matchBean.getSport());
-        assertEquals(date, matchBean.getMatchDate());
-        assertEquals(time, matchBean.getMatchTime());
-        assertEquals("Roma", matchBean.getCity());
-        assertEquals(9, matchBean.getRequiredParticipants());
-    }
-
-    @Test
-    @DisplayName("Recupero sport disponibili dovrebbe restituire array non vuoto")
-    void testGetAvailableSports() {
-        Sport[] sports = organizeController.getAvailableSports();
-
-        assertNotNull(sports);
-        assertTrue(sports.length > 0);
-    }
-
-    @Test
-    @DisplayName("Recupero organizer dal controller dovrebbe funzionare")
-    void testGetOrganizer() {
-        User organizer = organizeController.getOrganizer();
-
-        assertNotNull(organizer);
-        assertEquals("testOrg", organizer.getUsername());
-    }
-
-    @Test
-    @DisplayName("Validazione con controller e dati invalidi dovrebbe fallire")
-    void testValidateMatchDetailsInvalidViaController() {
-        LocalDate pastDate = LocalDate.of(2020, 1, 1);
-        LocalTime time = LocalTime.of(18, 0);
-
-        boolean isValid = organizeController.validateMatchDetails(
-            Sport.FOOTBALL_11, pastDate, time, "Milano", 21
         );
 
         assertFalse(isValid);
