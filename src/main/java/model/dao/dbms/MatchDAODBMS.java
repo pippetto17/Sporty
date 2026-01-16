@@ -2,9 +2,10 @@ package model.dao.dbms;
 
 import model.dao.MatchDAO;
 import model.domain.Match;
-import model.domain.MatchStatus;
 import model.domain.Sport;
+import model.domain.MatchStatus;
 import exception.DataAccessException;
+import model.utils.Constants;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -65,7 +66,7 @@ public class MatchDAODBMS implements MatchDAO {
                 }
             }
         } catch (SQLException e) {
-            throw new DataAccessException("Error saving match: " + e.getMessage(), e);
+            throw new DataAccessException(Constants.ERROR_SAVING_MATCH + e.getMessage(), e);
         }
     }
 
@@ -86,7 +87,7 @@ public class MatchDAODBMS implements MatchDAO {
                 }
             }
         } catch (SQLException e) {
-            throw new DataAccessException("Error finding match by ID: " + e.getMessage(), e);
+            throw new DataAccessException(Constants.ERROR_FINDING_MATCH_BY_ID + e.getMessage(), e);
         }
         return null;
     }
@@ -106,9 +107,8 @@ public class MatchDAODBMS implements MatchDAO {
                 matches.add(extractMatchFromResultSet(rs));
             }
         } catch (SQLException e) {
-            throw new DataAccessException("Error finding matches by organizer: " + e.getMessage(), e);
+            throw new DataAccessException(Constants.ERROR_FINDING_MATCHES_BY_ORGANIZER + e.getMessage(), e);
         }
-
         return matches;
     }
 
@@ -127,9 +127,8 @@ public class MatchDAODBMS implements MatchDAO {
                 matches.add(extractMatchFromResultSet(rs));
             }
         } catch (SQLException e) {
-            throw new DataAccessException("Error finding available matches: " + e.getMessage(), e);
+            throw new DataAccessException(Constants.ERROR_FINDING_AVAILABLE_MATCHES + e.getMessage(), e);
         }
-
         return matches;
     }
 
@@ -141,7 +140,7 @@ public class MatchDAODBMS implements MatchDAO {
             stmt.setInt(1, matchId);
             stmt.executeUpdate();
         } catch (SQLException e) {
-            throw new DataAccessException("Error deleting match: " + e.getMessage(), e);
+            throw new DataAccessException(Constants.ERROR_DELETING_MATCH + e.getMessage(), e);
         }
     }
 

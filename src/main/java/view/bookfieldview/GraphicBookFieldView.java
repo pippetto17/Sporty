@@ -18,6 +18,7 @@ import javafx.util.StringConverter;
 import model.bean.FieldBean;
 import model.bean.MatchBean;
 import model.service.MapService;
+import model.utils.Constants;
 
 import java.io.IOException;
 import java.time.format.DateTimeFormatter;
@@ -28,7 +29,6 @@ public class GraphicBookFieldView implements BookFieldView {
     private final BookFieldController bookFieldController;
     private Stage stage;
     private static final Logger logger = Logger.getLogger(GraphicBookFieldView.class.getName());
-
 
     @FXML
     private Button backButton;
@@ -189,12 +189,12 @@ public class GraphicBookFieldView implements BookFieldView {
 
         // Sport
         Label sportLabel = new Label("⚽ " + field.getSport().getDisplayName());
-        sportLabel.getStyleClass().add("field-detail");
+        sportLabel.getStyleClass().add(Constants.CSS_FIELD_DETAIL);
         card.getChildren().add(sportLabel);
 
         // Address
         Label addressLabel = new Label("📍 " + field.getAddress() + ", " + field.getCity());
-        addressLabel.getStyleClass().add("field-detail");
+        addressLabel.getStyleClass().add(Constants.CSS_FIELD_DETAIL);
         card.getChildren().add(addressLabel);
 
         // Distance (if coordinates available)
@@ -203,7 +203,7 @@ public class GraphicBookFieldView implements BookFieldView {
                     MapService.getDefaultLat(), MapService.getDefaultLon(),
                     field.getLatitude(), field.getLongitude());
             Label distanceLabel = new Label(String.format("🚗 %.1f km from center", distance));
-            distanceLabel.getStyleClass().add("field-detail");
+            distanceLabel.getStyleClass().add(Constants.CSS_FIELD_DETAIL);
             distanceLabel.setStyle("-fx-text-fill: #28a745; -fx-font-weight: bold;");
             card.getChildren().add(distanceLabel);
         }

@@ -3,8 +3,10 @@ package model.dao.filesystem;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import exception.DataAccessException;
 import model.dao.UserDAO;
 import model.domain.User;
+import model.utils.Constants;
 
 import java.io.*;
 import java.lang.reflect.Type;
@@ -35,7 +37,7 @@ public class UserDAOFileSystem implements UserDAO {
                 users = new ArrayList<>();
             }
         } catch (IOException e) {
-            throw new RuntimeException("Error loading users from file system", e);
+            throw new DataAccessException(Constants.ERROR_LOADING_USERS_FS, e);
         }
     }
 
@@ -46,7 +48,7 @@ public class UserDAOFileSystem implements UserDAO {
         try (Writer writer = new FileWriter(file)) {
             gson.toJson(users, writer);
         } catch (IOException e) {
-            throw new RuntimeException("Error saving users to file system", e);
+            throw new DataAccessException(Constants.ERROR_SAVING_USERS_FS, e);
         }
     }
 

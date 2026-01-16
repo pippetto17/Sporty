@@ -3,6 +3,7 @@ package controller;
 import model.bean.MatchBean;
 import model.domain.User;
 import model.service.MatchService;
+import model.utils.Constants;
 import view.matchdetailview.MatchDetailView;
 
 import java.util.List;
@@ -34,7 +35,7 @@ public class MatchController {
     public void showMatchDetail(int matchId) {
         MatchBean match = matchService.getMatchById(matchId);
         if (match == null) {
-            view.showError("Match not found");
+            view.showError(Constants.ERROR_MATCH_NOT_FOUND);
             return;
         }
 
@@ -53,17 +54,17 @@ public class MatchController {
      */
     public void joinMatch(int matchId) {
         if (currentUser == null) {
-            view.showError("User not logged in");
+            view.showError(Constants.ERROR_USER_NOT_LOGGED_IN);
             return;
         }
 
         boolean success = matchService.joinMatch(matchId, currentUser.getUsername());
         if (success) {
-            view.displaySuccess("Successfully joined the match!");
+            view.displaySuccess(Constants.SUCCESS_JOIN_MATCH);
             // Refresh match details
             showMatchDetail(matchId);
         } else {
-            view.showError("Could not join match. It may be full or you've already joined.");
+            view.showError(Constants.MSG_COULD_NOT_JOIN);
         }
     }
 
@@ -72,21 +73,20 @@ public class MatchController {
      */
     public void cancelMatch(int matchId) {
         List<String> participants = matchService.cancelMatch(matchId);
-
-        view.displaySuccess("Match cancelled successfully");
+        view.displaySuccess(Constants.SUCCESS_MATCH_CANCELLED);
 
         // Future: send notifications to participants
         if (!participants.isEmpty()) {
-            System.out.println("Participants to notify: " + participants);
+            System.out.println(Constants.INFO_PARTICIPANTS_TO_NOTIFY + participants);
         }
     }
 
     /**
      * Navigate to invite players view (future implementation).
      */
-    public void invitePlayers(int matchId) {
+    public void invitePlayers() {
         // Placeholder for future implementation
-        view.showInfo("Invite players feature coming soon!");
+        view.showInfo(Constants.INFO_INVITE_COMING_SOON);
     }
 
     private boolean isUserOrganizer(MatchBean match) {

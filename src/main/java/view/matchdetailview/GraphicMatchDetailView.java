@@ -104,7 +104,7 @@ public class GraphicMatchDetailView implements MatchDetailView {
 
         Button inviteButton = new Button("Invite Players");
         inviteButton.getStyleClass().add(Constants.CSS_SECONDARY_BUTTON);
-        inviteButton.setOnAction(e -> matchController.invitePlayers(0)); // ID will be set later
+        inviteButton.setOnAction(e -> matchController.invitePlayers());
 
         Button cancelButton = new Button("Cancel Match");
         cancelButton.getStyleClass().add(Constants.CSS_SECONDARY_BUTTON);

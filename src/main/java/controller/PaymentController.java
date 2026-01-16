@@ -4,6 +4,7 @@ import model.bean.MatchBean;
 import model.bean.PaymentBean;
 import model.service.PaymentService;
 import model.service.MatchService;
+import model.utils.Constants;
 import exception.ServiceInitializationException;
 
 import java.sql.SQLException;
@@ -28,7 +29,7 @@ public class PaymentController {
         try {
             this.matchService = new MatchService(applicationController.getPersistenceType());
         } catch (SQLException e) {
-            throw new ServiceInitializationException("Errore nell'inizializzazione di MatchService: " + e.getMessage(),
+            throw new ServiceInitializationException(Constants.ERROR_MATCH_SERVICE_INIT + e.getMessage(),
                     e);
         }
     }
@@ -53,8 +54,7 @@ public class PaymentController {
                 matchService.confirmMatch(matchBean);
                 applicationController.navigateToRecap(matchBean);
             } catch (Exception e) {
-                logger.log(Level.SEVERE, "Errore durante la conferma del match", e);
-                return false;
+                logger.log(Level.SEVERE, Constants.ERROR_MATCH_CONFIRM, e);
             }
         }
 

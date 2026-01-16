@@ -3,6 +3,7 @@ package controller;
 import model.bean.FieldBean;
 import model.bean.MatchBean;
 import model.service.FieldService;
+import model.utils.Constants;
 import exception.ServiceInitializationException;
 
 import java.sql.SQLException;
@@ -25,7 +26,7 @@ public class BookFieldController {
         try {
             this.fieldService = new FieldService(applicationController.getPersistenceType());
         } catch (SQLException e) {
-            throw new ServiceInitializationException("Errore nell'inizializzazione di FieldService: " + e.getMessage(),
+            throw new ServiceInitializationException(Constants.ERROR_FIELD_SERVICE_INIT + e.getMessage(),
                     e);
         }
     }
@@ -86,7 +87,7 @@ public class BookFieldController {
      */
     public void proceedToPayment() {
         if (selectedField == null) {
-            throw new IllegalStateException("Nessun campo selezionato");
+            throw new IllegalStateException(Constants.ERROR_NO_FIELD_SELECTED);
         }
 
         if (currentMatchBean.getPricePerPerson() == null) {

@@ -135,7 +135,7 @@ public class MapService {
                 html.append(String.format("<div class='field-info'>%s - %s</div>",
                         escapeHtml(field.getSport().getDisplayName()),
                         escapeHtml(field.getAddress())));
-                html.append("</div>");
+                html.append(HTML_DIV_END);
                 html.append("<div style='text-align:right;'>");
                 html.append(String.format("<div class='field-price'>€%.2f/h</div>",
                         field.getPricePerHour()));
@@ -146,12 +146,12 @@ public class MapService {
                         field.getLatitude(), field.getLongitude());
                 html.append(String.format("<a href='%s' class='view-btn' target='_blank'>Visualizza</a>",
                         escapeHtml(fieldOsmUrl)));
-                html.append("</div>");
-                html.append("</div>");
+                html.append(HTML_DIV_END);
+                html.append(HTML_DIV_END);
             }
         }
 
-        html.append("</div>");
+        html.append(HTML_DIV_END);
         html.append("</body></html>");
         return html.toString();
     }

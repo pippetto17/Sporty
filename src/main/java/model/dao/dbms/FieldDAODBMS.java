@@ -1,9 +1,10 @@
 package model.dao.dbms;
 
+import exception.DataAccessException;
 import model.dao.FieldDAO;
 import model.domain.Field;
 import model.domain.Sport;
-import exception.DataAccessException;
+import model.utils.Constants;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -30,7 +31,7 @@ public class FieldDAODBMS implements FieldDAO {
                 fields.add(extractFieldFromResultSet(rs));
             }
         } catch (SQLException e) {
-            throw new DataAccessException("Error finding all fields: " + e.getMessage(), e);
+            throw new DataAccessException(Constants.ERROR_FINDING_ALL_FIELDS + e.getMessage(), e);
         }
 
         return fields;
@@ -47,10 +48,10 @@ public class FieldDAODBMS implements FieldDAO {
             if (rs.next()) {
                 return extractFieldFromResultSet(rs);
             }
-            return null;
         } catch (SQLException e) {
-            throw new DataAccessException("Error finding field: " + e.getMessage(), e);
+            throw new DataAccessException(Constants.ERROR_FINDING_FIELD + e.getMessage(), e);
         }
+        return null;
     }
 
     @Override
@@ -66,7 +67,7 @@ public class FieldDAODBMS implements FieldDAO {
                 fields.add(extractFieldFromResultSet(rs));
             }
         } catch (SQLException e) {
-            throw new DataAccessException("Error finding fields by city: " + e.getMessage(), e);
+            throw new DataAccessException(Constants.ERROR_FINDING_FIELDS_BY_CITY + e.getMessage(), e);
         }
 
         return fields;
@@ -85,7 +86,7 @@ public class FieldDAODBMS implements FieldDAO {
                 fields.add(extractFieldFromResultSet(rs));
             }
         } catch (SQLException e) {
-            throw new DataAccessException("Error finding fields by sport: " + e.getMessage(), e);
+            throw new DataAccessException(Constants.ERROR_FINDING_FIELDS_BY_SPORT + e.getMessage(), e);
         }
 
         return fields;
@@ -108,7 +109,7 @@ public class FieldDAODBMS implements FieldDAO {
                 fields.add(extractFieldFromResultSet(rs));
             }
         } catch (SQLException e) {
-            throw new DataAccessException("Error finding available fields: " + e.getMessage(), e);
+            throw new DataAccessException(Constants.ERROR_FINDING_AVAILABLE_FIELDS + e.getMessage(), e);
         }
 
         return fields;
@@ -157,7 +158,7 @@ public class FieldDAODBMS implements FieldDAO {
 
             stmt.executeUpdate();
         } catch (SQLException e) {
-            throw new DataAccessException("Error saving field: " + e.getMessage(), e);
+            throw new DataAccessException(Constants.ERROR_SAVING_FIELD + e.getMessage(), e);
         }
     }
 
@@ -169,7 +170,7 @@ public class FieldDAODBMS implements FieldDAO {
             stmt.setString(1, fieldId);
             stmt.executeUpdate();
         } catch (SQLException e) {
-            throw new DataAccessException("Error deleting field: " + e.getMessage(), e);
+            throw new DataAccessException(Constants.ERROR_DELETING_FIELD + e.getMessage(), e);
         }
     }
 

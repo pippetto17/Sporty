@@ -1,5 +1,6 @@
 package controller;
 
+import exception.ServiceInitializationException;
 import model.bean.UserBean;
 import model.dao.DAOFactory;
 import model.dao.UserDAO;
@@ -15,7 +16,7 @@ public class LoginController {
         try {
             this.userDAO = DAOFactory.getUserDAO(persistenceType);
         } catch (SQLException e) {
-            throw new RuntimeException("Failed to initialize DAO: " + e.getMessage(), e);
+            throw new ServiceInitializationException(Constants.ERROR_DAO_INIT + e.getMessage(), e);
         }
     }
 
@@ -47,16 +48,16 @@ public class LoginController {
             throw new IllegalArgumentException(Constants.ERROR_PASSWORD_EMPTY);
         }
         if (name == null || name.isEmpty()) {
-            throw new IllegalArgumentException("Name cannot be empty");
+            throw new IllegalArgumentException(Constants.ERROR_NAME_EMPTY);
         }
         if (surname == null || surname.isEmpty()) {
-            throw new IllegalArgumentException("Surname cannot be empty");
+            throw new IllegalArgumentException(Constants.ERROR_SURNAME_EMPTY);
         }
 
         // Verifica se l'utente esiste già - usa UserDAO per operazioni CRUD
         User existingUser = userDAO.findByUsername(username);
         if (existingUser != null) {
-            throw new IllegalArgumentException("Username already exists");
+            throw new IllegalArgumentException(Constants.ERROR_USERNAME_EXISTS);
         }
 
         // Creazione nuovo utente - usa UserDAO per salvare

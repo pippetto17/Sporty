@@ -4,6 +4,7 @@ import model.bean.MatchBean;
 import model.domain.Sport;
 import model.domain.User;
 import model.service.MatchService;
+import model.utils.Constants;
 import exception.ServiceInitializationException;
 
 import java.sql.SQLException;
@@ -27,7 +28,7 @@ public class OrganizeMatchController {
         try {
             this.matchService = new MatchService(applicationController.getPersistenceType());
         } catch (SQLException e) {
-            throw new ServiceInitializationException("Errore nell'inizializzazione di MatchService: " + e.getMessage(),
+            throw new ServiceInitializationException(Constants.ERROR_MATCH_SERVICE_INIT + e.getMessage(),
                     e);
         }
     }
