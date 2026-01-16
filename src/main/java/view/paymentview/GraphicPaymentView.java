@@ -14,12 +14,15 @@ import model.bean.MatchBean;
 import model.bean.PaymentBean;
 
 import java.io.IOException;
+import java.util.logging.Logger;
 
 /**
  * Implementazione grafica della view di pagamento utilizzando JavaFX.
  * Gestisce l'input dei dati di pagamento e l'interazione con l'utente.
  */
 public class GraphicPaymentView implements PaymentView {
+    private static final Logger logger = Logger.getLogger(GraphicPaymentView.class.getName());
+
     private final PaymentController paymentController;
     private Stage stage;
 
@@ -70,7 +73,7 @@ public class GraphicPaymentView implements PaymentView {
 
                 initialize();
             } catch (IOException e) {
-                e.printStackTrace(); // Log error
+                logger.severe("Failed to load payment view: " + e.getMessage());
             }
         });
     }

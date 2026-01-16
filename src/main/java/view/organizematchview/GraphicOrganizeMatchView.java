@@ -21,8 +21,11 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
+import java.util.logging.Logger;
 
 public class GraphicOrganizeMatchView implements OrganizeMatchView {
+    private static final Logger logger = Logger.getLogger(GraphicOrganizeMatchView.class.getName());
+
     private final OrganizeMatchController organizeMatchController;
     private ApplicationController applicationController;
     private Stage stage;
@@ -90,10 +93,10 @@ public class GraphicOrganizeMatchView implements OrganizeMatchView {
 
                 stage.show();
             } catch (IOException e) {
-                e.printStackTrace(); // Print full stack trace
+                logger.severe("Failed to load organize match view: " + e.getMessage());
                 showErrorDialog("Failed to load organize match view: " + e.getMessage());
             } catch (Exception e) {
-                e.printStackTrace(); // Print full stack trace
+                logger.severe("Unexpected error loading organize match view: " + e.getMessage());
                 showErrorDialog("Unexpected error: " + e.getMessage());
             }
         });

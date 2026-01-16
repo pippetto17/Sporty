@@ -22,10 +22,13 @@ import model.service.MapService;
 import java.io.IOException;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.logging.Logger;
 
 public class GraphicBookFieldView implements BookFieldView {
     private final BookFieldController bookFieldController;
     private Stage stage;
+    private static final Logger logger = Logger.getLogger(GraphicBookFieldView.class.getName());
+
 
     @FXML
     private Button backButton;
@@ -76,10 +79,12 @@ public class GraphicBookFieldView implements BookFieldView {
 
                 stage.show();
             } catch (IOException e) {
-                e.printStackTrace(); // Print full stack trace
-                showErrorDialog("Failed to load book field view: " + e.getMessage());
-            } catch (Exception e) {
-                e.printStackTrace(); // Print full stack trace
+                logger.severe("Failed to load book field view: " + e.getMessage());
+                showErrorDialog("Failed to load view: " + e.getMessage());
+            }
+
+            catch (Exception e) {
+                logger.severe("Unexpected error loading book field view: " + e.getMessage());
                 showErrorDialog("Unexpected error: " + e.getMessage());
             }
         });

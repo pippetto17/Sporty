@@ -16,8 +16,11 @@ import model.domain.User;
 import model.utils.Constants;
 
 import java.io.IOException;
+import java.util.logging.Logger;
 
 public class GraphicLoginView extends Application implements LoginView {
+    private static final Logger logger = Logger.getLogger(GraphicLoginView.class.getName());
+
     // Static fields per passare i controller all'istanza creata da launch()
     private static LoginController staticLoginController;
     private static ApplicationController staticApplicationController;
@@ -73,7 +76,7 @@ public class GraphicLoginView extends Application implements LoginView {
                     this.primaryStage = stage;
                     start(stage);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    logger.severe("Failed to start login view: " + e.getMessage());
                 }
             });
         } catch (IllegalStateException e) {
