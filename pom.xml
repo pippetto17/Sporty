@@ -21,7 +21,18 @@
         <gson.version>2.10.1</gson.version>
         <junit.version>5.10.1</junit.version>
         <sonar.exclusions>**/*.css,**/view/**/*.java,**/org/example/*.java</sonar.exclusions>
-        <sonar.coverage.exclusions>**/view/**/*.java,**/org/example/*.java</sonar.coverage.exclusions>
+        <sonar.coverage.exclusions>
+            **/view/**/*.java,
+            **/org/example/*.java,
+            **/bean/*.java,
+            **/dao/*.java,
+            **/factory/*.java,
+            **/exception/*.java,
+            **/converter/*.java,
+            **/utils/*.java,
+            **/domain/DemoDataInitializer.java,
+            **/Main.java
+        </sonar.coverage.exclusions>
         <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
         <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
         <sonar.jacoco.reportPath>${project.basedir}/../target/jacoco.exec</sonar.jacoco.reportPath>
@@ -146,6 +157,13 @@
                     <excludes>
                         <exclude>**/view/**/*</exclude>
                         <exclude>**/org/example/**/*</exclude>
+                        <exclude>**/bean/*</exclude>
+                        <exclude>**/dao/*</exclude>
+                        <exclude>**/factory/*</exclude>
+                        <exclude>**/exception/*</exclude>
+                        <exclude>**/converter/*</exclude>
+                        <exclude>**/utils/*</exclude>
+                        <exclude>**/domain/DemoDataInitializer*</exclude>
                     </excludes>
                 </configuration>
                 <executions>

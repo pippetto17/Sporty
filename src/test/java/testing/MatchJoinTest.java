@@ -3,6 +3,8 @@ package testing;
 import model.bean.MatchBean;
 import model.dao.DAOFactory;
 import model.domain.Sport;
+import model.domain.Match;
+import model.domain.MatchStatus;
 import model.service.MatchService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -229,5 +231,110 @@ class MatchJoinTest {
         match.setFieldId("4");
         return match;
     }
-}
 
+    // ============================================================
+    // TEST MATCH DOMAIN CLASS
+    // ============================================================
+
+    @Test
+    @DisplayName("Creazione Match con costruttore completo dovrebbe funzionare")
+    void testMatchCreation() {
+        LocalDate date = LocalDate.of(2026, 6, 15);
+        LocalTime time = LocalTime.of(18, 0);
+
+        Match match = new Match(Sport.FOOTBALL_5, date, time, "Milano", 9, "org1");
+        match.setFieldId("field1");
+
+        assertEquals(Sport.FOOTBALL_5, match.getSport());
+        assertEquals(date, match.getMatchDate());
+        assertEquals(time, match.getMatchTime());
+        assertEquals("Milano", match.getCity());
+        assertEquals(9, match.getRequiredParticipants());
+        assertEquals("org1", match.getOrganizerUsername());
+        assertEquals("field1", match.getFieldId());
+    }
+
+    @Test
+    @DisplayName("Match.isFull dovrebbe restituire true quando pieno")
+    void testMatchIsFull() {
+        LocalDate date = LocalDate.of(2026, 7, 1);
+        LocalTime time = LocalTime.of(19, 0);
+
+        Match match = new Match(Sport.TENNIS_SINGLE, date, time, "Roma", 1, "org2");
+
+        // Aggiungi 1 partecipante (match per tennis single richiede 1 giocatore aggiuntivo)
+        match.addParticipant("player1");
+
+        assertTrue(match.isFull());
+    }
+
+    @Test
+    @DisplayName("Match.isFull dovrebbe restituire false quando non pieno")
+    void testMatchIsNotFull() {
+        LocalDate date = LocalDate.of(2026, 7, 1);
+        LocalTime time = LocalTime.of(19, 0);
+
+        Match match = new Match(Sport.FOOTBALL_5, date, time, "Torino", 9, "org3");
+
+        assertFalse(match.isFull());
+    }
+
+    @Test
+    @DisplayName("Match.addParticipant dovrebbe aggiungere giocatore")
+    void testMatchAddParticipant() {
+        LocalDate date = LocalDate.of(2026, 8, 1);
+        LocalTime time = LocalTime.of(20, 0);
+
+        Match match = new Match(Sport.BASKETBALL, date, time, "Napoli", 9, "org4");
+
+        boolean added = match.addParticipant("player1");
+
+        assertTrue(added);
+        assertTrue(match.getParticipants().contains("player1"));
+    }
+
+    @Test
+    @DisplayName("Match.addParticipant duplicato dovrebbe fallire")
+    void testMatchAddDuplicateParticipant() {
+        LocalDate date = LocalDate.of(2026, 8, 1);
+        LocalTime time = LocalTime.of(20, 0);
+
+        Match match = new Match(Sport.BASKETBALL, date, time, "Napoli", 9, "org5");
+
+        match.addParticipant("player1");
+        boolean addedAgain = match.addParticipant("player1");
+
+        assertFalse(addedAgain);
+    }
+
+    @Test
+    @DisplayName("Match.setStatus dovrebbe aggiornare lo stato")
+    void testMatchSetStatus() {
+        LocalDate date = LocalDate.of(2026, 9, 1);
+        LocalTime time = LocalTime.of(17, 0);
+
+        Match match = new Match(Sport.PADEL_DOUBLE, date, time, "Firenze", 3, "org6");
+
+        match.setStatus(MatchStatus.CONFIRMED);
+
+        assertEquals(MatchStatus.CONFIRMED, match.getStatus());
+    }
+
+    @Test
+    @DisplayName("Match.getParticipants dovrebbe restituire lista aggiornata")
+    void testMatchGetParticipants() {
+        LocalDate date = LocalDate.of(2026, 10, 1);
+        LocalTime time = LocalTime.of(16, 0);
+
+        Match match = new Match(Sport.FOOTBALL_5, date, time, "Bologna", 9, "org7");
+
+        assertEquals(0, match.getParticipants().size());
+
+        match.addParticipant("player1");
+        match.addParticipant("player2");
+
+        assertEquals(2, match.getParticipants().size());
+        assertTrue(match.getParticipants().contains("player1"));
+        assertTrue(match.getParticipants().contains("player2"));
+    }
+}

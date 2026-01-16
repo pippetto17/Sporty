@@ -3,8 +3,11 @@ package testing;
 import controller.LoginController;
 import model.bean.UserBean;
 import model.dao.DAOFactory;
-import model.domain.Role;
 import model.domain.User;
+import model.domain.Role;
+import model.domain.Sport;
+import model.domain.Match;
+import model.domain.MatchStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
@@ -151,6 +154,105 @@ class LoginControllerTest {
     void testRegisterOrganizer() {
         UserBean userBean = new UserBean("organizer1", "password");
         assertDoesNotThrow(() -> loginController.register(userBean, "John", "Organizer", Role.ORGANIZER.getCode()));
+    }
+
+    // ============================================================
+    // TEST DOMAIN CLASSES
+    // ============================================================
+
+    @Test
+    @DisplayName("Creazione User con tutti i parametri dovrebbe funzionare")
+    void testUserCreation() {
+        User user = new User("username", "password", "John", "Doe", Role.PLAYER.getCode());
+
+        assertEquals("username", user.getUsername());
+        assertEquals("password", user.getPassword());
+        assertEquals("John", user.getName());
+        assertEquals("Doe", user.getSurname());
+        assertEquals(Role.PLAYER.getCode(), user.getRole());
+    }
+
+    @Test
+    @DisplayName("Role.fromCode dovrebbe restituire il ruolo corretto")
+    void testRoleFromCode() {
+        Role player = Role.fromCode(1);
+        Role organizer = Role.fromCode(2);
+
+        assertEquals(Role.PLAYER, player);
+        assertEquals(Role.ORGANIZER, organizer);
+    }
+
+    @Test
+    @DisplayName("Role.fromCode con codice invalido dovrebbe lanciare eccezione")
+    void testRoleFromCodeInvalid() {
+        assertThrows(IllegalArgumentException.class, () -> Role.fromCode(999));
+    }
+
+    @Test
+    @DisplayName("Role.getDisplayName dovrebbe restituire nome formattato")
+    void testRoleGetDisplayName() {
+        String playerName = Role.PLAYER.getDisplayName();
+        String organizerName = Role.ORGANIZER.getDisplayName();
+
+        assertEquals("Player", playerName);
+        assertEquals("Organizer", organizerName);
+    }
+
+    @Test
+    @DisplayName("Sport.getRequiredPlayers dovrebbe restituire numero corretto")
+    void testSportGetRequiredPlayers() {
+        assertEquals(10, Sport.FOOTBALL_5.getRequiredPlayers());
+        assertEquals(22, Sport.FOOTBALL_11.getRequiredPlayers());
+        assertEquals(10, Sport.BASKETBALL.getRequiredPlayers());
+        assertEquals(2, Sport.TENNIS_SINGLE.getRequiredPlayers());
+    }
+
+    @Test
+    @DisplayName("Sport.getAdditionalParticipantsNeeded dovrebbe calcolare correttamente")
+    void testSportGetAdditionalParticipantsNeeded() {
+        assertEquals(9, Sport.FOOTBALL_5.getAdditionalParticipantsNeeded());
+        assertEquals(21, Sport.FOOTBALL_11.getAdditionalParticipantsNeeded());
+        assertEquals(1, Sport.TENNIS_SINGLE.getAdditionalParticipantsNeeded());
+    }
+
+    @Test
+    @DisplayName("Sport.isValidAdditionalParticipants dovrebbe validare correttamente")
+    void testSportIsValidAdditionalParticipants() {
+        assertTrue(Sport.FOOTBALL_5.isValidAdditionalParticipants(5));
+        assertTrue(Sport.FOOTBALL_5.isValidAdditionalParticipants(9));
+        assertFalse(Sport.FOOTBALL_5.isValidAdditionalParticipants(0));
+        assertFalse(Sport.FOOTBALL_5.isValidAdditionalParticipants(10));
+    }
+
+    @Test
+    @DisplayName("Sport.getDisplayName dovrebbe restituire nome leggibile")
+    void testSportGetDisplayName() {
+        assertEquals("Calcio a 5", Sport.FOOTBALL_5.getDisplayName());
+        assertEquals("Basket", Sport.BASKETBALL.getDisplayName());
+        assertEquals("Tennis Singolo", Sport.TENNIS_SINGLE.getDisplayName());
+    }
+
+    @Test
+    @DisplayName("MatchStatus enum dovrebbe avere tutti i valori")
+    void testMatchStatusValues() {
+        MatchStatus[] statuses = MatchStatus.values();
+
+        assertNotNull(statuses);
+        assertTrue(statuses.length >= 3);
+    }
+
+    @Test
+    @DisplayName("User con ruolo PLAYER dovrebbe avere codice corretto")
+    void testUserWithPlayerRole() {
+        User player = new User("player1", "pass", "Test", "Player", Role.PLAYER.getCode());
+        assertEquals(Role.PLAYER.getCode(), player.getRole());
+    }
+
+    @Test
+    @DisplayName("User con ruolo ORGANIZER dovrebbe avere codice corretto")
+    void testUserWithOrganizerRole() {
+        User organizer = new User("org1", "pass", "Test", "Organizer", Role.ORGANIZER.getCode());
+        assertEquals(Role.ORGANIZER.getCode(), organizer.getRole());
     }
 }
 

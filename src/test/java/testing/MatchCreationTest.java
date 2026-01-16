@@ -1,8 +1,12 @@
 package testing;
 
+import controller.ApplicationController;
+import controller.OrganizeMatchController;
 import model.bean.MatchBean;
 import model.dao.DAOFactory;
 import model.domain.Sport;
+import model.domain.User;
+import model.domain.Role;
 import model.service.MatchService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,10 +22,21 @@ import static org.junit.jupiter.api.Assertions.*;
 class MatchCreationTest {
 
     private MatchService matchService;
+    private OrganizeMatchController organizeController;
+    private User testOrganizer;
 
     @BeforeEach
     void setUp() throws Exception {
         matchService = new MatchService(DAOFactory.PersistenceType.MEMORY);
+
+        // Crea un utente organizer per i test del controller
+        testOrganizer = new User("testOrg", "password", "Test", "Organizer", Role.ORGANIZER.getCode());
+
+        // Crea ApplicationController mock (con persistenza MEMORY)
+        ApplicationController appController = new ApplicationController();
+        appController.setPersistenceMode(ApplicationController.PersistenceMode.MEMORY);
+
+        organizeController = new OrganizeMatchController(testOrganizer, appController);
     }
 
     @Test
@@ -250,5 +265,85 @@ class MatchCreationTest {
 
         // Assert
         assertNotNull(participants);
+    }
+
+    // ============================================================
+    // TEST ORGANIZE MATCH CONTROLLER
+    // ============================================================
+
+    @Test
+    @DisplayName("Inizializzazione nuovo match dovrebbe creare bean con organizer")
+    void testStartNewMatch() {
+        // Act
+        organizeController.startNewMatch();
+        MatchBean matchBean = organizeController.getCurrentMatchBean();
+
+        // Assert
+        assertNotNull(matchBean);
+        assertEquals("testOrg", matchBean.getOrganizerUsername());
+    }
+
+    @Test
+    @DisplayName("Validazione dettagli match tramite controller dovrebbe funzionare")
+    void testValidateMatchDetailsViaController() {
+        LocalDate futureDate = LocalDate.now().plusDays(10);
+        LocalTime time = LocalTime.of(18, 0);
+
+        boolean isValid = organizeController.validateMatchDetails(
+            Sport.FOOTBALL_5, futureDate, time, "Milano", 9
+        );
+
+        assertTrue(isValid);
+    }
+
+    @Test
+    @DisplayName("Impostazione dettagli match dovrebbe aggiornare bean")
+    void testSetMatchDetails() {
+        // Arrange
+        organizeController.startNewMatch();
+        LocalDate date = LocalDate.of(2026, 7, 15);
+        LocalTime time = LocalTime.of(19, 30);
+
+        // Act
+        organizeController.setMatchDetails(Sport.BASKETBALL, date, time, "Roma", 9);
+        MatchBean matchBean = organizeController.getCurrentMatchBean();
+
+        // Assert
+        assertEquals(Sport.BASKETBALL, matchBean.getSport());
+        assertEquals(date, matchBean.getMatchDate());
+        assertEquals(time, matchBean.getMatchTime());
+        assertEquals("Roma", matchBean.getCity());
+        assertEquals(9, matchBean.getRequiredParticipants());
+    }
+
+    @Test
+    @DisplayName("Recupero sport disponibili dovrebbe restituire array non vuoto")
+    void testGetAvailableSports() {
+        Sport[] sports = organizeController.getAvailableSports();
+
+        assertNotNull(sports);
+        assertTrue(sports.length > 0);
+    }
+
+    @Test
+    @DisplayName("Recupero organizer dal controller dovrebbe funzionare")
+    void testGetOrganizer() {
+        User organizer = organizeController.getOrganizer();
+
+        assertNotNull(organizer);
+        assertEquals("testOrg", organizer.getUsername());
+    }
+
+    @Test
+    @DisplayName("Validazione con controller e dati invalidi dovrebbe fallire")
+    void testValidateMatchDetailsInvalidViaController() {
+        LocalDate pastDate = LocalDate.of(2020, 1, 1);
+        LocalTime time = LocalTime.of(18, 0);
+
+        boolean isValid = organizeController.validateMatchDetails(
+            Sport.FOOTBALL_11, pastDate, time, "Milano", 21
+        );
+
+        assertFalse(isValid);
     }
 }
