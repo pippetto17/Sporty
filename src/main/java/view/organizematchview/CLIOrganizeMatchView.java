@@ -12,7 +12,6 @@ import java.util.Scanner;
 
 public class CLIOrganizeMatchView implements OrganizeMatchView {
     private final OrganizeMatchController organizeMatchController;
-    private ApplicationController applicationController;
     private final Scanner scanner;
     private boolean running;
 
@@ -24,7 +23,7 @@ public class CLIOrganizeMatchView implements OrganizeMatchView {
 
     @Override
     public void setApplicationController(ApplicationController applicationController) {
-        this.applicationController = applicationController;
+        // Not used in CLI view
     }
 
     @Override

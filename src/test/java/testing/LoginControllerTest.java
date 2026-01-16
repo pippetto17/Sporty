@@ -66,9 +66,12 @@ class LoginControllerTest {
         loginController.register(firstUser, "First", "User", Role.PLAYER.getCode());
 
         UserBean secondUser = new UserBean("duplicate", "pass2");
+        String name = "Second";
+        String surname = "User";
+        int roleCode = Role.PLAYER.getCode();
 
-        assertThrows(IllegalArgumentException.class, () ->
-            loginController.register(secondUser, "Second", "User", Role.PLAYER.getCode())
+        assertThrows(IllegalArgumentException.class,
+            () -> loginController.register(secondUser, name, surname, roleCode)
         );
     }
 }

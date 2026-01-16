@@ -76,7 +76,7 @@ public class RegisterViewController {
             new Thread(() -> {
                 try {
                     Thread.sleep(1500);
-                    javafx.application.Platform.runLater(() -> stage.close());
+                    javafx.application.Platform.runLater(stage::close);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }

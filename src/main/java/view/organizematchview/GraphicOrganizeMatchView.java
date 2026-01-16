@@ -27,7 +27,6 @@ public class GraphicOrganizeMatchView implements OrganizeMatchView {
     private static final Logger logger = Logger.getLogger(GraphicOrganizeMatchView.class.getName());
 
     private final OrganizeMatchController organizeMatchController;
-    private ApplicationController applicationController;
     private Stage stage;
 
     @FXML
@@ -69,7 +68,7 @@ public class GraphicOrganizeMatchView implements OrganizeMatchView {
 
     @Override
     public void setApplicationController(ApplicationController applicationController) {
-        this.applicationController = applicationController;
+        // Not used in this view
     }
 
     @Override
