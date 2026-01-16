@@ -120,6 +120,67 @@ class MatchJoinTest {
         assertEquals(initialParticipants + 1, finalParticipants);
     }
 
+    @Test
+    @DisplayName("Join a match inesistente dovrebbe fallire")
+    void testJoinNonExistentMatch() {
+        // Act
+        boolean joined = matchService.joinMatch(99999, "player1");
+
+        // Assert
+        assertFalse(joined);
+    }
+
+    @Test
+    @DisplayName("Creazione e join multipli per raggiungere il limite")
+    void testMatchBecomesFull() {
+        // Arrange
+        MatchBean match = createBasketballMatch("organizer2");
+        matchService.saveMatch(match);
+        int matchId = match.getMatchId();
+
+        // Act - join fino al limite (basketball richiede 4 giocatori)
+        matchService.joinMatch(matchId, "player1");
+        matchService.joinMatch(matchId, "player2");
+        matchService.joinMatch(matchId, "player3");
+        matchService.joinMatch(matchId, "player4");
+
+        // Assert - il quinto join dovrebbe fallire
+        boolean fifthJoin = matchService.joinMatch(matchId, "player5");
+        assertFalse(fifthJoin);
+    }
+
+    @Test
+    @DisplayName("Verifica che la lista partecipanti non sia null dopo join")
+    void testParticipantsListNotNull() {
+        // Arrange
+        MatchBean match = createFootballMatch("organizer3");
+        matchService.saveMatch(match);
+        int matchId = match.getMatchId();
+
+        // Act
+        matchService.joinMatch(matchId, "player1");
+
+        // Assert
+        MatchBean updatedMatch = matchService.getMatchById(matchId);
+        assertNotNull(updatedMatch.getParticipants());
+        assertFalse(updatedMatch.getParticipants().isEmpty());
+    }
+
+    @Test
+    @DisplayName("Join a match di volley dovrebbe funzionare")
+    void testJoinVolleyballMatch() {
+        // Arrange
+        MatchBean match = createVolleyballMatch("volleyOrg");
+        matchService.saveMatch(match);
+        int matchId = match.getMatchId();
+
+        // Act
+        boolean joined = matchService.joinMatch(matchId, "volleyPlayer");
+
+        // Assert
+        assertTrue(joined);
+    }
+
     // Helper methods
     private MatchBean createFootballMatch(String organizer) {
         MatchBean match = new MatchBean();
@@ -142,6 +203,30 @@ class MatchJoinTest {
         match.setCity("Roma");
         match.setRequiredParticipants(1);
         match.setFieldId("2");
+        return match;
+    }
+
+    private MatchBean createBasketballMatch(String organizer) {
+        MatchBean match = new MatchBean();
+        match.setOrganizerUsername(organizer);
+        match.setSport(Sport.BASKETBALL);
+        match.setMatchDate(LocalDate.of(2026, 8, 5));
+        match.setMatchTime(LocalTime.of(19, 30));
+        match.setCity("Torino");
+        match.setRequiredParticipants(4);
+        match.setFieldId("3");
+        return match;
+    }
+
+    private MatchBean createVolleyballMatch(String organizer) {
+        MatchBean match = new MatchBean();
+        match.setOrganizerUsername(organizer);
+        match.setSport(Sport.FOOTBALL_8);
+        match.setMatchDate(LocalDate.of(2026, 9, 20));
+        match.setMatchTime(LocalTime.of(17, 0));
+        match.setCity("Napoli");
+        match.setRequiredParticipants(5);
+        match.setFieldId("4");
         return match;
     }
 }

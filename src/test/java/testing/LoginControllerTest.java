@@ -76,5 +76,81 @@ class LoginControllerTest {
         assertThrows(IllegalArgumentException.class,
             () -> loginController.register(secondUser, "Second", "User", Role.ORGANIZER.getCode()));
     }
+
+    @Test
+    @DisplayName("Login con username null dovrebbe fallire")
+    void testLoginWithNullUsername() {
+        UserBean userBean = new UserBean(null, "password");
+        assertThrows(IllegalArgumentException.class, () -> loginController.login(userBean));
+    }
+
+    @Test
+    @DisplayName("Login con password null dovrebbe fallire")
+    void testLoginWithNullPassword() {
+        UserBean userBean = new UserBean("username", null);
+        assertThrows(IllegalArgumentException.class, () -> loginController.login(userBean));
+    }
+
+    @Test
+    @DisplayName("Registrazione con nome vuoto dovrebbe fallire")
+    void testRegisterWithEmptyName() {
+        UserBean userBean = new UserBean("newuser", "password");
+        assertThrows(IllegalArgumentException.class,
+            () -> loginController.register(userBean, "", "Surname", Role.PLAYER.getCode()));
+    }
+
+    @Test
+    @DisplayName("Registrazione con cognome vuoto dovrebbe fallire")
+    void testRegisterWithEmptySurname() {
+        UserBean userBean = new UserBean("newuser", "password");
+        assertThrows(IllegalArgumentException.class,
+            () -> loginController.register(userBean, "Name", "", Role.PLAYER.getCode()));
+    }
+
+    @Test
+    @DisplayName("Registrazione con nome null dovrebbe fallire")
+    void testRegisterWithNullName() {
+        UserBean userBean = new UserBean("newuser", "password");
+        assertThrows(IllegalArgumentException.class,
+            () -> loginController.register(userBean, null, "Surname", Role.PLAYER.getCode()));
+    }
+
+    @Test
+    @DisplayName("Registrazione con cognome null dovrebbe fallire")
+    void testRegisterWithNullSurname() {
+        UserBean userBean = new UserBean("newuser", "password");
+        assertThrows(IllegalArgumentException.class,
+            () -> loginController.register(userBean, "Name", null, Role.PLAYER.getCode()));
+    }
+
+    @Test
+    @DisplayName("Login con credenziali errate dovrebbe fallire")
+    void testLoginWithWrongPassword() {
+        // Arrange: registra un utente
+        UserBean registerBean = new UserBean("testuser2", "correctpass");
+        loginController.register(registerBean, "Test", "User", Role.PLAYER.getCode());
+
+        // Act & Assert: prova login con password sbagliata
+        UserBean loginBean = new UserBean("testuser2", "wrongpass");
+        User result = loginController.login(loginBean);
+
+        // Dovrebbe restituire null o lanciare eccezione
+        assertNull(result);
+    }
+
+    @Test
+    @DisplayName("Login con username inesistente dovrebbe fallire")
+    void testLoginWithNonexistentUsername() {
+        UserBean loginBean = new UserBean("nonexistent", "password");
+        User result = loginController.login(loginBean);
+        assertNull(result);
+    }
+
+    @Test
+    @DisplayName("Registrazione di organizer dovrebbe funzionare")
+    void testRegisterOrganizer() {
+        UserBean userBean = new UserBean("organizer1", "password");
+        assertDoesNotThrow(() -> loginController.register(userBean, "John", "Organizer", Role.ORGANIZER.getCode()));
+    }
 }
 
