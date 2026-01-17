@@ -14,6 +14,7 @@ public class Match {
     private int requiredParticipants;
     private String organizerUsername;
     private String fieldId; // Will be set after field selection
+    private Integer bookingId; // Link to Booking entity if field was booked
     private Double pricePerPerson; // Calculated based on selected field
     private MatchStatus status; // DRAFT, CONFIRMED, CANCELLED
     private List<String> participants; // Usernames of players who joined
@@ -106,6 +107,14 @@ public class Match {
 
     public void setStatus(MatchStatus status) {
         this.status = status;
+    }
+
+    public Integer getBookingId() {
+        return bookingId;
+    }
+
+    public void setBookingId(Integer bookingId) {
+        this.bookingId = bookingId;
     }
 
     public Double getPricePerPerson() {

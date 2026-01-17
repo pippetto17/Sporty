@@ -117,6 +117,13 @@ public class FieldDAOMemory implements FieldDAO {
     }
 
     @Override
+    public List<Field> findByManagerId(String managerId) {
+        return fields.values().stream()
+                .filter(field -> managerId.equals(field.getManagerId()))
+                .toList();
+    }
+
+    @Override
     public void save(Field field) {
         fields.put(field.getFieldId(), field);
     }

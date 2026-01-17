@@ -34,6 +34,11 @@ public interface FieldDAO {
     List<Field> findAvailableFields(Sport sport, String city, LocalDate date, LocalTime time);
 
     /**
+     * Find all fields owned by a specific manager
+     */
+    List<Field> findByManagerId(String managerId);
+
+    /**
      * Save or update a field
      */
     void save(Field field);
@@ -43,4 +48,3 @@ public interface FieldDAO {
      */
     void delete(String fieldId);
 }
-

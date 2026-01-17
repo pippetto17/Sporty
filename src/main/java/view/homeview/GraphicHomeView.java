@@ -3,6 +3,8 @@ package view.homeview;
 import controller.ApplicationController;
 import controller.HomeController;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
@@ -12,10 +14,14 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.layout.Region;
 import javafx.stage.Stage;
 import model.utils.Constants;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class GraphicHomeView implements HomeView {
     private final HomeController homeController;
@@ -73,6 +79,7 @@ public class GraphicHomeView implements HomeView {
                 // Load CSS
                 Scene scene = new Scene(root, 700, 600);
                 scene.getStylesheets().add(getClass().getResource("/css/style.css").toExternalForm());
+                scene.getStylesheets().add(getClass().getResource("/css/controls-dark.css").toExternalForm());
 
                 stage.setScene(scene);
                 stage.setResizable(true);
@@ -108,6 +115,54 @@ public class GraphicHomeView implements HomeView {
         updateStatus("Ready");
     }
 
+    @Override
+    public void refreshMatches() {
+        displayMatches(homeController.getMatches());
+    }
+
+    @Override
+    public void showMatchDetails(int matchId) {
+        try {
+            // Get match details from controller
+            model.bean.MatchBean match = homeController.getMatches().stream()
+                    .filter(m -> m.getMatchId() == matchId)
+                    .findFirst()
+                    .orElse(null);
+
+            if (match == null) {
+                updateStatus("Match not found");
+                return;
+            }
+
+            // Create dialog
+            Dialog<ButtonType> dialog = new Dialog<>();
+            dialog.setTitle("Match Details");
+            dialog.setHeaderText(match.getSport().getDisplayName());
+
+            // Create content
+            VBox content = new VBox(10);
+            content.setPadding(new Insets(20));
+            content.getChildren().addAll(
+                    new Label("📅 Date: " + match.getMatchDate() + " at " + match.getMatchTime()),
+                    new Label("📍 City: " + match.getCity()),
+                    new Label("👤 Organizer: " + match.getOrganizerUsername()),
+                    new Label("👥 Players: " + (match.getParticipants() != null ? match.getParticipants().size() : 0)
+                            + "/" + match.getRequiredParticipants()),
+                    new Label("💰 Price: €"
+                            + (match.getPricePerPerson() != null ? String.format("%.2f", match.getPricePerPerson())
+                                    : "Free")),
+                    new Label("📊 Status: " + match.getStatus().name()));
+
+            dialog.getDialogPane().setContent(content);
+            dialog.getDialogPane().getButtonTypes().addAll(ButtonType.CLOSE);
+
+            dialog.showAndWait();
+
+        } catch (Exception e) {
+            updateStatus("Error showing match details: " + e.getMessage());
+        }
+    }
+
     private void updateViewMode() {
         if (homeController.isViewingAsPlayer()) {
             organizerActionsBox.setVisible(false);
@@ -121,55 +176,67 @@ public class GraphicHomeView implements HomeView {
     }
 
     private void addRoleSwitchToggle() {
-        HBox toggleContainer = new HBox(10);
-        toggleContainer.setAlignment(Pos.CENTER_LEFT);
-        toggleContainer.setPadding(new Insets(10, 0, 10, 0));
+        // Create toggle switch container
+        HBox switchContainer = new HBox(0);
+        switchContainer.setAlignment(Pos.CENTER_LEFT);
+        switchContainer.setPadding(new Insets(0, 0, 15, 0));
+        switchContainer.setMaxWidth(Region.USE_PREF_SIZE); // Fit to content
+        switchContainer.getStyleClass().add("role-switch-container");
 
-        Label toggleLabel = new Label("View as:");
-        toggleLabel.setStyle("-fx-font-size: 13px; -fx-font-weight: bold;");
+        // Create button elements
+        Button playerButton = new Button("Player");
+        playerButton.getStyleClass().add("role-switch-button");
+        playerButton.setPrefWidth(100);
 
-        javafx.scene.control.ToggleButton playerToggle = new javafx.scene.control.ToggleButton("Player");
-        javafx.scene.control.ToggleButton organizerToggle = new javafx.scene.control.ToggleButton("Organizer");
+        Button organizerButton = new Button("Organizer");
+        organizerButton.getStyleClass().add("role-switch-button");
+        organizerButton.setPrefWidth(100);
 
-        ToggleGroup group = new ToggleGroup();
-        playerToggle.setToggleGroup(group);
-        organizerToggle.setToggleGroup(group);
-
-        playerToggle.getStyleClass().add(Constants.CSS_SECONDARY_BUTTON);
-        organizerToggle.getStyleClass().add(Constants.CSS_SECONDARY_BUTTON);
-
-        // Set initial selection
+        // Set initial active state
         if (homeController.isViewingAsPlayer()) {
-            playerToggle.setSelected(true);
+            playerButton.getStyleClass().add("active");
         } else {
-            organizerToggle.setSelected(true);
+            organizerButton.getStyleClass().add("active");
         }
 
-        // Handle toggle
-        playerToggle.setOnAction(e -> {
-            if (playerToggle.isSelected() && !homeController.isViewingAsPlayer()) {
+        // Handle player button click
+        playerButton.setOnAction(e -> {
+            if (!homeController.isViewingAsPlayer()) {
                 homeController.switchRole();
+                playerButton.getStyleClass().add("active");
+                organizerButton.getStyleClass().remove("active");
                 updateViewMode();
                 displayMatches(homeController.getMatches());
             }
         });
 
-        organizerToggle.setOnAction(e -> {
-            if (organizerToggle.isSelected() && homeController.isViewingAsPlayer()) {
+        // Handle organizer button click
+        organizerButton.setOnAction(e -> {
+            if (homeController.isViewingAsPlayer()) {
                 homeController.switchRole();
+                organizerButton.getStyleClass().add("active");
+                playerButton.getStyleClass().remove("active");
                 updateViewMode();
                 displayMatches(homeController.getMatches());
             }
         });
 
-        toggleContainer.getChildren().addAll(toggleLabel, playerToggle, organizerToggle);
+        switchContainer.getChildren().addAll(playerButton, organizerButton);
 
-        // Insert before matches section
-        mainContentBox.getChildren().add(0, toggleContainer);
+        // Insert at the beginning of content
+        mainContentBox.getChildren().add(0, switchContainer);
     }
 
     private javafx.scene.control.ComboBox<model.domain.Sport> sportFilter;
-    private javafx.scene.control.TextField cityFilter;
+    private javafx.scene.control.ComboBox<String> cityFilter;
+    private boolean isUpdatingCityComboBox = false;
+
+    // List of Italian cities for autocomplete
+    private static final List<String> ALL_CITIES = Arrays.asList(
+            "Rome", "Milan", "Naples", "Turin", "Palermo",
+            "Genoa", "Bologna", "Florence", "Bari", "Catania",
+            "Venice", "Verona", "Messina", "Padua", "Trieste",
+            "Brescia", "Parma", "Prato", "Modena", "Reggio Calabria");
     private javafx.scene.control.DatePicker dateFilter;
 
     private void addFilterUI() {
@@ -178,31 +245,48 @@ public class GraphicHomeView implements HomeView {
         filterBox.setPadding(new Insets(10, 0, 10, 0));
 
         Label filterLabel = new Label("Filters:");
-        filterLabel.setStyle("-fx-font-size: 13px; -fx-font-weight: bold;");
+        filterLabel.getStyleClass().add("field-label");
 
         // Sport filter
         sportFilter = new javafx.scene.control.ComboBox<>();
         sportFilter.setPromptText("Sport");
-        sportFilter.setPrefWidth(120);
+        sportFilter.setPrefWidth(150);
+        sportFilter.setPrefHeight(40);
+        sportFilter.getStyleClass().add("custom-combo-box");
         sportFilter.getItems().add(null); // "All" option
         sportFilter.getItems().addAll(model.domain.Sport.values());
         sportFilter.setValue(null);
 
-        // City filter
-        cityFilter = new javafx.scene.control.TextField();
+        // City filter with autocomplete
+        cityFilter = new javafx.scene.control.ComboBox<>();
+        cityFilter.setEditable(true);
         cityFilter.setPromptText("City");
-        cityFilter.setPrefWidth(120);
+        cityFilter.setPrefWidth(150);
+        cityFilter.setPrefHeight(40);
+        cityFilter.getStyleClass().add("custom-combo-box");
+        cityFilter.getItems().addAll(ALL_CITIES);
+
+        // Add autocomplete listener
+        cityFilter.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
+            if (!isUpdatingCityComboBox) {
+                updateCityComboBox(newValue);
+            }
+        });
 
         // Date filter
         dateFilter = new javafx.scene.control.DatePicker();
         dateFilter.setPromptText("Date");
-        dateFilter.setPrefWidth(140);
+        dateFilter.setPrefWidth(150);
+        dateFilter.setPrefHeight(40);
+        dateFilter.getStyleClass().add("custom-date-picker");
 
         Button applyFilters = new Button("Apply");
+        applyFilters.setPrefHeight(40);
         applyFilters.getStyleClass().add("primary-button");
         applyFilters.setOnAction(e -> applyFilters());
 
         Button clearFilters = new Button("Clear");
+        clearFilters.setPrefHeight(40);
         clearFilters.getStyleClass().add(Constants.CSS_SECONDARY_BUTTON);
         clearFilters.setOnAction(e -> clearFilters());
 
@@ -215,7 +299,7 @@ public class GraphicHomeView implements HomeView {
 
     private void applyFilters() {
         model.domain.Sport sport = sportFilter.getValue();
-        String city = cityFilter.getText();
+        String city = cityFilter.getEditor().getText();
         java.time.LocalDate date = dateFilter.getValue();
 
         java.util.List<model.bean.MatchBean> filtered = homeController.filterMatches(sport, city, date);
@@ -225,10 +309,41 @@ public class GraphicHomeView implements HomeView {
 
     private void clearFilters() {
         sportFilter.setValue(null);
-        cityFilter.clear();
+        cityFilter.getEditor().clear();
+        cityFilter.setValue(null);
         dateFilter.setValue(null);
         displayMatches(homeController.getMatches());
         updateStatus("Filters cleared");
+    }
+
+    /**
+     * Updates the city ComboBox items based on user input for autocomplete
+     * functionality.
+     * 
+     * @param input the current text input from the user
+     */
+    private void updateCityComboBox(String input) {
+        isUpdatingCityComboBox = true;
+
+        ObservableList<String> filteredCities = FXCollections.observableArrayList();
+
+        if (input == null || input.isEmpty()) {
+            // Show all cities if input is empty
+            filteredCities.addAll(ALL_CITIES);
+        } else {
+            // Filter cities that start with the input (case-insensitive)
+            filteredCities.addAll(
+                    ALL_CITIES.stream()
+                            .filter(city -> city.toLowerCase().startsWith(input.toLowerCase()))
+                            .collect(Collectors.toList()));
+        }
+
+        cityFilter.setItems(filteredCities);
+        if (!filteredCities.isEmpty()) {
+            cityFilter.show();
+        }
+
+        isUpdatingCityComboBox = false;
     }
 
     @Override

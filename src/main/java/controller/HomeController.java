@@ -14,6 +14,7 @@ public class HomeController {
     private final ApplicationController applicationController;
     private final MatchService matchService;
     private boolean viewAsPlayer; // Toggle between organizer and player view
+    private view.homeview.HomeView homeView; // Reference to view for dialog
 
     public HomeController(User user, ApplicationController applicationController, MatchService matchService) {
         this.currentUser = user;
@@ -21,6 +22,10 @@ public class HomeController {
         this.matchService = matchService;
         // Default view based on user role
         this.viewAsPlayer = !user.isOrganizer();
+    }
+
+    public void setHomeView(view.homeview.HomeView homeView) {
+        this.homeView = homeView;
     }
 
     public User getCurrentUser() {
@@ -87,7 +92,7 @@ public class HomeController {
      * Navigate to match detail view.
      */
     public void viewMatchDetail(int matchId) {
-        applicationController.navigateToMatchDetail(matchId, currentUser);
+        homeView.showMatchDetails(matchId); // Modified method call
     }
 
     /**

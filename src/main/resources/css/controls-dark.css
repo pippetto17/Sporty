@@ -1,0 +1,134 @@
+/* ============================================ */
+/* JavaFX Control Overrides for Dark Mode */
+/* ============================================ */
+
+/* ComboBox Dark Mode */
+.combo-box {
+    -fx-background-color: #1f2937;
+    -fx-border-color: #374151;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+}
+
+.combo-box .list-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: #e5e7eb;
+}
+
+.combo-box .text-input {
+    -fx-text-fill: #e5e7eb !important;
+}
+
+.combo-box-popup .list-view {
+    -fx-background-color: #1f2937;
+    -fx-border-color: #374151;
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-padding: 4;
+    /* Emulates overflow:hidden by keeping cells away from corners */
+}
+
+.combo-box-popup .list-view .list-cell {
+    -fx-background-color: #1f2937;
+    -fx-text-fill: #e5e7eb;
+    -fx-padding: 10;
+}
+
+.combo-box-popup .list-view .list-cell:hover {
+    -fx-background-color: #374151;
+}
+
+.combo-box-popup .list-view .list-cell:selected {
+    -fx-background-color: #10b981;
+    -fx-text-fill: white;
+    -fx-background-radius: 8;
+    /* Rounded selection matches container */
+}
+
+.combo-box .arrow-button {
+    -fx-background-color: transparent;
+    -fx-background-radius: 0 12 12 0;
+}
+
+.combo-box .arrow {
+    -fx-background-color: #e5e7eb;
+}
+
+/* TextField Dark Mode */
+.text-field {
+    -fx-background-color: #1f2937;
+    -fx-text-fill: #e5e7eb;
+    -fx-prompt-text-fill: #6b7280;
+    -fx-border-color: #374151;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+}
+
+.text-field:focused {
+    -fx-border-color: #10b981;
+    -fx-border-width: 2;
+}
+
+/* DatePicker Dark Mode */
+.date-picker {
+    -fx-background-color: #1f2937;
+}
+
+.date-picker .text-field {
+    -fx-background-color: #1f2937;
+    -fx-text-fill: #e5e7eb;
+    -fx-prompt-text-fill: #6b7280;
+}
+
+.date-picker .arrow-button {
+    -fx-background-color: #374151;
+    -fx-background-radius: 0 12 12 0;
+}
+
+.date-picker-popup {
+    -fx-background-color: #1f2937;
+    -fx-border-color: #374151;
+}
+
+.date-picker-popup .month-year-pane {
+    -fx-background-color: #1a1f26;
+}
+
+.date-picker-popup .week-number-cell {
+    -fx-text-fill: #6b7280;
+}
+
+.date-picker-popup .day-cell {
+    -fx-background-color: #1f2937;
+    -fx-text-fill: #e5e7eb;
+}
+
+.date-picker-popup .day-cell:hover {
+    -fx-background-color: #374151;
+}
+
+.date-picker-popup .selected {
+    -fx-background-color: #10b981;
+    -fx-text-fill: white;
+}
+
+.date-picker-popup .previous-month,
+.date-picker-popup .next-month {
+    -fx-text-fill: #6b7280;
+}
+
+/* Spinner Dark Mode */
+.spinner {
+    -fx-background-color: #1f2937;
+    -fx-border-color: #374151;
+}
+
+.spinner .text-field {
+    -fx-background-color: #1f2937;
+    -fx-text-fill: #e5e7eb;
+}
+
+.spinner .increment-arrow-button,
+.spinner .decrement-arrow-button {
+    -fx-background-color: #374151;
+}

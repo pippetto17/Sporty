@@ -14,4 +14,13 @@ public interface HomeView extends View {
     void displayMenu();
 
     void setApplicationController(ApplicationController applicationController);
+
+    void refreshMatches();
+
+    /**
+     * Show match details in a dialog/popup.
+     * 
+     * @param matchId ID of the match to show details for
+     */
+    void showMatchDetails(int matchId);
 }

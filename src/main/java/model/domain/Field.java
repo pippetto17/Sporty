@@ -12,6 +12,11 @@ public class Field {
     private String availability; // JSON or structured data of available time slots
     private boolean indoor;
 
+    // Field Manager fields
+    private String managerId; // Username of field manager who owns this field
+    private String structureName; // Name of the sports structure/facility
+    private Boolean autoApprove; // Auto approve booking requests (default: false)
+
     public Field() {
     }
 
@@ -102,6 +107,30 @@ public class Field {
 
     public void setIndoor(boolean indoor) {
         this.indoor = indoor;
+    }
+
+    public String getManagerId() {
+        return managerId;
+    }
+
+    public void setManagerId(String managerId) {
+        this.managerId = managerId;
+    }
+
+    public String getStructureName() {
+        return structureName;
+    }
+
+    public void setStructureName(String structureName) {
+        this.structureName = structureName;
+    }
+
+    public Boolean getAutoApprove() {
+        return autoApprove != null && autoApprove;
+    }
+
+    public void setAutoApprove(Boolean autoApprove) {
+        this.autoApprove = autoApprove;
     }
 
     /**

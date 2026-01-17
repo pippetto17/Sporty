@@ -14,13 +14,19 @@ public class FieldBean {
     private Double pricePerPerson; // Calculated based on match participants
     private boolean indoor;
 
+    // Field Manager related fields
+    private String managerId; // Username of field manager who owns this field
+    private String structureName; // Name of the sports structure/facility
+    private boolean autoApprove; // Auto-approve booking requests without manager intervention
+
     /**
      * Default no-arg constructor required for JavaBeans specification.
      * This constructor is needed for serialization/deserialization frameworks
      * (e.g., Jackson, JAXB) and for JavaFX property binding.
      */
     public FieldBean() {
-        // Empty constructor required by JavaBeans specification for reflection-based instantiation
+        // Empty constructor required by JavaBeans specification for reflection-based
+        // instantiation
     }
 
     // Getters and Setters
@@ -103,5 +109,28 @@ public class FieldBean {
     public void setIndoor(boolean indoor) {
         this.indoor = indoor;
     }
-}
 
+    public String getManagerId() {
+        return managerId;
+    }
+
+    public void setManagerId(String managerId) {
+        this.managerId = managerId;
+    }
+
+    public String getStructureName() {
+        return structureName;
+    }
+
+    public void setStructureName(String structureName) {
+        this.structureName = structureName;
+    }
+
+    public boolean isAutoApprove() {
+        return autoApprove;
+    }
+
+    public void setAutoApprove(boolean autoApprove) {
+        this.autoApprove = autoApprove;
+    }
+}

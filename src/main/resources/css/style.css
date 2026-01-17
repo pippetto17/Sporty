@@ -1,142 +1,140 @@
-/* Sporty Application - Main Stylesheet */
+/* ============================================ */
+/* SPORTY - Dark Mode with Green Palette */
+/* ============================================ */
 
-/* Root Container */
-.root-container {
-    -fx-background-color: linear-gradient(to bottom, #f0f8f0, #d4edda);
+/* Root & Global */
+.root-container,
+.main-container {
+    -fx-background-color: #0f1419;
+    -fx-font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
 }
 
-/* Title Label */
+/* ============================================ */
+/* HEADER STYLES */
+/* ============================================ */
+
+.header-container {
+    -fx-background-color: #1a1f26;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 10, 0, 0, 2);
+    -fx-padding: 24 32;
+}
+
 .title-label {
-    -fx-text-fill: #1e7e34;
-    -fx-font-weight: bold;
+    -fx-text-fill: #10b981;
+    -fx-font-weight: 800;
+    -fx-font-size: 32px;
+    -fx-letter-spacing: -1px;
 }
 
-/* Subtitle Label */
-.subtitle-label {
-    -fx-text-fill: #6c757d;
+.welcome-label {
+    -fx-text-fill: #e5e7eb;
+    -fx-font-weight: 600;
+    -fx-font-size: 15px;
 }
 
-/* Form Container */
-.form-container {
-    -fx-background-color: white;
-    -fx-background-radius: 10;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 10, 0, 0, 5);
-}
-
-/* Field Label */
-.field-label {
-    -fx-text-fill: #34495e;
-    -fx-font-weight: bold;
-    -fx-font-size: 12px;
-}
-
-/* Custom Text Field */
-.custom-text-field {
-    -fx-background-color: #f8f9fa;
-    -fx-border-color: #d4edda;
-    -fx-border-radius: 5;
-    -fx-background-radius: 5;
-    -fx-padding: 10;
+.role-label {
+    -fx-text-fill: #9ca3af;
     -fx-font-size: 13px;
+    -fx-font-weight: 500;
 }
 
-/* Custom ComboBox */
-.custom-combo-box {
-    -fx-background-color: #f8f9fa;
-    -fx-border-color: #d4edda;
-    -fx-border-radius: 5;
-    -fx-background-radius: 5;
+/* ============================================ */
+/* TOGGLE SWITCH STYLES */
+/* ============================================ */
+
+.role-switch-container {
+    -fx-background-color: #1f2937;
+    -fx-background-radius: 24;
+    -fx-padding: 4;
+    -fx-spacing: 2;
+}
+
+.role-switch-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #9ca3af;
+    -fx-background-radius: 20;
+    -fx-padding: 8 20;
     -fx-font-size: 13px;
-}
-
-/* Primary Button */
-.primary-button {
-    -fx-background-color: #28a745;
-    -fx-text-fill: white;
-    -fx-font-weight: bold;
-    -fx-font-size: 14px;
-    -fx-padding: 10 20 10 20;
-    -fx-background-radius: 5;
+    -fx-font-weight: 600;
+    -fx-border-width: 0;
     -fx-cursor: hand;
 }
 
-.primary-button:hover {
-    -fx-background-color: #218838;
+.role-switch-button:hover {
+    -fx-text-fill: #d1d5db;
 }
 
-/* Secondary Button */
-.secondary-button {
-    -fx-background-color: white;
-    -fx-text-fill: #28a745;
-    -fx-border-color: #28a745;
-    -fx-border-width: 2;
-    -fx-border-radius: 5;
-    -fx-background-radius: 5;
-    -fx-font-weight: bold;
+.role-switch-button.active {
+    -fx-background-color: #10b981;
+    -fx-text-fill: white;
+    -fx-effect: dropshadow(gaussian, rgba(16, 185, 129, 0.4), 8, 0, 0, 2);
+}
+
+/* ============================================ */
+/* BUTTON STYLES */
+/* ============================================ */
+
+.primary-button {
+    -fx-background-color: #10b981;
+    -fx-text-fill: white;
+    -fx-font-weight: 600;
     -fx-font-size: 14px;
-    -fx-padding: 10 20 10 20;
+    -fx-padding: 12 24;
+    -fx-background-radius: 12;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(16, 185, 129, 0.4), 12, 0, 0, 4);
+}
+
+.primary-button:hover {
+    -fx-background-color: #059669;
+    -fx-effect: dropshadow(gaussian, rgba(16, 185, 129, 0.6), 16, 0, 0, 6);
+}
+
+.secondary-button {
+    -fx-background-color: #374151;
+    -fx-text-fill: #10b981;
+    -fx-border-color: #10b981;
+    -fx-border-width: 1.5;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-font-weight: 600;
+    -fx-font-size: 14px;
+    -fx-padding: 12 24;
     -fx-cursor: hand;
 }
 
 .secondary-button:hover {
-    -fx-background-color: #f0f8f0;
-}
-
-/* Message Label */
-.message-label {
-    -fx-font-size: 12px;
-    -fx-padding: 5;
-}
-
-.message-label.error {
-    -fx-text-fill: #e74c3c;
-}
-
-.message-label.success {
-    -fx-text-fill: #27ae60;
+    -fx-background-color: #4b5563;
+    -fx-border-color: #34d399;
+    -fx-text-fill: #34d399;
 }
 
 /* ============================================ */
-/* HOME VIEW STYLES */
+/* CONTENT & SECTIONS */
 /* ============================================ */
 
-/* Header Container */
-.header-container {
-    -fx-background-color: white;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 5, 0, 0, 2);
-}
-
-/* Welcome Label */
-.welcome-label {
-    -fx-text-fill: #2d3436;
-    -fx-font-weight: bold;
-}
-
-/* Role Label */
-.role-label {
-    -fx-text-fill: #28a745;
-    -fx-font-style: italic;
-}
-
-/* Content Container */
 .content-container {
     -fx-background-color: transparent;
 }
 
-/* Actions Container */
 .actions-container {
-    -fx-background-color: white;
-    -fx-background-radius: 8;
-    -fx-padding: 15;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.08), 8, 0, 0, 3);
+    -fx-background-color: #1a1f26;
+    -fx-background-radius: 16;
+    -fx-padding: 20;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 12, 0, 0, 2);
 }
 
-/* Section Title */
 .section-title {
-    -fx-text-fill: #1e7e34;
+    -fx-text-fill: #f3f4f6;
+    -fx-font-weight: 700;
+    -fx-font-size: 18px;
+    -fx-letter-spacing: -0.5px;
 }
 
-/* Matches Scroll Pane */
+/* ============================================ */
+/* MATCH CARDS - Dark Glassmorphism */
+/* ============================================ */
+
 .matches-scroll {
     -fx-background-color: transparent;
     -fx-border-color: transparent;
@@ -146,246 +144,310 @@
     -fx-background-color: transparent;
 }
 
-/* Matches List */
 .matches-list {
-    -fx-background-color: white;
-    -fx-background-radius: 8;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.08), 8, 0, 0, 3);
+    -fx-background-color: transparent;
 }
 
-/* Match Card */
 .match-card {
-    -fx-background-color: #f8f9fa;
-    -fx-background-radius: 6;
-    -fx-border-color: #d4edda;
-    -fx-border-radius: 6;
+    -fx-background-color: #1a1f26;
+    -fx-background-radius: 16;
+    -fx-border-color: #374151;
+    -fx-border-radius: 16;
     -fx-border-width: 1;
-    -fx-padding: 15;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.05), 5, 0, 0, 2);
+    -fx-padding: 20;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 12, 0, 0, 2);
 }
 
 .match-card:hover {
-    -fx-background-color: #e8f5e9;
-    -fx-border-color: #28a745;
+    -fx-background-color: #1f2937;
+    -fx-border-color: #10b981;
+    -fx-border-width: 2;
     -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(16, 185, 129, 0.3), 16, 0, 0, 4);
 }
 
-/* Match Title */
 .match-title {
-    -fx-text-fill: #1e7e34;
-    -fx-font-weight: bold;
-    -fx-font-size: 14px;
+    -fx-text-fill: #f3f4f6;
+    -fx-font-weight: 700;
+    -fx-font-size: 16px;
 }
 
-/* Match Info */
 .match-info {
-    -fx-text-fill: #6c757d;
-    -fx-font-size: 12px;
+    -fx-text-fill: #9ca3af;
+    -fx-font-size: 13px;
+    -fx-font-weight: 500;
 }
 
-/* Match Status Badge */
 .status-badge {
-    -fx-background-color: #28a745;
+    -fx-background-color: #10b981;
     -fx-text-fill: white;
-    -fx-background-radius: 3;
-    -fx-padding: 3 8 3 8;
-    -fx-font-size: 10px;
-    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-padding: 6 12;
+    -fx-font-size: 11px;
+    -fx-font-weight: 700;
+    -fx-letter-spacing: 0.5px;
 }
 
-/* Footer Container */
+/* ============================================ */
+/* FOOTER */
+/* ============================================ */
+
 .footer-container {
-    -fx-background-color: white;
-    -fx-border-color: #d4edda;
+    -fx-background-color: #1a1f26;
+    -fx-border-color: #374151;
     -fx-border-width: 1 0 0 0;
 }
 
-/* Status Label */
 .status-label {
-    -fx-text-fill: #6c757d;
+    -fx-text-fill: #6b7280;
+    -fx-font-size: 12px;
+    -fx-font-weight: 500;
 }
 
 /* ============================================ */
-/* ORGANIZE MATCH & BOOK FIELD STYLES */
+/* FORM ELEMENTS */
 /* ============================================ */
 
-/* Content Scroll */
-.content-scroll {
-    -fx-background-color: transparent;
-    -fx-border-color: transparent;
-}
-
-.content-scroll .viewport {
-    -fx-background-color: transparent;
-}
-
-/* Field Label Bold */
-.field-label-bold {
-    -fx-text-fill: #1e7e34;
-    -fx-font-weight: bold;
-}
-
-/* Custom Date Picker */
-.custom-date-picker {
-    -fx-background-color: #f8f9fa;
-    -fx-border-color: #d4edda;
-    -fx-border-radius: 5;
-    -fx-background-radius: 5;
-}
-
-/* Custom Spinner */
-.custom-spinner {
-    -fx-background-color: #f8f9fa;
-    -fx-border-color: #d4edda;
-    -fx-border-radius: 5;
-}
-
-/* Info Label */
-.info-label {
-    -fx-text-fill: #6c757d;
-    -fx-font-size: 11px;
-    -fx-font-style: italic;
-}
-
-/* Summary Box */
-.summary-box {
-    -fx-background-color: #e8f5e9;
-    -fx-background-radius: 8;
-    -fx-border-color: #28a745;
-    -fx-border-radius: 8;
-    -fx-border-width: 1;
-    -fx-padding: 15;
-}
-
-/* Summary Labels */
-.summary-label {
-    -fx-text-fill: #6c757d;
-    -fx-font-size: 12px;
-    -fx-font-weight: bold;
-}
-
-.summary-value {
-    -fx-text-fill: #1e7e34;
-    -fx-font-size: 12px;
-}
-
-/* Field Card (for book field list) */
-.field-card {
-    -fx-background-color: white;
-    -fx-background-radius: 8;
-    -fx-border-color: #d4edda;
-    -fx-border-radius: 8;
-    -fx-border-width: 1;
-    -fx-padding: 15;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.08), 8, 0, 0, 3);
-}
-
-.field-card:hover {
-    -fx-border-color: #28a745;
-    -fx-border-width: 2;
-    -fx-cursor: hand;
-    -fx-background-color: #f0f8f0;
-}
-
-.field-card.selected {
-    -fx-background-color: #e8f5e9;
-    -fx-border-color: #28a745;
-    -fx-border-width: 2;
-}
-
-/* Field Info Labels */
-.field-name {
-    -fx-text-fill: #1e7e34;
-    -fx-font-weight: bold;
+.custom-text-field {
+    -fx-background-color: #1f2937;
+    -fx-text-fill: #e5e7eb;
+    -fx-border-color: #374151;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-padding: 12;
     -fx-font-size: 14px;
 }
 
+.custom-text-field:focused {
+    -fx-border-color: #10b981;
+    -fx-border-width: 2;
+}
+
+.custom-combo-box {
+    -fx-background-color: #1f2937;
+    -fx-text-fill: #e5e7eb;
+    -fx-border-color: #374151;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-font-size: 14px;
+}
+
+.field-label {
+    -fx-text-fill: #d1d5db;
+    -fx-font-weight: 600;
+    -fx-font-size: 13px;
+}
+
+/* ============================================ */
+/* MESSAGE LABELS */
+/* ============================================ */
+
+.message-label {
+    -fx-font-size: 13px;
+    -fx-padding: 12 16;
+    -fx-background-radius: 12;
+    -fx-font-weight: 500;
+}
+
+.message-label.error {
+    -fx-background-color: rgba(239, 68, 68, 0.2);
+    -fx-text-fill: #fca5a5;
+}
+
+.message-label.success {
+    -fx-background-color: rgba(16, 185, 129, 0.2);
+    -fx-text-fill: #6ee7b7;
+}
+
+/* ============================================ */
+/* FIELD CARDS */
+/* ============================================ */
+
+.field-card {
+    -fx-background-color: #1a1f26;
+    -fx-background-radius: 16;
+    -fx-border-color: #374151;
+    -fx-border-radius: 16;
+    -fx-border-width: 1;
+    -fx-padding: 20;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 12, 0, 0, 2);
+}
+
+.field-card:hover {
+    -fx-border-color: #10b981;
+    -fx-border-width: 2;
+    -fx-cursor: hand;
+    -fx-background-color: #1f2937;
+    -fx-effect: dropshadow(gaussian, rgba(16, 185, 129, 0.3), 16, 0, 0, 4);
+}
+
+.field-card.selected {
+    -fx-background-color: rgba(16, 185, 129, 0.1);
+    -fx-border-color: #10b981;
+    -fx-border-width: 2;
+}
+
+.field-name {
+    -fx-text-fill: #f3f4f6;
+    -fx-font-weight: 700;
+    -fx-font-size: 16px;
+}
+
 .field-detail {
-    -fx-text-fill: #6c757d;
-    -fx-font-size: 12px;
+    -fx-text-fill: #9ca3af;
+    -fx-font-size: 13px;
 }
 
 .field-price {
-    -fx-text-fill: #28a745;
-    -fx-font-weight: bold;
-    -fx-font-size: 15px;
+    -fx-text-fill: #10b981;
+    -fx-font-weight: 700;
+    -fx-font-size: 18px;
 }
 
-/* Sort Controls */
-.sort-container {
-    -fx-background-color: white;
-    -fx-background-radius: 6;
-    -fx-border-color: #d4edda;
-    -fx-border-radius: 6;
+/* ============================================ */
+/* SCROLLBAR STYLING - Dark Mode */
+/* ============================================ */
+
+.scroll-pane .scroll-bar:vertical {
+    -fx-background-color: transparent;
+}
+
+.scroll-pane .scroll-bar:vertical .track {
+    -fx-background-color: #1f2937;
+    -fx-background-radius: 8;
+}
+
+.scroll-pane .scroll-bar:vertical .thumb {
+    -fx-background-color: #4b5563;
+    -fx-background-radius: 8;
+}
+
+.scroll-pane .scroll-bar:vertical .thumb:hover {
+    -fx-background-color: #6b7280;
+}
+
+/* ============================================ */
+/* ADDITIONAL COMPONENTS */
+/* ============================================ */
+
+.subtitle-label {
+    -fx-text-fill: #9ca3af;
+}
+
+.form-container {
+    -fx-background-color: #1a1f26;
+    -fx-background-radius: 16;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 12, 0, 0, 4);
+}
+
+.custom-date-picker {
+    -fx-background-color: #1f2937;
+    -fx-text-fill: #e5e7eb;
+    -fx-border-color: #374151;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+}
+
+.custom-spinner {
+    -fx-background-color: #1f2937;
+    -fx-border-color: #374151;
+    -fx-border-radius: 12;
+}
+
+.info-label {
+    -fx-text-fill: #9ca3af;
+    -fx-font-size: 12px;
+    -fx-font-style: italic;
+}
+
+.summary-box {
+    -fx-background-color: rgba(16, 185, 129, 0.1);
+    -fx-background-radius: 12;
+    -fx-border-color: #10b981;
+    -fx-border-radius: 12;
     -fx-border-width: 1;
-    -fx-padding: 10;
+    -fx-padding: 16;
 }
 
-/* Match Info Box */
+.summary-label {
+    -fx-text-fill: #d1d5db;
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+}
+
+.summary-value {
+    -fx-text-fill: #10b981;
+    -fx-font-size: 13px;
+}
+
+.sort-container {
+    -fx-background-color: #1a1f26;
+    -fx-background-radius: 12;
+    -fx-border-color: #374151;
+    -fx-border-radius: 12;
+    -fx-border-width: 1;
+    -fx-padding: 12;
+}
+
 .match-info-box {
-    -fx-background-color: #e8f5e9;
-    -fx-background-radius: 6;
-    -fx-border-color: #28a745;
-    -fx-border-radius: 6;
+    -fx-background-color: rgba(16, 185, 129, 0.1);
+    -fx-background-radius: 12;
+    -fx-border-color: #10b981;
+    -fx-border-radius: 12;
     -fx-border-width: 1;
 }
 
 .match-info-text {
-    -fx-text-fill: #1e7e34;
-    -fx-font-weight: bold;
+    -fx-text-fill: #10b981;
+    -fx-font-weight: 600;
 }
 
-/* ============================================ */
-/* MATCH DETAIL VIEW STYLES */
-/* ============================================ */
-
-/* Detail Container */
 .detail-container {
-    -fx-background-color: white;
-    -fx-background-radius: 10;
-    -fx-padding: 20;
+    -fx-background-color: #1a1f26;
+    -fx-background-radius: 16;
+    -fx-padding: 24;
 }
 
-/* Detail Header */
 .detail-header {
-    -fx-background-color: white;
-    -fx-padding: 10;
+    -fx-background-color: #1a1f26;
+    -fx-padding: 12;
 }
 
-/* Detail Title */
 .detail-title {
-    -fx-text-fill: #1e7e34;
-    -fx-font-weight: bold;
+    -fx-text-fill: #10b981;
+    -fx-font-weight: 700;
     -fx-font-size: 24px;
 }
 
-/* Detail Info Labels */
 .detail-info-title {
-    -fx-text-fill: #2d3436;
-    -fx-font-weight: bold;
+    -fx-text-fill: #e5e7eb;
+    -fx-font-weight: 600;
     -fx-font-size: 14px;
 }
 
 .detail-info-value {
-    -fx-text-fill: #6c757d;
+    -fx-text-fill: #9ca3af;
     -fx-font-size: 14px;
 }
 
-/* Detail Sport Label */
 .detail-sport {
-    -fx-text-fill: #1e7e34;
-    -fx-font-weight: bold;
+    -fx-text-fill: #10b981;
+    -fx-font-weight: 700;
     -fx-font-size: 18px;
 }
 
-/* Map Container */
 .map-container {
-    -fx-background-color: white;
-    -fx-padding: 10;
+    -fx-background-color: #1a1f26;
+    -fx-padding: 12;
 }
 
 .map-title {
-    -fx-text-fill: #1e7e34;
-    -fx-font-weight: bold;
+    -fx-text-fill: #10b981;
+    -fx-font-weight: 600;
     -fx-font-size: 14px;
+}
+
+.field-label-bold {
+    -fx-text-fill: #10b981;
+    -fx-font-weight: 700;
 }

@@ -17,6 +17,10 @@ import view.paymentview.GraphicPaymentView;
 import view.paymentview.PaymentView;
 import view.recapview.GraphicRecapView;
 import view.recapview.RecapView;
+import view.addfieldview.AddFieldView;
+import view.addfieldview.GraphicAddFieldView;
+import view.myfieldsview.MyFieldsView;
+import view.myfieldsview.GraphicMyFieldsView;
 
 public class GraphicViewFactory implements ViewFactory {
 
@@ -53,7 +57,17 @@ public class GraphicViewFactory implements ViewFactory {
     }
 
     @Override
-    public view.matchdetailview.MatchDetailView createMatchDetailView(controller.MatchController matchController) {
-        return new view.matchdetailview.GraphicMatchDetailView(matchController);
+    public view.fieldmanagerview.FieldManagerView createFieldManagerView(controller.FieldManagerController controller) {
+        return new view.fieldmanagerview.GraphicFieldManagerView(controller, controller.getFieldManager());
+    }
+
+    @Override
+    public AddFieldView createAddFieldView(controller.FieldManagerController controller) {
+        return new GraphicAddFieldView(controller);
+    }
+
+    @Override
+    public MyFieldsView createMyFieldsView(controller.FieldManagerController controller) {
+        return new GraphicMyFieldsView(controller);
     }
 }

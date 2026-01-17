@@ -98,6 +98,7 @@ public final class Constants {
     // Role names
     public static final String ROLE_PLAYER = "Player";
     public static final String ROLE_ORGANIZER = "Organizer";
+    public static final String ROLE_FIELD_MANAGER = "Field Manager";
 
     // Separators
     public static final String SEPARATOR = "=================================";
@@ -105,4 +106,3 @@ public final class Constants {
     // Prefixes
     public static final String FOUND_PREFIX = "Found ";
 }
-

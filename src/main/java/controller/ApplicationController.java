@@ -109,10 +109,18 @@ public class ApplicationController {
     }
 
     public void navigateToHome(User user) {
+        // Check if user is a Field Manager - route to dashboard instead
+        if (user.getRole() == model.domain.Role.FIELD_MANAGER.getCode()) {
+            navigateToFieldManagerDashboard(user);
+            return;
+        }
+
+        // Regular home view for Players and Organizers
         try {
             MatchService matchService = new MatchService(persistenceType);
             HomeController homeController = new HomeController(user, this, matchService);
             HomeView homeView = viewFactory.createHomeView(homeController);
+            homeController.setHomeView(homeView); // Connect view to controller
             homeView.setApplicationController(this);
             pushAndDisplay(homeView);
         } catch (ServiceInitializationException | java.sql.SQLException e) {
@@ -123,36 +131,14 @@ public class ApplicationController {
         }
     }
 
-    public void navigateToMatchDetail(int matchId, User user) {
+    public void navigateToFieldManagerDashboard(User fieldManager) {
         try {
-            MatchService matchService = new MatchService(persistenceType);
-            MatchController matchController = new MatchController(matchService);
-            matchController.setCurrentUser(user);
-
-            view.matchdetailview.MatchDetailView detailView = viewFactory.createMatchDetailView(matchController);
-
-            // Set application controller for navigation
-            if (detailView instanceof view.matchdetailview.GraphicMatchDetailView graphicView) {
-                graphicView.setApplicationController(this);
-            }
-
-            // Close current view before displaying new one
-            if (!viewStack.isEmpty()) {
-                viewStack.peekFirst().close();
-            }
-            viewStack.addFirst(detailView);
-
-            // For MatchDetailView, we need to call the specific display method with matchId
-            // This will create the UI and show the details in one go
-            if (detailView instanceof view.matchdetailview.GraphicMatchDetailView graphicView) {
-                graphicView.display(matchId);
-            } else {
-                // Fallback for CLI or other implementations
-                detailView.display();
-                matchController.showMatchDetail(matchId);
-            }
-        } catch (ServiceInitializationException | java.sql.SQLException e) {
-            logger.severe("Error navigating to match detail: " + e.getMessage());
+            FieldManagerController fmController = new FieldManagerController(fieldManager, persistenceType);
+            view.fieldmanagerview.FieldManagerView fieldManagerView = viewFactory.createFieldManagerView(fmController);
+            fieldManagerView.setApplicationController(this);
+            pushAndDisplay(fieldManagerView);
+        } catch (Exception e) {
+            logger.severe("Error navigating to Field Manager Dashboard: " + e.getMessage());
             for (StackTraceElement element : e.getStackTrace()) {
                 logger.severe("\tat " + element.toString());
             }
@@ -189,6 +175,30 @@ public class ApplicationController {
         pushAndDisplay(recapView);
     }
 
+    /**
+     * Navigate to Add Field view for Field Managers.
+     */
+    public void navigateToAddField(FieldManagerController fieldManagerController) {
+        try {
+            view.addfieldview.AddFieldView addFieldView = viewFactory.createAddFieldView(fieldManagerController);
+            pushAndDisplay(addFieldView);
+        } catch (Exception e) {
+            logger.severe("Error navigating to Add Field view: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Navigate to My Fields view for Field Managers.
+     */
+    public void navigateToMyFields(FieldManagerController fieldManagerController) {
+        try {
+            view.myfieldsview.MyFieldsView myFieldsView = viewFactory.createMyFieldsView(fieldManagerController);
+            pushAndDisplay(myFieldsView);
+        } catch (Exception e) {
+            logger.severe("Error navigating to My Fields view: " + e.getMessage());
+        }
+    }
+
     private void pushAndDisplay(View view) {
         if (!viewStack.isEmpty()) {
             viewStack.peekFirst().close();
@@ -204,7 +214,6 @@ public class ApplicationController {
             View previousView = viewStack.peekFirst();
             previousView.display();
         } else {
-            System.out.println("Cannot go back from login screen.");
             logger.info("Cannot go back from login screen.");
         }
     }

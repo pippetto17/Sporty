@@ -24,6 +24,9 @@ public class FieldConverter {
         field.setLongitude(fieldBean.getLongitude());
         field.setPricePerHour(fieldBean.getPricePerHour());
         field.setIndoor(fieldBean.isIndoor());
+        field.setManagerId(fieldBean.getManagerId());
+        field.setStructureName(fieldBean.getStructureName());
+        field.setAutoApprove(fieldBean.isAutoApprove());
 
         return field;
     }
@@ -43,6 +46,9 @@ public class FieldConverter {
         fieldBean.setLongitude(field.getLongitude());
         fieldBean.setPricePerHour(field.getPricePerHour());
         fieldBean.setIndoor(field.isIndoor());
+        fieldBean.setManagerId(field.getManagerId());
+        fieldBean.setStructureName(field.getStructureName());
+        fieldBean.setAutoApprove(field.getAutoApprove());
 
         return fieldBean;
     }
@@ -66,4 +72,3 @@ public class FieldConverter {
         return toFieldBean(entity);
     }
 }
-

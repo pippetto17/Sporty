@@ -62,7 +62,7 @@
         <VBox spacing="5">
             <Label text="I want to register as" styleClass="field-label"/>
             <ComboBox fx:id="roleComboBox" promptText="Select your role"
-                     styleClass="custom-combo-box" prefWidth="320"/>
+                     styleClass="custom-combo-box" prefWidth="320" prefHeight="40" maxWidth="Infinity"/>
         </VBox>
 
         <!-- Buttons -->

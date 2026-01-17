@@ -58,6 +58,7 @@ public class GraphicRecapView implements RecapView {
 
                 Scene scene = new Scene(root, 600, 500);
                 scene.getStylesheets().add(getClass().getResource("/css/style.css").toExternalForm());
+                scene.getStylesheets().add(getClass().getResource("/css/controls-dark.css").toExternalForm());
 
                 stage.setScene(scene);
                 stage.show();

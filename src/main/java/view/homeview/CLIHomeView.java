@@ -126,4 +126,46 @@ public class CLIHomeView implements HomeView {
         }
         return true;
     }
+
+    @Override
+    public void refreshMatches() {
+        displayMatches(homeController.getMatches());
+    }
+
+    @Override
+    public void showMatchDetails(int matchId) {
+        try {
+            // Get match details from controller
+            model.bean.MatchBean match = homeController.getMatches().stream()
+                    .filter(m -> m.getMatchId() == matchId)
+                    .findFirst()
+                    .orElse(null);
+
+            if (match == null) {
+                System.out.println("Match not found");
+                return;
+            }
+
+            // Display details inline
+            System.out.println("\n" + Constants.SEPARATOR);
+            System.out.println("MATCH DETAILS");
+            System.out.println(Constants.SEPARATOR);
+            System.out.println("Sport: " + match.getSport().getDisplayName());
+            System.out.println("Date: " + match.getMatchDate() + " at " + match.getMatchTime());
+            System.out.println("City: " + match.getCity());
+            System.out.println("Organizer: " + match.getOrganizerUsername());
+            System.out.println("Players: " + (match.getParticipants() != null ? match.getParticipants().size() : 0)
+                    + "/" + match.getRequiredParticipants());
+            System.out.println("Price: €"
+                    + (match.getPricePerPerson() != null ? String.format("%.2f", match.getPricePerPerson()) : "Free"));
+            System.out.println("Status: " + match.getStatus().name());
+            System.out.println(Constants.SEPARATOR);
+
+            System.out.print("\nPress Enter to continue...");
+            scanner.nextLine();
+
+        } catch (Exception e) {
+            System.out.println("Error showing match details: " + e.getMessage());
+        }
+    }
 }

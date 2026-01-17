@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Text?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      spacing="20"
+      styleClass="main-container">
+    
+    <padding>
+        <Insets top="30" right="30" bottom="30" left="30"/>
+    </padding>
+
+    <!-- Header -->
+    <HBox alignment="CENTER_LEFT" spacing="15">
+        <Label text="Field Manager Dashboard" styleClass="page-title"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Label fx:id="managerNameLabel" text="Manager: " styleClass="subtitle"/>
+    </HBox>
+
+    <Separator/>
+
+    <!-- Statistics Cards -->
+    <HBox spacing="20" alignment="CENTER">
+        <VBox styleClass="stat-card" spacing="5" HBox.hgrow="ALWAYS">
+            <Label text="Total Fields" styleClass="stat-label"/>
+            <Label fx:id="totalFieldsLabel" text="0" styleClass="stat-value"/>
+        </VBox>
+        
+        <VBox styleClass="stat-card" spacing="5" HBox.hgrow="ALWAYS">
+            <Label text="Pending Requests" styleClass="stat-label"/>
+            <Label fx:id="pendingRequestsLabel" text="0" styleClass="stat-value pending"/>
+        </VBox>
+        
+        <VBox styleClass="stat-card" spacing="5" HBox.hgrow="ALWAYS">
+            <Label text="Today's Bookings" styleClass="stat-label"/>
+            <Label fx:id="todayBookingsLabel" text="0" styleClass="stat-value"/>
+        </VBox>
+    </HBox>
+
+    <!-- Pending Booking Requests -->
+    <VBox spacing="10" VBox.vgrow="ALWAYS">
+        <Label text="Pending Booking Requests" styleClass="section-title"/>
+        
+        <TableView fx:id="bookingsTable" VBox.vgrow="ALWAYS">
+            <columns>
+                <TableColumn fx:id="fieldNameColumn" text="Field" prefWidth="150"/>
+                <TableColumn fx:id="requesterColumn" text="Requester" prefWidth="120"/>
+                <TableColumn fx:id="dateColumn" text="Date" prefWidth="100"/>
+                <TableColumn fx:id="timeColumn" text="Time" prefWidth="120"/>
+                <TableColumn fx:id="typeColumn" text="Type" prefWidth="80"/>
+                <TableColumn fx:id="priceColumn" text="Price" prefWidth="80"/>
+            </columns>
+        </TableView>
+        
+        <!-- Action Buttons -->
+        <HBox spacing="10" alignment="CENTER_LEFT">
+            <Button fx:id="approveButton" text="✓ Approve" styleClass="success-button" 
+                    onAction="#handleApprove" disable="true"/>
+            <Button fx:id="rejectButton" text="✗ Reject" styleClass="danger-button" 
+                    onAction="#handleReject" disable="true"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="Refresh" onAction="#handleRefresh"/>
+        </HBox>
+    </VBox>
+
+    <Separator/>
+
+    <!-- Quick Actions -->
+    <HBox spacing="15" alignment="CENTER">
+        <Button text="➕ Add New Field" onAction="#handleAddField" styleClass="success-button"/>
+        <Button text="📋 My Fields" onAction="#handleManageFields" styleClass="primary-button"/>
+        <Button text="Set Availability" onAction="#handleSetAvailability"/>
+        <Button text="View All Bookings" onAction="#handleViewBookings"/>
+    </HBox>
+
+    <!-- Message Label -->
+    <Label fx:id="messageLabel" styleClass="message-label"/>
+
+</VBox>

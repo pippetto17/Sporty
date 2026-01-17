@@ -37,7 +37,10 @@ public class GraphicRegisterView {
     private void initialize() {
         // Set default role selection
         if (roleComboBox.getItems().isEmpty()) {
-            roleComboBox.getItems().addAll(Constants.ROLE_PLAYER, Constants.ROLE_ORGANIZER);
+            roleComboBox.getItems().addAll(
+                    Constants.ROLE_PLAYER,
+                    Constants.ROLE_ORGANIZER,
+                    Constants.ROLE_FIELD_MANAGER);
         }
         roleComboBox.setValue(Constants.ROLE_PLAYER);
     }

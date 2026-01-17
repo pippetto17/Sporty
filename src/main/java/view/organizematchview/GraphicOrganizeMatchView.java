@@ -84,6 +84,7 @@ public class GraphicOrganizeMatchView implements OrganizeMatchView {
 
                 Scene scene = new Scene(root, 650, 700);
                 scene.getStylesheets().add(getClass().getResource("/css/style.css").toExternalForm());
+                scene.getStylesheets().add(getClass().getResource("/css/controls-dark.css").toExternalForm());
 
                 stage.setScene(scene);
                 stage.setResizable(true);

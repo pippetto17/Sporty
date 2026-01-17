@@ -71,6 +71,7 @@ public class GraphicBookFieldView implements BookFieldView {
 
                 Scene scene = new Scene(root, 800, 700);
                 scene.getStylesheets().add(getClass().getResource("/css/style.css").toExternalForm());
+                scene.getStylesheets().add(getClass().getResource("/css/controls-dark.css").toExternalForm());
 
                 stage.setScene(scene);
                 stage.setResizable(true);

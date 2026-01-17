@@ -75,7 +75,14 @@ public class LoginController {
         if (roleString == null) {
             throw new IllegalArgumentException("Role cannot be null");
         }
-        return roleString.equals(Constants.ROLE_PLAYER) ? model.domain.Role.PLAYER.getCode()
-                : model.domain.Role.ORGANIZER.getCode();
+        if (roleString.equals(Constants.ROLE_PLAYER)) {
+            return model.domain.Role.PLAYER.getCode();
+        } else if (roleString.equals(Constants.ROLE_ORGANIZER)) {
+            return model.domain.Role.ORGANIZER.getCode();
+        } else if (roleString.equals(Constants.ROLE_FIELD_MANAGER)) {
+            return model.domain.Role.FIELD_MANAGER.getCode();
+        } else {
+            throw new IllegalArgumentException("Unknown role: " + roleString);
+        }
     }
 }

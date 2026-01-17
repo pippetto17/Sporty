@@ -4,6 +4,7 @@ import controller.LoginController;
 import controller.HomeController;
 import controller.OrganizeMatchController;
 import controller.BookFieldController;
+import controller.FieldManagerController;
 import view.loginview.LoginView;
 import view.loginview.CLILoginView;
 import view.homeview.HomeView;
@@ -17,6 +18,12 @@ import view.paymentview.PaymentView;
 import view.recapview.CLIRecapView;
 import view.recapview.RecapView;
 import controller.PaymentController;
+import view.fieldmanagerview.CLIFieldManagerView;
+import view.fieldmanagerview.FieldManagerView;
+import view.addfieldview.AddFieldView;
+import view.addfieldview.CLIAddFieldView;
+import view.myfieldsview.MyFieldsView;
+import view.myfieldsview.CLIMyFieldsView;
 
 public class CLIViewFactory implements ViewFactory {
 
@@ -51,7 +58,17 @@ public class CLIViewFactory implements ViewFactory {
     }
 
     @Override
-    public view.matchdetailview.MatchDetailView createMatchDetailView(controller.MatchController matchController) {
-        throw new UnsupportedOperationException("CLI Match Detail View not yet implemented");
+    public FieldManagerView createFieldManagerView(FieldManagerController controller) {
+        return new CLIFieldManagerView(controller, controller.getFieldManager());
+    }
+
+    @Override
+    public AddFieldView createAddFieldView(FieldManagerController controller) {
+        return new CLIAddFieldView(controller);
+    }
+
+    @Override
+    public MyFieldsView createMyFieldsView(FieldManagerController controller) {
+        return new CLIMyFieldsView(controller);
     }
 }

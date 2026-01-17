@@ -108,6 +108,7 @@ public class GraphicLoginView extends Application implements LoginView {
             // Load CSS
             Scene scene = new Scene(root, 450, 550);
             scene.getStylesheets().add(getClass().getResource("/css/style.css").toExternalForm());
+            scene.getStylesheets().add(getClass().getResource("/css/controls-dark.css").toExternalForm());
 
             primaryStage.setScene(scene);
             primaryStage.setResizable(false);
@@ -156,6 +157,7 @@ public class GraphicLoginView extends Application implements LoginView {
             // Load CSS
             Scene scene = new Scene(root, 450, 650);
             scene.getStylesheets().add(getClass().getResource("/css/style.css").toExternalForm());
+            scene.getStylesheets().add(getClass().getResource("/css/controls-dark.css").toExternalForm());
 
             registerStage.setScene(scene);
             registerStage.setResizable(false);
