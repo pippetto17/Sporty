@@ -4,7 +4,6 @@ import model.bean.BookingBean;
 import model.dao.DAOFactory;
 import model.domain.BookingType;
 import model.domain.User;
-import model.service.BookingService;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -17,93 +16,88 @@ import java.util.List;
  */
 public class BookingController {
     private final User currentUser;
-    private final BookingService bookingService;
+    private final model.dao.BookingDAO bookingDAO;
 
     public BookingController(User currentUser, DAOFactory.PersistenceType persistenceType) throws SQLException {
         this.currentUser = currentUser;
-        this.bookingService = new BookingService(persistenceType);
+        this.bookingDAO = DAOFactory.getBookingDAO(persistenceType);
     }
 
-    /**
-     * Request a field booking for a match.
-     * Used by organizers when booking a field for their match.
-     */
     public BookingBean requestMatchBooking(String fieldId, LocalDate date,
             LocalTime startTime, LocalTime endTime) {
-        return bookingService.requestBooking(
-                fieldId,
-                currentUser.getUsername(),
-                date,
-                startTime,
-                endTime,
-                BookingType.MATCH);
+        return createBooking(fieldId, date, startTime, endTime, BookingType.MATCH);
     }
 
-    /**
-     * Request a private field booking.
-     * Used by players for private bookings.
-     */
     public BookingBean requestPrivateBooking(String fieldId, LocalDate date,
             LocalTime startTime, LocalTime endTime) {
-        return bookingService.requestBooking(
-                fieldId,
-                currentUser.getUsername(),
-                date,
-                startTime,
-                endTime,
-                BookingType.PRIVATE);
+        return createBooking(fieldId, date, startTime, endTime, BookingType.PRIVATE);
     }
 
-    /**
-     * Get all bookings for current user.
-     */
+    private BookingBean createBooking(String fieldId, LocalDate date, LocalTime startTime, LocalTime endTime,
+            BookingType type) {
+        model.domain.Booking booking = new model.domain.Booking();
+        booking.setFieldId(fieldId);
+        booking.setRequesterUsername(currentUser.getUsername());
+        booking.setBookingDate(date);
+        booking.setStartTime(startTime);
+        booking.setEndTime(endTime);
+        booking.setType(type);
+        booking.setStatus(model.domain.BookingStatus.PENDING);
+
+        bookingDAO.save(booking);
+        return model.converter.BookingConverter.toBean(booking);
+    }
+
     public List<BookingBean> getMyBookings() {
-        return bookingService.getUserBookings(currentUser.getUsername());
+        return bookingDAO.findByRequesterId(currentUser.getUsername()).stream()
+                .map(model.converter.BookingConverter::toBean)
+                .toList();
     }
 
-    /**
-     * Get pending booking requests (for field managers only).
-     */
     public List<BookingBean> getPendingRequests() {
-        // Only field managers can see pending requests
         if (currentUser.getRole() != model.domain.Role.FIELD_MANAGER.getCode()) {
             throw new IllegalStateException("Only field managers can view pending requests");
         }
-        return bookingService.getPendingBookingsForManager(currentUser.getUsername());
+        return bookingDAO.findPendingByManagerId(currentUser.getUsername()).stream()
+                .map(model.converter.BookingConverter::toBean)
+                .toList();
     }
 
-    /**
-     * Approve a booking request (field managers only).
-     */
     public void approveBooking(int bookingId) {
         if (currentUser.getRole() != model.domain.Role.FIELD_MANAGER.getCode()) {
             throw new IllegalStateException("Only field managers can approve bookings");
         }
-        bookingService.approveBooking(bookingId, currentUser.getUsername());
+        model.domain.Booking booking = bookingDAO.findById(bookingId);
+        if (booking != null) {
+            booking.setStatus(model.domain.BookingStatus.CONFIRMED);
+            bookingDAO.save(booking);
+        }
     }
 
-    /**
-     * Reject a booking request (field managers only).
-     */
     public void rejectBooking(int bookingId, String reason) {
         if (currentUser.getRole() != model.domain.Role.FIELD_MANAGER.getCode()) {
             throw new IllegalStateException("Only field managers can reject bookings");
         }
-        bookingService.rejectBooking(bookingId, currentUser.getUsername(), reason);
+        model.domain.Booking booking = bookingDAO.findById(bookingId);
+        if (booking != null) {
+            booking.setStatus(model.domain.BookingStatus.REJECTED);
+            // Optionally save reason if supported by domain/DAO
+            bookingDAO.save(booking);
+        }
     }
 
-    /**
-     * Cancel own booking.
-     */
     public void cancelMyBooking(int bookingId) {
-        bookingService.cancelBooking(bookingId, currentUser.getUsername());
+        model.domain.Booking booking = bookingDAO.findById(bookingId);
+        if (booking != null && booking.getRequesterUsername().equals(currentUser.getUsername())) {
+            booking.setStatus(model.domain.BookingStatus.CANCELLED);
+            bookingDAO.save(booking);
+        }
     }
 
-    /**
-     * Get bookings for a specific field (managers can check their fields).
-     */
     public List<BookingBean> getFieldBookings(String fieldId) {
-        return bookingService.getFieldBookings(fieldId);
+        return bookingDAO.findByFieldId(fieldId).stream()
+                .map(model.converter.BookingConverter::toBean)
+                .toList();
     }
 
     public User getCurrentUser() {

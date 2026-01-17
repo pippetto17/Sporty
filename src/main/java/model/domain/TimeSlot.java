@@ -91,10 +91,7 @@ public class TimeSlot {
      * Check if this slot overlaps with another time range.
      */
     public boolean overlapsWith(LocalTime otherStart, LocalTime otherEnd) {
-        if (startTime == null || endTime == null || otherStart == null || otherEnd == null) {
-            return false;
-        }
-        return startTime.isBefore(otherEnd) && endTime.isAfter(otherStart);
+        return model.utils.TimeUtils.timeRangesOverlap(startTime, endTime, otherStart, otherEnd);
     }
 
     /**
@@ -108,10 +105,7 @@ public class TimeSlot {
      * Calculate duration in hours.
      */
     public double getDurationHours() {
-        if (startTime == null || endTime == null) {
-            return 0.0;
-        }
-        return (endTime.toSecondOfDay() - startTime.toSecondOfDay()) / 3600.0;
+        return model.utils.TimeUtils.calculateDurationHours(startTime, endTime);
     }
 
     @Override

@@ -137,10 +137,7 @@ public class Booking {
      * Calculate duration in hours.
      */
     public double getDurationHours() {
-        if (startTime == null || endTime == null) {
-            return 0.0;
-        }
-        return (endTime.toSecondOfDay() - startTime.toSecondOfDay()) / 3600.0;
+        return model.utils.TimeUtils.calculateDurationHours(startTime, endTime);
     }
 
     /**

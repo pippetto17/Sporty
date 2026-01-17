@@ -14,6 +14,7 @@ public class DemoDataInitializer {
 
     /**
      * Get list of demo users for testing
+     * 
      * @return List of pre-configured demo users
      */
     public static List<User> getDemoUsers() {
@@ -27,7 +28,11 @@ public class DemoDataInitializer {
         User organizerUser = new User("organizer", "org123", "Test", "Organizer", Role.ORGANIZER.getCode());
         users.add(organizerUser);
 
+        // Field Manager user
+        User fieldManagerUser = new User("fieldmanager", "fm123", "Test", "Field Manager",
+                Role.FIELD_MANAGER.getCode());
+        users.add(fieldManagerUser);
+
         return users;
     }
 }
-

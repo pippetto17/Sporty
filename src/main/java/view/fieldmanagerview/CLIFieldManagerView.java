@@ -1,143 +1,160 @@
 package view.fieldmanagerview;
 
 import controller.FieldManagerController;
+import controller.ApplicationController;
 import model.bean.BookingBean;
 import model.domain.User;
 
 import java.util.List;
 import java.util.Scanner;
 
-/**
- * CLI implementation of Field Manager Dashboard.
- */
 public class CLIFieldManagerView implements FieldManagerView {
+
     private final FieldManagerController controller;
-    private final User fieldManager;
-    private controller.ApplicationController applicationController;
+    private final User manager;
     private final Scanner scanner;
 
-    public CLIFieldManagerView(FieldManagerController controller, User fieldManager) {
+    public CLIFieldManagerView(FieldManagerController controller, User manager) {
         this.controller = controller;
-        this.fieldManager = fieldManager;
+        this.manager = manager;
         this.scanner = new Scanner(System.in);
     }
 
     @Override
-    public void setApplicationController(controller.ApplicationController applicationController) {
-        this.applicationController = applicationController;
+    public void setApplicationController(ApplicationController appController) {
+        // Se la CLI non naviga (non cambia scene), questo metodo può rimanere vuoto o
+        // rimosso
     }
 
     @Override
     public void display() {
         boolean running = true;
         while (running) {
-            System.out.println("\n========================================");
-            System.out.println("  FIELD MANAGER DASHBOARD");
-            System.out.println("  Manager: " + fieldManager.getName() + " " + fieldManager.getSurname());
-            System.out.println("========================================");
-
-            // Display stats
-            displayDashboardStats();
-
-            System.out.println("\n1) View Pending Booking Requests");
-            System.out.println("2) Approve Booking");
-            System.out.println("3) Reject Booking");
-            System.out.println("4) My Fields");
-            System.out.println("5) Set Availability");
-            System.out.println("6) View All Bookings");
-            System.out.println("0) Back");
-            System.out.print("\nYour choice: ");
+            printHeader();
+            printStats();
+            printMenu();
 
             String choice = scanner.nextLine().trim();
-
             switch (choice) {
-                case "1" -> viewPendingRequests();
-                case "2" -> approveBooking();
-                case "3" -> rejectBooking();
-                case "4" -> System.out.println("Manage Fields - Not yet implemented");
-                case "5" -> System.out.println("Set Availability - Not yet implemented");
-                case "6" -> System.out.println("View All Bookings - Not yet implemented");
+                case "1" -> listPendingRequests();
+                case "2" -> handleApprove();
+                case "3" -> handleReject();
                 case "0" -> running = false;
-                default -> System.out.println("Invalid choice");
+                default -> System.out.println("⚠ Invalid choice, try again.");
             }
         }
     }
 
     @Override
     public void close() {
-        // CLI doesn't need cleanup
+        // No-op per CLI
     }
 
-    private void displayDashboardStats() {
+    // --- DISPLAY HELPERS ---
+
+    private void printHeader() {
+        System.out.println("\n========================================");
+        System.out.println("  FIELD MANAGER: " + manager.getName() + " " + manager.getSurname());
+        System.out.println("========================================");
+    }
+
+    private void printStats() {
         try {
-            FieldManagerController.DashboardData data = controller.getDashboardData();
-            System.out.println("\nSTATISTICS:");
-            System.out.println("  Total Fields: " + data.getTotalFields());
-            System.out.println("  Pending Requests: " + data.getPendingRequests());
-            System.out.println("  Today's Bookings: " + data.getTodayBookings());
+            var data = controller.getDashboardData();
+            System.out.printf("Fields: %d | Pending: %d | Today's Bookings: %d%n",
+                    data.getTotalFields(), data.getPendingRequests(), data.getTodayBookings());
         } catch (Exception e) {
-            System.out.println("Error loading stats: " + e.getMessage());
+            System.out.println("Stats unavailable: " + e.getMessage());
         }
     }
 
-    private void viewPendingRequests() {
+    private void printMenu() {
+        System.out.println("\n1) List Pending Requests");
+        System.out.println("2) Approve Booking");
+        System.out.println("3) Reject Booking");
+        System.out.println("0) Back");
+        System.out.print("> ");
+    }
+
+    // --- ACTIONS ---
+
+    private void listPendingRequests() {
         try {
             List<BookingBean> pending = controller.getPendingRequests();
-
             if (pending.isEmpty()) {
-                System.out.println("\nNo pending booking requests.");
+                System.out.println("\n✓ No pending requests.");
                 return;
             }
 
-            System.out.println("\nPENDING BOOKING REQUESTS:");
-            System.out.println("----------------------------------------");
-            for (int i = 0; i < pending.size(); i++) {
-                BookingBean booking = pending.get(i);
-                System.out.printf("%d) Field: %s | Requester: %s | Date: %s | Time: %s-%s | Price: €%.2f%n",
-                        i + 1,
-                        booking.getFieldName(),
-                        booking.getRequesterUsername(),
-                        booking.getBookingDate(),
-                        booking.getStartTime(),
-                        booking.getEndTime(),
-                        booking.getTotalPrice());
+            System.out.println("\n--- PENDING REQUESTS ---");
+            // Intestazione Tabella
+            System.out.printf("%-8s %-15s %-15s %-12s %-12s %s%n", "ID", "FIELD", "USER", "DATE", "TIME", "PRICE");
+
+            for (BookingBean b : pending) {
+                System.out.printf("[%-6d] %-15s %-15s %-12s %s-%-6s €%.2f%n",
+                        b.getBookingId(), // Mostriamo il VERO ID
+                        truncate(b.getFieldName(), 15),
+                        truncate(b.getRequesterUsername(), 15),
+                        b.getBookingDate(),
+                        b.getStartTime(), b.getEndTime(),
+                        b.getTotalPrice());
             }
+        } catch (Exception e) {
+            System.out.println("Error fetching list: " + e.getMessage());
+        }
+    }
+
+    private void handleApprove() {
+        int id = readInt("Enter Booking ID to APPROVE: ");
+        if (id == -1)
+            return;
+
+        try {
+            controller.approveBooking(id);
+            System.out.println("✓ Booking " + id + " approved.");
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
         }
     }
 
-    private void approveBooking() {
-        System.out.print("Enter booking ID to approve: ");
+    private void handleReject() {
+        int id = readInt("Enter Booking ID to REJECT: ");
+        if (id == -1)
+            return;
+
+        System.out.print("Reason for rejection: ");
+        String reason = scanner.nextLine().trim();
+
+        if (reason.isEmpty()) {
+            System.out.println("⚠ Reason is required.");
+            return;
+        }
+
         try {
-            int bookingId = Integer.parseInt(scanner.nextLine().trim());
-            controller.approveBooking(bookingId);
-            System.out.println("✓ Booking approved successfully!");
-        } catch (NumberFormatException e) {
-            System.out.println("Invalid booking ID");
+            controller.rejectBooking(id, reason);
+            System.out.println("✓ Booking " + id + " rejected.");
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
         }
     }
 
-    private void rejectBooking() {
-        System.out.print("Enter booking ID to reject: ");
+    // --- UTILS ---
+
+    // Legge un intero gestendo l'errore di formato
+    private int readInt(String prompt) {
+        System.out.print(prompt);
         try {
-            int bookingId = Integer.parseInt(scanner.nextLine().trim());
-            System.out.print("Rejection reason: ");
-            String reason = scanner.nextLine().trim();
-
-            if (reason.isEmpty()) {
-                System.out.println("Rejection reason is required");
-                return;
-            }
-
-            controller.rejectBooking(bookingId, reason);
-            System.out.println("✓ Booking rejected");
+            return Integer.parseInt(scanner.nextLine().trim());
         } catch (NumberFormatException e) {
-            System.out.println("Invalid booking ID");
-        } catch (Exception e) {
-            System.out.println("Error: " + e.getMessage());
+            System.out.println("⚠ Invalid number format.");
+            return -1;
         }
+    }
+
+    // Taglia le stringhe troppo lunghe per non rompere la tabella
+    private String truncate(String input, int length) {
+        if (input == null)
+            return "";
+        return input.length() > length ? input.substring(0, length - 2) + ".." : input;
     }
 }

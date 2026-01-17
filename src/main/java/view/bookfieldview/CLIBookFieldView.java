@@ -115,53 +115,6 @@ public class CLIBookFieldView implements BookFieldView {
     }
 
     @Override
-    public void displaySortOptions() {
-        System.out.println("\n--- SORT OPTIONS ---");
-        System.out.println("1. Price (Low to High)");
-        System.out.println("2. Price (High to Low)");
-        System.out.println("3. Name");
-        System.out.println("4. Distance (coming soon)");
-        System.out.print("Choose sorting option: ");
-
-        String choice = scanner.nextLine().trim();
-        model.service.FieldService.SortCriteria criteria = switch (choice) {
-            case "1" -> model.service.FieldService.SortCriteria.PRICE_ASC;
-            case "2" -> model.service.FieldService.SortCriteria.PRICE_DESC;
-            case "3" -> model.service.FieldService.SortCriteria.NAME;
-            case "4" -> model.service.FieldService.SortCriteria.DISTANCE;
-            default -> null;
-        };
-
-        if (criteria != null) {
-            bookFieldController.sortFields(criteria);
-            displaySuccess("Fields sorted by " + criteria.getDisplayName());
-        } else {
-            displayError("Invalid sorting option.");
-        }
-    }
-
-    @Override
-    public void displayFilterOptions() {
-        System.out.println("\n--- FILTER OPTIONS ---");
-        System.out.println("1. Filter by price range");
-        System.out.println("2. Filter by indoor/outdoor");
-        System.out.println("3. Clear filters");
-        System.out.print("Choose filter option: ");
-
-        String choice = scanner.nextLine().trim();
-
-        switch (choice) {
-            case "1" -> filterByPrice();
-            case "2" -> filterByIndoor();
-            case "3" -> {
-                bookFieldController.searchAvailableFields();
-                displaySuccess("Filters cleared.");
-            }
-            default -> displayError("Invalid filter option.");
-        }
-    }
-
-    @Override
     public void displayError(String message) {
         System.out.println("\n[ERROR] " + message);
     }
@@ -186,11 +139,9 @@ public class CLIBookFieldView implements BookFieldView {
     private void displayMenu() {
         System.out.println("\n--- OPTIONS ---");
         System.out.println("1. Select a field (enter field number)");
-        System.out.println("2. Sort fields");
-        System.out.println("3. Filter fields");
-        System.out.println("4. View field details");
-        System.out.println("5. Refresh search");
-        System.out.println("6. Back");
+        System.out.println("2. View field details");
+        System.out.println("3. Refresh search");
+        System.out.println("4. Back");
         System.out.print("Choose an option: ");
     }
 
@@ -205,9 +156,7 @@ public class CLIBookFieldView implements BookFieldView {
                     displayError("Invalid field number.");
                 }
             }
-            case "2" -> displaySortOptions();
-            case "3" -> displayFilterOptions();
-            case "4" -> {
+            case "2" -> {
                 System.out.print("Enter field number: ");
                 try {
                     int fieldNum = Integer.parseInt(scanner.nextLine().trim());
@@ -216,11 +165,11 @@ public class CLIBookFieldView implements BookFieldView {
                     displayError("Invalid field number.");
                 }
             }
-            case "5" -> {
+            case "3" -> {
                 bookFieldController.searchAvailableFields();
                 displaySuccess("Search refreshed.");
             }
-            case "6" -> {
+            case "4" -> {
                 bookFieldController.navigateBack();
                 running = false;
             }
@@ -261,45 +210,4 @@ public class CLIBookFieldView implements BookFieldView {
         }
     }
 
-    private void filterByPrice() {
-        System.out.print("Enter minimum price per person: ");
-        try {
-            double minPrice = Double.parseDouble(scanner.nextLine().trim());
-            System.out.print("Enter maximum price per person: ");
-            double maxPrice = Double.parseDouble(scanner.nextLine().trim());
-
-            List<FieldBean> filtered = bookFieldController.filterByPriceRange(minPrice, maxPrice);
-
-            if (filtered.isEmpty()) {
-                displayError("No fields found in this price range.");
-            } else {
-                displaySuccess(FOUND_PREFIX + filtered.size() + " fields in price range €" +
-                        minPrice + " - €" + maxPrice);
-            }
-        } catch (NumberFormatException e) {
-            displayError("Invalid price format.");
-        }
-    }
-
-    private void filterByIndoor() {
-        System.out.println("1. Indoor only");
-        System.out.println("2. Outdoor only");
-        System.out.print("Choose: ");
-
-        String choice = scanner.nextLine().trim();
-
-        if (choice.equals("1") || choice.equals("2")) {
-            boolean indoor = choice.equals("1");
-            List<FieldBean> filtered = bookFieldController.filterByIndoor(indoor);
-
-            if (filtered.isEmpty()) {
-                displayError("No " + (indoor ? "indoor" : "outdoor") + " fields found.");
-            } else {
-                displaySuccess(FOUND_PREFIX + filtered.size() + " " +
-                        (indoor ? "indoor" : "outdoor") + " fields.");
-            }
-        } else {
-            displayError("Invalid choice.");
-        }
-    }
 }

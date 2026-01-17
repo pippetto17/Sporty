@@ -1,10 +1,14 @@
 package view.fieldmanagerview;
 
+import controller.ApplicationController;
 import controller.FieldManagerController;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import model.bean.BookingBean;
@@ -12,251 +16,184 @@ import model.domain.User;
 import model.utils.Constants;
 
 import java.time.format.DateTimeFormatter;
-import java.util.List;
+import java.util.Optional;
+import java.util.logging.Logger;
 
-/**
- * Graphic view for Field Manager Dashboard.
- * Displays pending booking requests and field statistics.
- */
 public class GraphicFieldManagerView implements FieldManagerView {
+
+    // Dipendenze essenziali
     private final FieldManagerController controller;
-    private final User fieldManager;
-    private controller.ApplicationController applicationController;
+    private final User manager; // Rinominato da fieldManager per brevità
+    private ApplicationController appController;
     private Stage stage;
+    private final Logger logger = Logger.getLogger(getClass().getName());
 
-    // Statistics
+    // UI Elements (Raggruppati per pulizia)
     @FXML
-    private Label managerNameLabel;
-    @FXML
-    private Label totalFieldsLabel;
-    @FXML
-    private Label pendingRequestsLabel;
-    @FXML
-    private Label todayBookingsLabel;
-
-    // Table
+    private Label managerNameLabel, totalFieldsLabel, pendingRequestsLabel, todayBookingsLabel, messageLabel;
     @FXML
     private TableView<BookingBean> bookingsTable;
     @FXML
-    private TableColumn<BookingBean, String> fieldNameColumn;
+    private TableColumn<BookingBean, String> fieldNameColumn, requesterColumn, dateColumn, timeColumn, typeColumn,
+            priceColumn;
     @FXML
-    private TableColumn<BookingBean, String> requesterColumn;
-    @FXML
-    private TableColumn<BookingBean, String> dateColumn;
-    @FXML
-    private TableColumn<BookingBean, String> timeColumn;
-    @FXML
-    private TableColumn<BookingBean, String> typeColumn;
-    @FXML
-    private TableColumn<BookingBean, String> priceColumn;
-
-    // Buttons
-    @FXML
-    private Button approveButton;
-    @FXML
-    private Button rejectButton;
-
-    // Message
-    @FXML
-    private Label messageLabel;
+    private Button approveButton, rejectButton;
 
     private final ObservableList<BookingBean> bookingsList = FXCollections.observableArrayList();
 
-    public GraphicFieldManagerView(FieldManagerController controller, User fieldManager) {
+    public GraphicFieldManagerView(FieldManagerController controller, User manager) {
         this.controller = controller;
-        this.fieldManager = fieldManager;
+        this.manager = manager;
     }
 
     @Override
-    public void setApplicationController(controller.ApplicationController applicationController) {
-        this.applicationController = applicationController;
+    public void setApplicationController(ApplicationController appController) {
+        this.appController = appController;
     }
 
     @Override
     public void display() {
-        javafx.application.Platform.runLater(() -> {
-            try {
-                stage = new javafx.stage.Stage();
-                stage.setTitle("Field Manager Dashboard - Sporty");
+        Platform.runLater(this::initStage);
+    }
 
-                // Load FXML
-                javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
-                        getClass().getResource("/fxml/field_manager_dashboard.fxml"));
-                loader.setController(this);
-                javafx.scene.layout.VBox root = loader.load();
+    private void initStage() {
+        try {
+            stage = new Stage();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/field_manager_dashboard.fxml"));
+            loader.setController(this);
 
-                // Load CSS
-                javafx.scene.Scene scene = new javafx.scene.Scene(root, 1000, 700);
-                scene.getStylesheets().add(
-                        getClass().getResource("/css/field_manager.css").toExternalForm());
-                scene.getStylesheets().add(
-                        getClass().getResource("/css/style.css").toExternalForm());
-                scene.getStylesheets().add(
-                        getClass().getResource("/css/controls-dark.css").toExternalForm());
-                stage.setScene(scene);
-                stage.setResizable(true);
-                stage.show();
+            Scene scene = new Scene(loader.load(), 1000, 700);
+            loadStyles(scene);
 
-            } catch (Exception e) {
-                showError("Error loading dashboard: " + e.getMessage());
-                e.printStackTrace();
-            }
-        });
+            stage.setTitle("Field Manager Dashboard - Sporty");
+            stage.setScene(scene);
+            stage.show();
+        } catch (Exception e) {
+            logger.severe("Dashboard load failed: " + e.getMessage());
+        }
+    }
+
+    private void loadStyles(Scene scene) {
+        String[] styles = { "/css/field_manager.css", "/css/style.css", "/css/controls-dark.css" };
+        for (String style : styles) {
+            scene.getStylesheets().add(getClass().getResource(style).toExternalForm());
+        }
     }
 
     @Override
     public void close() {
-        if (stage != null) {
+        if (stage != null)
             stage.close();
-        }
-    }
-
-    public void setStage(Stage stage) {
-        this.stage = stage;
     }
 
     @FXML
     private void initialize() {
-        // Set manager name
-        managerNameLabel.setText("Manager: " + fieldManager.getName() + " " + fieldManager.getSurname());
-
-        // Configure table columns
-        fieldNameColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getFieldName()));
-        requesterColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getRequesterUsername()));
-        dateColumn.setCellValueFactory(data -> new SimpleStringProperty(
-                data.getValue().getBookingDate().format(DateTimeFormatter.ISO_LOCAL_DATE)));
-        timeColumn.setCellValueFactory(data -> new SimpleStringProperty(
-                data.getValue().getStartTime() + " - " + data.getValue().getEndTime()));
-        typeColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getType()));
-        priceColumn.setCellValueFactory(
-                data -> new SimpleStringProperty(String.format("€%.2f", data.getValue().getTotalPrice())));
-
-        // Set table data
-        bookingsTable.setItems(bookingsList);
-
-        // Enable buttons when row is selected
-        bookingsTable.getSelectionModel().selectedItemProperty().addListener(
-                (obs, oldSelection, newSelection) -> {
-                    boolean hasSelection = newSelection != null;
-                    approveButton.setDisable(!hasSelection);
-                    rejectButton.setDisable(!hasSelection);
-                });
-
-        // Load initial data
-        loadDashboardData();
+        managerNameLabel.setText("Manager: " + manager.getName() + " " + manager.getSurname());
+        setupTable();
+        loadData();
     }
 
-    private void loadDashboardData() {
+    private void setupTable() {
+        // Mapping colonne più compatto
+        fieldNameColumn.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getFieldName()));
+        requesterColumn.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getRequesterUsername()));
+        typeColumn.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getType()));
+        dateColumn.setCellValueFactory(
+                d -> new SimpleStringProperty(d.getValue().getBookingDate().format(DateTimeFormatter.ISO_LOCAL_DATE)));
+        timeColumn.setCellValueFactory(
+                d -> new SimpleStringProperty(d.getValue().getStartTime() + " - " + d.getValue().getEndTime()));
+        priceColumn.setCellValueFactory(
+                d -> new SimpleStringProperty(String.format("€%.2f", d.getValue().getTotalPrice())));
+
+        bookingsTable.setItems(bookingsList);
+
+        // Listener selezione riga
+        bookingsTable.getSelectionModel().selectedItemProperty().addListener((obs, old, selected) -> {
+            boolean active = selected != null;
+            approveButton.setDisable(!active);
+            rejectButton.setDisable(!active);
+        });
+    }
+
+    private void loadData() {
         try {
-            // Load dashboard stats
-            FieldManagerController.DashboardData dashboardData = controller.getDashboardData();
-            totalFieldsLabel.setText(String.valueOf(dashboardData.getTotalFields()));
-            pendingRequestsLabel.setText(String.valueOf(dashboardData.getPendingRequests()));
-            todayBookingsLabel.setText(String.valueOf(dashboardData.getTodayBookings()));
+            var stats = controller.getDashboardData(); // 'var' rende il codice meno verboso (Java 10+)
+            totalFieldsLabel.setText(String.valueOf(stats.getTotalFields()));
+            pendingRequestsLabel.setText(String.valueOf(stats.getPendingRequests()));
+            todayBookingsLabel.setText(String.valueOf(stats.getTodayBookings()));
 
-            // Load pending booking requests
-            List<BookingBean> pendingBookings = controller.getPendingRequests();
-            bookingsList.clear();
-            bookingsList.addAll(pendingBookings);
-
+            bookingsList.setAll(controller.getPendingRequests());
         } catch (Exception e) {
-            showError("Error loading dashboard: " + e.getMessage());
+            showMessage(e.getMessage(), true);
         }
     }
 
     @FXML
     private void handleApprove() {
         BookingBean selected = bookingsTable.getSelectionModel().getSelectedItem();
-        if (selected == null) {
+        if (selected == null)
             return;
-        }
 
         try {
             controller.approveBooking(selected.getBookingId());
-            showSuccess("Booking approved successfully!");
-            loadDashboardData(); // Refresh
+            showMessage("Booking approved!", false);
+            loadData();
         } catch (Exception e) {
-            showError("Error approving booking: " + e.getMessage());
+            showMessage("Approval failed: " + e.getMessage(), true);
         }
     }
 
     @FXML
     private void handleReject() {
         BookingBean selected = bookingsTable.getSelectionModel().getSelectedItem();
-        if (selected == null) {
+        if (selected == null)
+            return;
+
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Reject Booking");
+        dialog.setHeaderText("Rejecting request from " + selected.getRequesterUsername());
+        dialog.setContentText("Reason:");
+
+        Optional<String> result = dialog.showAndWait();
+
+        // Guard Clause: esci se non c'è risultato o è vuoto
+        if (result.isEmpty() || result.get().trim().isEmpty()) {
+            if (result.isPresent())
+                showMessage("Reason required", true);
             return;
         }
 
-        // Show dialog for rejection reason
-        TextInputDialog dialog = new TextInputDialog();
-        dialog.setTitle("Reject Booking");
-        dialog.setHeaderText("Reject booking from " + selected.getRequesterUsername());
-        dialog.setContentText("Reason:");
-
-        dialog.showAndWait().ifPresent(reason -> {
-            if (reason == null || reason.trim().isEmpty()) {
-                showError("Rejection reason is required");
-                return;
-            }
-
-            try {
-                controller.rejectBooking(selected.getBookingId(), reason);
-                showSuccess("Booking rejected");
-                loadDashboardData(); // Refresh
-            } catch (Exception e) {
-                showError("Error rejecting booking: " + e.getMessage());
-            }
-        });
+        try {
+            controller.rejectBooking(selected.getBookingId(), result.get());
+            showMessage("Booking rejected", false);
+            loadData();
+        } catch (Exception e) {
+            showMessage("Rejection failed: " + e.getMessage(), true);
+        }
     }
 
     @FXML
     private void handleRefresh() {
-        loadDashboardData();
-        showInfo("Dashboard refreshed");
+        loadData();
+        showMessage("Dashboard refreshed", false);
     }
 
-    @FXML
+    @FXML // Navigazione semplificata con null check inline
     private void handleManageFields() {
-        if (applicationController != null) {
-            applicationController.navigateToMyFields(controller);
-        }
-    }
-
-    @FXML
-    private void handleSetAvailability() {
-        showInfo("Set Availability feature - To be implemented");
-        // TODO: Navigate to Availability Editor view
+        if (appController != null)
+            appController.navigateToMyFields(controller);
     }
 
     @FXML
     private void handleAddField() {
-        if (applicationController != null) {
-            applicationController.navigateToAddField(controller);
-        }
+        if (appController != null)
+            appController.navigateToAddField(controller);
     }
 
-    @FXML
-    private void handleViewBookings() {
-        showInfo("View All Bookings feature - To be implemented");
-        // TODO: Navigate to All Bookings view
-    }
-
-    // Message helpers
-    private void showError(String message) {
-        messageLabel.getStyleClass().removeAll(Constants.CSS_SUCCESS, "info");
-        messageLabel.getStyleClass().add(Constants.CSS_ERROR);
-        messageLabel.setText(message);
-    }
-
-    private void showSuccess(String message) {
-        messageLabel.getStyleClass().removeAll(Constants.CSS_ERROR, "info");
-        messageLabel.getStyleClass().add(Constants.CSS_SUCCESS);
-        messageLabel.setText(message);
-    }
-
-    private void showInfo(String message) {
-        messageLabel.getStyleClass().removeAll(Constants.CSS_ERROR, Constants.CSS_SUCCESS);
-        messageLabel.getStyleClass().add("info");
-        messageLabel.setText(message);
+    // Unificato ShowError/Success/Info in un unico metodo logico
+    private void showMessage(String msg, boolean isError) {
+        messageLabel.getStyleClass().removeAll(Constants.CSS_ERROR, Constants.CSS_SUCCESS, "info");
+        messageLabel.getStyleClass().add(isError ? Constants.CSS_ERROR : Constants.CSS_SUCCESS);
+        messageLabel.setText(msg);
     }
 }

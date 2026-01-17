@@ -3,7 +3,7 @@ package testing;
 import model.bean.MatchBean;
 import model.dao.DAOFactory;
 import model.domain.Sport;
-import model.service.MatchService;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
@@ -15,13 +15,14 @@ import static org.junit.jupiter.api.Assertions.*;
  * Test suite per la creazione di Match.
  */
 @DisplayName("Match Creation Test Suite")
+
 class MatchCreationTest {
 
-    private MatchService matchService;
+    private model.dao.MatchDAO matchDAO;
 
     @BeforeEach
     void setUp() throws Exception {
-        matchService = new MatchService(DAOFactory.PersistenceType.MEMORY);
+        matchDAO = DAOFactory.getMatchDAO(DAOFactory.PersistenceType.MEMORY);
     }
 
     @Test
@@ -36,9 +37,15 @@ class MatchCreationTest {
         matchBean.setRequiredParticipants(10);
         matchBean.setFieldId("1");
 
-        matchService.saveMatch(matchBean);
+        model.domain.Match match = model.converter.MatchConverter.toEntity(matchBean);
+        matchDAO.save(match);
 
-        assertNotNull(matchBean.getMatchId());
+        // Update bean with ID if generated (mock DAO usually generates ID)
+        if (match.getMatchId() != null) {
+            matchBean.setMatchId(match.getMatchId());
+        }
+
+        assertNotNull(match.getMatchId());
     }
 
     @Test
@@ -53,9 +60,10 @@ class MatchCreationTest {
         matchBean.setRequiredParticipants(4);
         matchBean.setFieldId("2");
 
-        matchService.saveMatch(matchBean);
+        model.domain.Match match = model.converter.MatchConverter.toEntity(matchBean);
+        matchDAO.save(match);
 
-        assertNotNull(matchBean.getMatchId());
+        assertNotNull(match.getMatchId());
     }
 
     @Test
@@ -70,38 +78,13 @@ class MatchCreationTest {
         matchBean.setRequiredParticipants(10);
         matchBean.setFieldId("1");
 
-        matchService.saveMatch(matchBean);
-        int matchId = matchBean.getMatchId();
+        model.domain.Match match = model.converter.MatchConverter.toEntity(matchBean);
+        matchDAO.save(match);
+        int matchId = match.getMatchId();
 
-        MatchBean retrieved = matchService.getMatchById(matchId);
+        model.domain.Match retrieved = matchDAO.findById(matchId);
 
         assertNotNull(retrieved);
         assertEquals(matchId, retrieved.getMatchId());
-    }
-
-    @Test
-    @DisplayName("Validazione match con dati corretti")
-    void testValidateMatchWithCorrectData() {
-        LocalDate futureDate = LocalDate.now().plusDays(5);
-        LocalTime time = LocalTime.of(18, 0);
-
-        boolean isValid = matchService.validateMatchDetails(
-            Sport.FOOTBALL_11, futureDate, time, "Milano", 10
-        );
-
-        assertTrue(isValid);
-    }
-
-    @Test
-    @DisplayName("Validazione match con data passata")
-    void testValidateMatchWithPastDate() {
-        LocalDate pastDate = LocalDate.of(2020, 1, 1);
-        LocalTime time = LocalTime.of(18, 0);
-
-        boolean isValid = matchService.validateMatchDetails(
-            Sport.FOOTBALL_11, pastDate, time, "Milano", 10
-        );
-
-        assertFalse(isValid);
     }
 }

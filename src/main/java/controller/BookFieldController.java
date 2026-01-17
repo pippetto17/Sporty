@@ -2,7 +2,6 @@ package controller;
 
 import model.bean.FieldBean;
 import model.bean.MatchBean;
-import model.service.FieldService;
 import model.utils.Constants;
 import exception.ServiceInitializationException;
 
@@ -16,7 +15,7 @@ import java.util.List;
  */
 public class BookFieldController {
     private final ApplicationController applicationController;
-    private final FieldService fieldService;
+    private final model.dao.FieldDAO fieldDAO;
     private MatchBean currentMatchBean;
     private List<FieldBean> availableFields;
     private FieldBean selectedField;
@@ -24,10 +23,9 @@ public class BookFieldController {
     public BookFieldController(ApplicationController applicationController) {
         this.applicationController = applicationController;
         try {
-            this.fieldService = new FieldService(applicationController.getPersistenceType());
+            this.fieldDAO = model.dao.DAOFactory.getFieldDAO(applicationController.getPersistenceType());
         } catch (SQLException e) {
-            throw new ServiceInitializationException(Constants.ERROR_FIELD_SERVICE_INIT + e.getMessage(),
-                    e);
+            throw new ServiceInitializationException(Constants.ERROR_FIELD_SERVICE_INIT + e.getMessage(), e);
         }
     }
 
@@ -51,44 +49,43 @@ public class BookFieldController {
         }
     }
 
-    /**
-     * Cerca i campi disponibili in base ai criteri del match corrente.
-     * Delega la ricerca e il calcolo dei prezzi a FieldService.
-     */
     public List<FieldBean> searchAvailableFields() {
-        availableFields = fieldService.searchAvailableFields(currentMatchBean);
+        if (currentMatchBean == null)
+            return List.of();
+
+        List<model.domain.Field> fields = fieldDAO.findAvailableFields(
+                currentMatchBean.getSport(),
+                currentMatchBean.getCity(),
+                null,
+                null);
+
+        this.availableFields = fields.stream()
+                .map(model.converter.FieldConverter::toBean)
+                .toList();
         return availableFields;
     }
 
-    /**
-     * Ordina i campi disponibili secondo il criterio specificato.
-     */
-    public List<FieldBean> sortFields(FieldService.SortCriteria criteria) {
-        availableFields = fieldService.sortFields(availableFields, criteria);
-        return availableFields;
-    }
+    // sortFields removed as unused and relying on deleted type
 
-    /**
-     * Filtra i campi in base a un range di prezzo.
-     */
     public List<FieldBean> filterByPriceRange(double minPrice, double maxPrice) {
-        return fieldService.filterByPriceRange(availableFields, minPrice, maxPrice);
+        if (availableFields == null)
+            return List.of();
+        return availableFields.stream()
+                .filter(f -> f.getPricePerPerson() >= minPrice && f.getPricePerPerson() <= maxPrice)
+                .toList();
     }
 
-    /**
-     * Filtra i campi in base al tipo (indoor/outdoor).
-     */
     public List<FieldBean> filterByIndoor(boolean indoor) {
-        return fieldService.filterByIndoor(availableFields, indoor);
+        if (availableFields == null)
+            return List.of();
+        return availableFields.stream()
+                .filter(f -> f.isIndoor() == indoor)
+                .toList();
     }
 
-    /**
-     * Procede alla schermata di pagamento dopo la selezione del campo.
-     */
     public void proceedToPayment() {
-        if (selectedField == null) {
+        if (selectedField == null)
             throw new IllegalStateException(Constants.ERROR_NO_FIELD_SELECTED);
-        }
 
         if (currentMatchBean.getPricePerPerson() == null) {
             currentMatchBean.setPricePerPerson(selectedField.getPricePerPerson());

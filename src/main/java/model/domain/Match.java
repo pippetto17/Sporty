@@ -185,10 +185,8 @@ public class Match {
     }
 
     public void calculatePricePerPerson(double fieldPricePerHour, double hoursBooked) {
-        if (requiredParticipants <= 0) {
-            throw new IllegalStateException("Cannot calculate price: invalid participants count");
-        }
-        this.pricePerPerson = (fieldPricePerHour * hoursBooked) / requiredParticipants;
+        this.pricePerPerson = model.utils.PriceCalculationUtils.calculatePricePerPerson(
+                fieldPricePerHour, hoursBooked, requiredParticipants);
     }
 
     public void confirm() {

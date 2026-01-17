@@ -4,7 +4,7 @@ import model.bean.MatchBean;
 import model.domain.User;
 import model.domain.Role;
 import model.domain.Sport;
-import model.service.MatchService;
+import model.dao.MatchDAO;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -12,15 +12,14 @@ import java.util.List;
 public class HomeController {
     private final User currentUser;
     private final ApplicationController applicationController;
-    private final MatchService matchService;
-    private boolean viewAsPlayer; // Toggle between organizer and player view
-    private view.homeview.HomeView homeView; // Reference to view for dialog
+    private final MatchDAO matchDAO;
+    private boolean viewAsPlayer;
+    private view.homeview.HomeView homeView;
 
-    public HomeController(User user, ApplicationController applicationController, MatchService matchService) {
+    public HomeController(User user, ApplicationController applicationController, MatchDAO matchDAO) {
         this.currentUser = user;
         this.applicationController = applicationController;
-        this.matchService = matchService;
-        // Default view based on user role
+        this.matchDAO = matchDAO;
         this.viewAsPlayer = !user.isOrganizer();
     }
 
@@ -44,43 +43,30 @@ public class HomeController {
         return currentUser.isPlayer();
     }
 
-    /**
-     * Check if currently viewing as player (used for role switch).
-     */
     public boolean isViewingAsPlayer() {
         return viewAsPlayer;
     }
 
-    /**
-     * Toggle between organizer and player view.
-     * Only available for organizers.
-     */
     public void switchRole() {
         if (currentUser.isOrganizer()) {
             viewAsPlayer = !viewAsPlayer;
         }
     }
 
-    /**
-     * Get matches based on current view mode.
-     */
     public List<MatchBean> getMatches() {
         if (viewAsPlayer) {
-            // Player view: show all available matches
-            return matchService.getAllAvailableMatches();
-        } else {
-            // Organizer view: show only own matches
-            return matchService.getOrganizerMatches(currentUser.getUsername());
+            return matchDAO.findAllAvailable().stream()
+                    .filter(match -> !match.isFull())
+                    .map(model.converter.MatchConverter::toBean)
+                    .toList();
         }
+        return matchDAO.findByOrganizer(currentUser.getUsername()).stream()
+                .map(model.converter.MatchConverter::toBean)
+                .toList();
     }
 
-    /**
-     * Filter matches by sport, city, and date.
-     */
     public List<MatchBean> filterMatches(Sport sport, String city, LocalDate date) {
-        List<MatchBean> matches = getMatches();
-
-        return matches.stream()
+        return getMatches().stream()
                 .filter(match -> sport == null || match.getSport() == sport)
                 .filter(match -> city == null || city.trim().isEmpty() ||
                         match.getCity().equalsIgnoreCase(city.trim()))
@@ -88,16 +74,10 @@ public class HomeController {
                 .toList();
     }
 
-    /**
-     * Navigate to match detail view.
-     */
     public void viewMatchDetail(int matchId) {
-        homeView.showMatchDetails(matchId); // Modified method call
+        homeView.showMatchDetails(matchId);
     }
 
-    /**
-     * Navigate to organize match.
-     */
     public void organizeMatch() {
         applicationController.navigateToOrganizeMatch(currentUser);
     }

@@ -2,8 +2,6 @@ package controller;
 
 import model.bean.MatchBean;
 import model.bean.PaymentBean;
-import model.service.PaymentService;
-import model.service.MatchService;
 import model.utils.Constants;
 import exception.ServiceInitializationException;
 
@@ -19,18 +17,15 @@ import java.util.logging.Logger;
 public class PaymentController {
     private static final Logger logger = Logger.getLogger(PaymentController.class.getName());
     private final ApplicationController applicationController;
-    private final PaymentService paymentService;
-    private final MatchService matchService;
+    private final model.dao.MatchDAO matchDAO;
     private MatchBean matchBean;
 
     public PaymentController(ApplicationController applicationController) {
         this.applicationController = applicationController;
-        this.paymentService = new PaymentService();
         try {
-            this.matchService = new MatchService(applicationController.getPersistenceType());
+            this.matchDAO = model.dao.DAOFactory.getMatchDAO(applicationController.getPersistenceType());
         } catch (SQLException e) {
-            throw new ServiceInitializationException(Constants.ERROR_MATCH_SERVICE_INIT + e.getMessage(),
-                    e);
+            throw new ServiceInitializationException(Constants.ERROR_MATCH_SERVICE_INIT + e.getMessage(), e);
         }
     }
 
@@ -42,22 +37,31 @@ public class PaymentController {
         return matchBean;
     }
 
-    /**
-     * Processa il pagamento e, se ha successo, conferma il match.
-     * Utilizza PaymentService per il pagamento e MatchService per il salvataggio.
-     */
     public boolean processPayment(PaymentBean paymentBean) {
-        boolean success = paymentService.processPayment(paymentBean);
+        // Simple mock payment logic (KISS)
+        boolean success = paymentBean != null &&
+                paymentBean.getCardNumber() != null &&
+                !paymentBean.getCardNumber().isEmpty();
 
         if (success) {
             try {
-                matchService.confirmMatch(matchBean);
+                if (matchBean == null)
+                    throw new IllegalArgumentException("MatchBean cannot be null");
+                matchBean.setStatus(model.domain.MatchStatus.CONFIRMED);
+
+                model.domain.Match match = model.converter.MatchConverter.toEntity(matchBean);
+                matchDAO.save(match);
+
+                if (match.getMatchId() != null) {
+                    matchBean.setMatchId(match.getMatchId());
+                }
+
                 applicationController.navigateToRecap(matchBean);
             } catch (Exception e) {
                 logger.log(Level.SEVERE, Constants.ERROR_MATCH_CONFIRM, e);
+                return false;
             }
         }
-
         return success;
     }
 

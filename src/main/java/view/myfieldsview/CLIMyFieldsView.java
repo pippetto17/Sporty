@@ -10,6 +10,7 @@ import java.util.List;
  */
 public class CLIMyFieldsView implements MyFieldsView {
     private final FieldManagerController controller;
+    @SuppressWarnings("unused")
     private controller.ApplicationController applicationController;
 
     public CLIMyFieldsView(FieldManagerController controller) {

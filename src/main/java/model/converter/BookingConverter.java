@@ -17,7 +17,7 @@ public class BookingConverter {
     /**
      * Convert Booking domain object to BookingBean.
      */
-    public static BookingBean toBookingBean(Booking booking) {
+    public static BookingBean toBean(Booking booking) {
         if (booking == null) {
             return null;
         }

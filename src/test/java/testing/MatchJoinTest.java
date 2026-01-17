@@ -3,7 +3,7 @@ package testing;
 import model.bean.MatchBean;
 import model.dao.DAOFactory;
 import model.domain.Sport;
-import model.service.MatchService;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
@@ -15,23 +15,26 @@ import static org.junit.jupiter.api.Assertions.*;
  * Test suite per la funzionalità di Join Match.
  */
 @DisplayName("Match Join Test Suite")
+
 class MatchJoinTest {
 
-    private MatchService matchService;
+    private model.dao.MatchDAO matchDAO;
 
     @BeforeEach
     void setUp() throws Exception {
-        matchService = new MatchService(DAOFactory.PersistenceType.MEMORY);
+        matchDAO = DAOFactory.getMatchDAO(DAOFactory.PersistenceType.MEMORY);
     }
 
     @Test
     @DisplayName("Join a un match")
     void testJoinMatch() {
-        MatchBean match = createFootballMatch();
-        matchService.saveMatch(match);
+        model.domain.Match match = createFootballMatch();
+        matchDAO.save(match);
         int matchId = match.getMatchId();
 
-        boolean joined = matchService.joinMatch(matchId, "player1");
+        model.domain.Match retrieved = matchDAO.findById(matchId);
+        boolean joined = retrieved.addParticipant("player1");
+        matchDAO.save(retrieved);
 
         assertTrue(joined);
     }
@@ -39,13 +42,15 @@ class MatchJoinTest {
     @Test
     @DisplayName("Join multiplo di player diversi")
     void testMultiplePlayersJoin() {
-        MatchBean match = createFootballMatch();
-        matchService.saveMatch(match);
+        model.domain.Match match = createFootballMatch();
+        matchDAO.save(match);
         int matchId = match.getMatchId();
 
-        boolean joined1 = matchService.joinMatch(matchId, "player1");
-        boolean joined2 = matchService.joinMatch(matchId, "player2");
-        boolean joined3 = matchService.joinMatch(matchId, "player3");
+        model.domain.Match retrieved = matchDAO.findById(matchId);
+        boolean joined1 = retrieved.addParticipant("player1");
+        boolean joined2 = retrieved.addParticipant("player2");
+        boolean joined3 = retrieved.addParticipant("player3");
+        matchDAO.save(retrieved);
 
         assertTrue(joined1);
         assertTrue(joined2);
@@ -55,26 +60,25 @@ class MatchJoinTest {
     @Test
     @DisplayName("Join duplicato dello stesso player")
     void testDuplicateJoin() {
-        MatchBean match = createFootballMatch();
-        matchService.saveMatch(match);
+        model.domain.Match match = createFootballMatch();
+        matchDAO.save(match);
         int matchId = match.getMatchId();
 
-        boolean firstJoin = matchService.joinMatch(matchId, "player1");
-        boolean secondJoin = matchService.joinMatch(matchId, "player1");
+        model.domain.Match retrieved = matchDAO.findById(matchId);
+        boolean firstJoin = retrieved.addParticipant("player1");
+        boolean secondJoin = retrieved.addParticipant("player1");
 
         assertTrue(firstJoin);
         assertFalse(secondJoin);
     }
 
-    private MatchBean createFootballMatch() {
-        MatchBean match = new MatchBean();
-        match.setOrganizerUsername("organizer1");
-        match.setSport(Sport.FOOTBALL_11);
-        match.setMatchDate(LocalDate.of(2026, 6, 15));
-        match.setMatchTime(LocalTime.of(18, 0));
-        match.setCity("Milano");
-        match.setRequiredParticipants(10);
-        match.setFieldId("1");
-        return match;
+    private model.domain.Match createFootballMatch() {
+        return new model.domain.Match(
+                model.domain.Sport.FOOTBALL_5,
+                java.time.LocalDate.now().plusDays(1),
+                java.time.LocalTime.of(18, 0),
+                "Roma",
+                10,
+                "organizer");
     }
 }

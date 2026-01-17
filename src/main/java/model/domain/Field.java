@@ -151,10 +151,8 @@ public class Field {
     }
 
     public double calculatePricePerPerson(int numberOfParticipants, double hoursBooked) {
-        if (pricePerHour == null || numberOfParticipants <= 0 || hoursBooked <= 0) {
-            throw new IllegalArgumentException("Invalid parameters for price calculation");
-        }
-        return (pricePerHour * hoursBooked) / numberOfParticipants;
+        return model.utils.PriceCalculationUtils.calculatePricePerPerson(
+                pricePerHour, hoursBooked, numberOfParticipants);
     }
 
     public boolean hasCoordinates() {

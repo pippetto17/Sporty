@@ -3,7 +3,6 @@ package controller;
 import model.bean.MatchBean;
 import model.domain.Sport;
 import model.domain.User;
-import model.service.MatchService;
 import model.utils.Constants;
 import exception.ServiceInitializationException;
 
@@ -19,23 +18,19 @@ import java.time.LocalTime;
 public class OrganizeMatchController {
     private final User organizer;
     private final ApplicationController applicationController;
-    private final MatchService matchService;
+    private final model.dao.MatchDAO matchDAO;
     private MatchBean currentMatchBean;
 
     public OrganizeMatchController(User organizer, ApplicationController applicationController) {
         this.organizer = organizer;
         this.applicationController = applicationController;
         try {
-            this.matchService = new MatchService(applicationController.getPersistenceType());
+            this.matchDAO = model.dao.DAOFactory.getMatchDAO(applicationController.getPersistenceType());
         } catch (SQLException e) {
-            throw new ServiceInitializationException(Constants.ERROR_MATCH_SERVICE_INIT + e.getMessage(),
-                    e);
+            throw new ServiceInitializationException(Constants.ERROR_MATCH_SERVICE_INIT + e.getMessage(), e);
         }
     }
 
-    /**
-     * Inizializza un nuovo match associandolo all'organizzatore.
-     */
     public void startNewMatch() {
         this.currentMatchBean = new MatchBean();
         this.currentMatchBean.setOrganizerUsername(organizer.getUsername());
@@ -45,18 +40,35 @@ public class OrganizeMatchController {
         return currentMatchBean;
     }
 
-    /**
-     * Valida i dettagli del match.
-     * Delega la validazione a MatchService per mantenere la logica centralizzata.
-     */
     public boolean validateMatchDetails(Sport sport, LocalDate date, LocalTime time,
             String city, int additionalParticipants) {
-        return matchService.validateMatchDetails(sport, date, time, city, additionalParticipants);
+        if (sport == null || date == null || time == null)
+            return false;
+        if (city == null || city.trim().isEmpty())
+            return false;
+        if (date.isBefore(LocalDate.now()))
+            return false;
+
+        return sport.isValidAdditionalParticipants(additionalParticipants);
     }
 
     /**
-     * Imposta i dettagli del match dopo la validazione.
+     * Save match logic moved here.
      */
+    public void saveMatch() {
+        if (currentMatchBean == null)
+            throw new IllegalArgumentException("MatchBean cannot be null");
+        try {
+            model.domain.Match match = model.converter.MatchConverter.toEntity(currentMatchBean);
+            matchDAO.save(match);
+            if (match.getMatchId() != null) {
+                currentMatchBean.setMatchId(match.getMatchId());
+            }
+        } catch (exception.DataAccessException e) {
+            throw new ServiceInitializationException("Error saving match: " + e.getMessage(), e);
+        }
+    }
+
     public void setMatchDetails(Sport sport, LocalDate date, LocalTime time,
             String city, int additionalParticipants) {
         currentMatchBean.setSport(sport);
@@ -66,10 +78,8 @@ public class OrganizeMatchController {
         currentMatchBean.setRequiredParticipants(additionalParticipants);
     }
 
-    /**
-     * Procede alla selezione del campo sportivo.
-     */
     public void proceedToFieldSelection() {
+        // Potentially save draft state here if needed, or just navigate
         applicationController.navigateToBookField(currentMatchBean);
     }
 
@@ -77,23 +87,14 @@ public class OrganizeMatchController {
         return Sport.values();
     }
 
-    /**
-     * Get list of all Italian cities for combo box population.
-     */
     public java.util.List<String> getCities() {
         return model.utils.ItalianCities.CITIES;
     }
 
-    /**
-     * Search cities by prefix for autocomplete functionality.
-     */
     public java.util.List<String> searchCitiesByPrefix(String prefix) {
         return model.utils.ItalianCities.searchByPrefix(prefix);
     }
 
-    /**
-     * Validate if a city is a valid Italian city.
-     */
     public boolean isValidCity(String city) {
         return model.utils.ItalianCities.isValidCity(city);
     }
