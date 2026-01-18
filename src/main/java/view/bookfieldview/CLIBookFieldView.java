@@ -191,10 +191,14 @@ public class CLIBookFieldView implements BookFieldView {
         String confirm = scanner.nextLine().trim().toLowerCase();
 
         if (confirm.equals("y") || confirm.equals("yes")) {
-            displaySuccess("Field booked successfully!");
-            System.out.println("\nProceeding to payment...");
-            bookFieldController.proceedToPayment();
-            running = false;
+            try {
+                displaySuccess("Field booked successfully!");
+                System.out.println("\nProceeding to payment...");
+                bookFieldController.proceedToPayment();
+                running = false;
+            } catch (exception.ValidationException e) {
+                displayError(e.getMessage());
+            }
         } else {
             bookFieldController.setSelectedField(null);
             displaySuccess("Selection cancelled.");

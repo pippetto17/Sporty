@@ -214,6 +214,8 @@ public class GraphicBookFieldView implements BookFieldView {
             if (response == ButtonType.OK) {
                 try {
                     controller.proceedToPayment();
+                } catch (exception.ValidationException e) {
+                    showAlert(ERROR_TITLE, e.getMessage(), Alert.AlertType.ERROR);
                 } catch (Exception e) {
                     showAlert(ERROR_TITLE, "Cannot proceed: " + e.getMessage(), Alert.AlertType.ERROR);
                 }

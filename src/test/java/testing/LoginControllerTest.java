@@ -1,6 +1,7 @@
 package testing;
 
 import controller.LoginController;
+import exception.ValidationException;
 import model.bean.UserBean;
 import model.dao.DAOFactory;
 import model.domain.Role;
@@ -26,7 +27,7 @@ class LoginControllerTest {
 
     @Test
     @DisplayName("Login con credenziali valide")
-    void testValidLogin() {
+    void testValidLogin() throws ValidationException {
         // Registra un utente
         UserBean registerBean = new UserBean("testuser", "password123");
         loginController.register(registerBean, "John", "Doe", Role.PLAYER.getCode());
@@ -61,7 +62,7 @@ class LoginControllerTest {
 
     @Test
     @DisplayName("Registrazione con username duplicato")
-    void testRegisterDuplicateUsername() {
+    void testRegisterDuplicateUsername() throws ValidationException {
         UserBean firstUser = new UserBean("duplicate", "pass1");
         loginController.register(firstUser, "First", "User", Role.PLAYER.getCode());
 
@@ -70,7 +71,7 @@ class LoginControllerTest {
         String surname = "User";
         int roleCode = Role.PLAYER.getCode();
 
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(ValidationException.class,
             () -> loginController.register(secondUser, name, surname, roleCode)
         );
     }

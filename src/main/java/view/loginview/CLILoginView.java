@@ -74,21 +74,17 @@ public class CLILoginView implements LoginView {
         System.out.println("\n--- LOGIN ---");
         UserBean userBean = getUserCredentials();
 
-        try {
-            User user = loginController.login(userBean);
-            if (user != null) {
-                displayLoginSuccess(user.getUsername());
-                System.out.println("Name: " + user.getName() + " " + user.getSurname());
-                System.out.println("Role: " + getRoleString(user.getRole()));
+        User user = loginController.login(userBean);
+        if (user != null) {
+            displayLoginSuccess(user.getUsername());
+            System.out.println("Name: " + user.getName() + " " + user.getSurname());
+            System.out.println("Role: " + getRoleString(user.getRole()));
 
-                // Naviga alla home tramite ApplicationController
-                running = false; // Ferma il loop corrente
-                applicationController.navigateToHome(user);
-            } else {
-                displayLoginError(Constants.ERROR_INVALID_CREDENTIALS);
-            }
-        } catch (IllegalArgumentException e) {
-            displayLoginError(e.getMessage());
+            // Naviga alla home tramite ApplicationController
+            running = false; // Ferma il loop corrente
+            applicationController.navigateToHome(user);
+        } else {
+            displayLoginError(Constants.ERROR_INVALID_CREDENTIALS);
         }
     }
 
@@ -118,7 +114,7 @@ public class CLILoginView implements LoginView {
         try {
             loginController.register(userBean, name, surname, role);
             System.out.println("✓ Registration successful! You can now login.");
-        } catch (IllegalArgumentException e) {
+        } catch (exception.ValidationException e) {
             displayLoginError(e.getMessage());
         }
     }

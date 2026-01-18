@@ -90,7 +90,7 @@ public class RegisterViewController {
                 }
             }).start();
 
-        } catch (IllegalArgumentException e) {
+        } catch (exception.ValidationException e) {
             showError(e.getMessage());
         }
     }

@@ -90,7 +90,7 @@ public class GraphicRegisterView {
                 }
             }).start();
 
-        } catch (IllegalArgumentException e) {
+        } catch (exception.ValidationException e) {
             showError(e.getMessage());
         }
     }

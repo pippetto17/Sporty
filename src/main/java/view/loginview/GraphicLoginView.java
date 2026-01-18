@@ -121,20 +121,16 @@ public class GraphicLoginView extends Application implements LoginView {
     @FXML
     private void handleLogin() {
         UserBean userBean = getUserCredentials();
-        try {
-            User user = loginController.login(userBean);
-            if (user != null) {
-                displayLoginSuccess(user.getUsername());
-                // Navigate to home
-                Platform.runLater(() -> {
-                    primaryStage.close();
-                    applicationController.navigateToHome(user);
-                });
-            } else {
-                displayLoginError(Constants.ERROR_INVALID_CREDENTIALS);
-            }
-        } catch (IllegalArgumentException e) {
-            displayLoginError(e.getMessage());
+        User user = loginController.login(userBean);
+        if (user != null) {
+            displayLoginSuccess(user.getUsername());
+            // Navigate to home
+            Platform.runLater(() -> {
+                primaryStage.close();
+                applicationController.navigateToHome(user);
+            });
+        } else {
+            displayLoginError(Constants.ERROR_INVALID_CREDENTIALS);
         }
     }
 

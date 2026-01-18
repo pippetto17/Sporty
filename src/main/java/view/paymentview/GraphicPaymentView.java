@@ -139,16 +139,24 @@ public class GraphicPaymentView implements PaymentView {
 
         // Run in background to avoid freezing UI if service sleeps
         new Thread(() -> {
-            boolean success = paymentController.processPayment(paymentBean);
+            try {
+                boolean success = paymentController.processPayment(paymentBean);
 
-            Platform.runLater(() -> {
-                payButton.setDisable(false);
-                payButton.setText("Pay Now");
+                Platform.runLater(() -> {
+                    payButton.setDisable(false);
+                    payButton.setText("Pay Now");
 
-                if (!success) {
-                    showError("Payment declined. Please check details.");
-                }
-            });
+                    if (!success) {
+                        showError("Payment declined. Please check details.");
+                    }
+                });
+            } catch (exception.ValidationException e) {
+                Platform.runLater(() -> {
+                    payButton.setDisable(false);
+                    payButton.setText("Pay Now");
+                    showError(e.getMessage());
+                });
+            }
         }).start();
     }
 
