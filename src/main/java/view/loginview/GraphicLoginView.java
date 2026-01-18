@@ -124,8 +124,8 @@ public class GraphicLoginView extends Application implements LoginView {
 
             // Load CSS
             Scene scene = new Scene(root, 450, 550);
-            scene.getStylesheets().add(getClass().getResource("/css/style.css").toExternalForm());
-            scene.getStylesheets().add(getClass().getResource("/css/controls-dark.css").toExternalForm());
+            scene.getStylesheets().add(getClass().getResource(Constants.CSS_PATH_STYLE).toExternalForm());
+            scene.getStylesheets().add(getClass().getResource(Constants.CSS_PATH_CONTROLS_DARK).toExternalForm());
 
             primaryStage.setScene(scene);
             primaryStage.setResizable(false);
@@ -170,8 +170,8 @@ public class GraphicLoginView extends Application implements LoginView {
 
             // Mantieni la stessa scene con CSS
             Scene scene = new Scene(root, 450, 650);
-            scene.getStylesheets().add(getClass().getResource("/css/style.css").toExternalForm());
-            scene.getStylesheets().add(getClass().getResource("/css/controls-dark.css").toExternalForm());
+            scene.getStylesheets().add(getClass().getResource(Constants.CSS_PATH_STYLE).toExternalForm());
+            scene.getStylesheets().add(getClass().getResource(Constants.CSS_PATH_CONTROLS_DARK).toExternalForm());
 
             primaryStage.setScene(scene);
             primaryStage.setTitle("Sporty - Register");
@@ -233,8 +233,8 @@ public class GraphicLoginView extends Application implements LoginView {
             Parent root = loader.load();
 
             Scene scene = new Scene(root, 450, 550);
-            scene.getStylesheets().add(getClass().getResource("/css/style.css").toExternalForm());
-            scene.getStylesheets().add(getClass().getResource("/css/controls-dark.css").toExternalForm());
+            scene.getStylesheets().add(getClass().getResource(Constants.CSS_PATH_STYLE).toExternalForm());
+            scene.getStylesheets().add(getClass().getResource(Constants.CSS_PATH_CONTROLS_DARK).toExternalForm());
 
             primaryStage.setScene(scene);
             primaryStage.setTitle("Sporty - Login");
