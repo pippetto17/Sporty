@@ -62,7 +62,7 @@ public class CLIFieldManagerView implements FieldManagerView {
         try {
             var data = controller.getDashboardData();
             System.out.printf("Fields: %d | Pending: %d | Today's Bookings: %d%n",
-                    data.getTotalFields(), data.getPendingRequests(), data.getTodayBookings());
+                    data.totalFields(), data.pendingRequests(), data.todayBookings());
         } catch (Exception e) {
             System.out.println("Stats unavailable: " + e.getMessage());
         }

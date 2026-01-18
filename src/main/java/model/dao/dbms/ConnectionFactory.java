@@ -13,7 +13,7 @@ public class ConnectionFactory {
         // Private constructor per impedire istanziazione
     }
 
-    private static Properties properties;
+    private static final Properties properties;
 
     static {
         try (InputStream input = ConnectionFactory.class.getResourceAsStream("/db.properties")) {

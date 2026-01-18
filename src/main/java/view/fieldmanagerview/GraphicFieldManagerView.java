@@ -141,9 +141,9 @@ public class GraphicFieldManagerView implements FieldManagerView {
     private void loadData() {
         try {
             var stats = controller.getDashboardData(); // 'var' rende il codice meno verboso (Java 10+)
-            totalFieldsLabel.setText(String.valueOf(stats.getTotalFields()));
-            pendingRequestsLabel.setText(String.valueOf(stats.getPendingRequests()));
-            todayBookingsLabel.setText(String.valueOf(stats.getTodayBookings()));
+            totalFieldsLabel.setText(String.valueOf(stats.totalFields()));
+            pendingRequestsLabel.setText(String.valueOf(stats.pendingRequests()));
+            todayBookingsLabel.setText(String.valueOf(stats.todayBookings()));
 
             bookingsList.setAll(controller.getPendingRequests());
         } catch (Exception e) {

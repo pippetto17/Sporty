@@ -175,34 +175,6 @@ public class FieldManagerController {
         return fieldManager;
     }
 
-    public static class DashboardData {
-        private final int totalFields;
-        private final int pendingRequests;
-        private final int todayBookings;
-        private final double weekRevenue;
-
-        public DashboardData(int totalFields, int pendingRequests,
-                int todayBookings, double weekRevenue) {
-            this.totalFields = totalFields;
-            this.pendingRequests = pendingRequests;
-            this.todayBookings = todayBookings;
-            this.weekRevenue = weekRevenue;
-        }
-
-        public int getTotalFields() {
-            return totalFields;
-        }
-
-        public int getPendingRequests() {
-            return pendingRequests;
-        }
-
-        public int getTodayBookings() {
-            return todayBookings;
-        }
-
-        public double getWeekRevenue() {
-            return weekRevenue;
-        }
+    public record DashboardData(int totalFields, int pendingRequests, int todayBookings, double weekRevenue) {
     }
 }

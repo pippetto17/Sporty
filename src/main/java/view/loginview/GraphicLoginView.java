@@ -9,7 +9,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import model.bean.UserBean;
 import model.domain.User;
@@ -25,7 +24,7 @@ public class GraphicLoginView extends Application implements LoginView {
     private static LoginController staticLoginController;
     private static ApplicationController staticApplicationController;
 
-    private LoginController loginController;
+    private final LoginController loginController;
     private ApplicationController applicationController;
     private Stage primaryStage;
 
@@ -40,6 +39,24 @@ public class GraphicLoginView extends Application implements LoginView {
     private Button loginButton;
     @FXML
     private Button registerButton;
+
+    // FXML fields - Register
+    @FXML
+    private TextField registerUsernameField;
+    @FXML
+    private PasswordField registerPasswordField;
+    @FXML
+    private TextField nameField;
+    @FXML
+    private TextField surnameField;
+    @FXML
+    private ComboBox<String> roleComboBox;
+    @FXML
+    private Label registerMessageLabel;
+    @FXML
+    private Button submitRegisterButton;
+    @FXML
+    private Button cancelRegisterButton;
 
     public GraphicLoginView() {
         // Constructor vuoto per JavaFX - recupera i controller dalle variabili statiche
@@ -137,30 +154,92 @@ public class GraphicLoginView extends Application implements LoginView {
     @FXML
     private void handleRegister() {
         try {
-            Stage registerStage = new Stage();
-            registerStage.initModality(Modality.APPLICATION_MODAL);
-            registerStage.initOwner(primaryStage);
-            registerStage.setTitle("Sporty - Register");
-
-            // Create GraphicRegisterView
-            GraphicRegisterView registerController = new GraphicRegisterView(loginController, registerStage);
-
-            // Load FXML
+            // Load FXML per la registrazione
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/register.fxml"));
-            loader.setController(registerController);
+            loader.setController(this);
             Parent root = loader.load();
 
-            // Load CSS
+            // Inizializza il ComboBox delle role dopo il caricamento
+            if (roleComboBox != null && roleComboBox.getItems().isEmpty()) {
+                roleComboBox.getItems().addAll(
+                        Constants.ROLE_PLAYER,
+                        Constants.ROLE_ORGANIZER,
+                        Constants.ROLE_FIELD_MANAGER);
+                roleComboBox.setValue(Constants.ROLE_PLAYER);
+            }
+
+            // Mantieni la stessa scene con CSS
             Scene scene = new Scene(root, 450, 650);
             scene.getStylesheets().add(getClass().getResource("/css/style.css").toExternalForm());
             scene.getStylesheets().add(getClass().getResource("/css/controls-dark.css").toExternalForm());
 
-            registerStage.setScene(scene);
-            registerStage.setResizable(false);
-            registerStage.showAndWait();
-
+            primaryStage.setScene(scene);
+            primaryStage.setTitle("Sporty - Register");
         } catch (IOException e) {
             showError("Failed to load register view: " + e.getMessage());
+        }
+    }
+
+    @FXML
+    private void handleRegisterSubmit() {
+        registerMessageLabel.setText("");
+        registerMessageLabel.getStyleClass().removeAll(Constants.CSS_ERROR, Constants.CSS_SUCCESS);
+
+        try {
+            String username = registerUsernameField.getText().trim();
+            String password = registerPasswordField.getText();
+            String name = nameField.getText().trim();
+            String surname = surnameField.getText().trim();
+            String selectedRole = roleComboBox.getValue();
+
+            if (username.isEmpty() || password.isEmpty() || name.isEmpty() ||
+                    surname.isEmpty() || selectedRole == null) {
+                showRegisterError(Constants.ERROR_ALL_FIELDS_REQUIRED);
+                return;
+            }
+
+            int roleCode = LoginController.getRoleCodeFromString(selectedRole);
+
+            model.domain.User tempUser = new model.domain.User();
+            tempUser.setUsername(username);
+            tempUser.setPassword(password);
+            UserBean userBean = model.converter.UserConverter.toUserBean(tempUser);
+
+            loginController.register(userBean, name, surname, roleCode);
+
+            showRegisterSuccess(Constants.SUCCESS_REGISTRATION);
+
+            // Torna al login dopo 1.5 secondi
+            new Thread(() -> {
+                try {
+                    Thread.sleep(1500);
+                    javafx.application.Platform.runLater(this::handleCancelRegister);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }).start();
+
+        } catch (exception.ValidationException e) {
+            showRegisterError(e.getMessage());
+        }
+    }
+
+    @FXML
+    private void handleCancelRegister() {
+        try {
+            // Ricarica la view del login
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/login.fxml"));
+            loader.setController(this);
+            Parent root = loader.load();
+
+            Scene scene = new Scene(root, 450, 550);
+            scene.getStylesheets().add(getClass().getResource("/css/style.css").toExternalForm());
+            scene.getStylesheets().add(getClass().getResource("/css/controls-dark.css").toExternalForm());
+
+            primaryStage.setScene(scene);
+            primaryStage.setTitle("Sporty - Login");
+        } catch (IOException e) {
+            showError("Failed to load login view: " + e.getMessage());
         }
     }
 
@@ -192,5 +271,17 @@ public class GraphicLoginView extends Application implements LoginView {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+
+    private void showRegisterError(String message) {
+        registerMessageLabel.getStyleClass().removeAll(Constants.CSS_SUCCESS);
+        registerMessageLabel.getStyleClass().add(Constants.CSS_ERROR);
+        registerMessageLabel.setText(message);
+    }
+
+    private void showRegisterSuccess(String message) {
+        registerMessageLabel.getStyleClass().removeAll(Constants.CSS_ERROR);
+        registerMessageLabel.getStyleClass().add(Constants.CSS_SUCCESS);
+        registerMessageLabel.setText(message);
     }
 }

@@ -33,14 +33,14 @@
         <!-- Username -->
         <VBox spacing="5">
             <Label text="Username" styleClass="field-label"/>
-            <TextField fx:id="usernameField" promptText="Choose a username"
+            <TextField fx:id="registerUsernameField" promptText="Choose a username"
                       styleClass="custom-text-field" prefWidth="320"/>
         </VBox>
 
         <!-- Password -->
         <VBox spacing="5">
             <Label text="Password" styleClass="field-label"/>
-            <PasswordField fx:id="passwordField" promptText="Choose a password"
+            <PasswordField fx:id="registerPasswordField" promptText="Choose a password"
                           styleClass="custom-text-field" prefWidth="320"/>
         </VBox>
 
@@ -70,14 +70,14 @@
             <padding>
                 <Insets top="15"/>
             </padding>
-            <Button fx:id="registerButton" text="Register" onAction="#handleRegisterSubmit"
+            <Button fx:id="submitRegisterButton" text="Register" onAction="#handleRegisterSubmit"
                    styleClass="primary-button" prefWidth="150"/>
-            <Button fx:id="cancelButton" text="Cancel" onAction="#handleCancel"
+            <Button fx:id="cancelRegisterButton" text="Cancel" onAction="#handleCancelRegister"
                    styleClass="secondary-button" prefWidth="150"/>
         </HBox>
 
         <!-- Message Label -->
-        <Label fx:id="messageLabel" styleClass="message-label" wrapText="true"
+        <Label fx:id="registerMessageLabel" styleClass="message-label" wrapText="true"
                maxWidth="320" alignment="CENTER"/>
     </VBox>
 </VBox>
