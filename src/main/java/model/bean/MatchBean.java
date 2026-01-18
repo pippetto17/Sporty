@@ -122,4 +122,8 @@ public class MatchBean {
     public void setParticipants(List<String> participants) {
         this.participants = participants;
     }
+
+    public boolean isFull() {
+        return participants != null && participants.size() >= requiredParticipants;
+    }
 }

@@ -17,7 +17,7 @@ import model.utils.Constants;
 import view.ViewUtils;
 
 import java.time.format.DateTimeFormatter;
-import java.util.Optional;
+import java.util.List;
 import java.util.logging.Logger;
 
 public class GraphicFieldManagerView implements FieldManagerView {
@@ -26,6 +26,7 @@ public class GraphicFieldManagerView implements FieldManagerView {
     private final FieldManagerController controller;
     private final User manager; // Rinominato da fieldManager per brevità
     private ApplicationController appController;
+    private model.notification.NotificationService notificationService;
     private Stage stage;
     private final Logger logger = Logger.getLogger(getClass().getName());
 
@@ -69,6 +70,8 @@ public class GraphicFieldManagerView implements FieldManagerView {
     @Override
     public void setApplicationController(ApplicationController appController) {
         this.appController = appController;
+        this.notificationService = new model.notification.NotificationService();
+        this.notificationService.subscribe(new FieldManagerNotificationObserver());
     }
 
     @Override
@@ -93,7 +96,6 @@ public class GraphicFieldManagerView implements FieldManagerView {
         }
     }
 
-
     @Override
     public void close() {
         if (stage != null)
@@ -101,15 +103,42 @@ public class GraphicFieldManagerView implements FieldManagerView {
     }
 
     @FXML
-    @SuppressWarnings("unused") // Called by FXML loader
+    @SuppressWarnings("unused")
     private void initialize() {
         managerNameLabel.setText("Manager: " + manager.getName() + " " + manager.getSurname());
         setupTable();
         loadData();
+        Platform.runLater(this::checkAndShowNotifications);
+    }
+
+    private void checkAndShowNotifications() {
+        if (notificationService == null)
+            return;
+
+        List<String> unread = notificationService.getUnreadNotifications(manager.getUsername());
+        if (!unread.isEmpty()) {
+            showNotificationsPopup(unread);
+        }
+    }
+
+    private void showNotificationsPopup(List<String> notifications) {
+        StringBuilder content = new StringBuilder();
+        content.append("Hai ").append(notifications.size()).append(" nuove notifiche:\n\n");
+
+        for (String notification : notifications) {
+            content.append("🔔 ").append(notification).append("\n\n");
+        }
+
+        Alert alert = createStyledAlert(Alert.AlertType.INFORMATION,
+                "Notifiche",
+                content.toString());
+        alert.setHeaderText("Nuove notifiche!");
+        alert.showAndWait();
+
+        notificationService.markAllAsRead(manager.getUsername());
     }
 
     private void setupTable() {
-        // Mapping colonne più compatto
         fieldNameColumn.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getFieldName()));
         requesterColumn.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getRequesterUsername()));
         typeColumn.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getType()));

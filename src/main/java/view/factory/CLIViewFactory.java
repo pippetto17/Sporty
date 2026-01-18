@@ -9,6 +9,8 @@ import view.fieldmanagerview.CLIFieldManagerView;
 import view.fieldmanagerview.FieldManagerView;
 import view.homeview.CLIHomeView;
 import view.homeview.HomeView;
+import view.joinmatchview.CLIJoinMatchView;
+import view.joinmatchview.JoinMatchView;
 import view.loginview.CLILoginView;
 import view.loginview.LoginView;
 import view.myfieldsview.CLIMyFieldsView;
@@ -17,8 +19,6 @@ import view.organizematchview.CLIOrganizeMatchView;
 import view.organizematchview.OrganizeMatchView;
 import view.paymentview.CLIPaymentView;
 import view.paymentview.PaymentView;
-import view.recapview.CLIRecapView;
-import view.recapview.RecapView;
 
 public class CLIViewFactory implements ViewFactory {
 
@@ -47,10 +47,6 @@ public class CLIViewFactory implements ViewFactory {
         return new CLIPaymentView(paymentController);
     }
 
-    @Override
-    public RecapView createRecapView() {
-        return new CLIRecapView();
-    }
 
     @Override
     public FieldManagerView createFieldManagerView(FieldManagerController controller) {
@@ -65,5 +61,10 @@ public class CLIViewFactory implements ViewFactory {
     @Override
     public MyFieldsView createMyFieldsView(FieldManagerController controller) {
         return new CLIMyFieldsView(controller);
+    }
+
+    @Override
+    public JoinMatchView createJoinMatchView(JoinMatchController controller) {
+        return new CLIJoinMatchView(controller);
     }
 }

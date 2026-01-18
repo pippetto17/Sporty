@@ -4,101 +4,97 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
+
 <BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
-            styleClass="root-container" prefWidth="700" prefHeight="600">
+            styleClass="root-container" prefWidth="1000" prefHeight="750">
 
     <top>
-        <VBox spacing="10" styleClass="header-container">
-            <padding>
-                <Insets top="20" right="30" bottom="20" left="30"/>
-            </padding>
-
-            <HBox alignment="CENTER_LEFT" spacing="20">
+        <VBox spacing="0">
+            <!-- Header Superiore (Logo + Toggle + Utente) -->
+            <HBox alignment="CENTER_LEFT" spacing="20" styleClass="header-container">
+                <padding>
+                    <Insets top="15" right="30" bottom="15" left="30"/>
+                </padding>
+                
                 <Label text="SPORTY" styleClass="title-label">
                     <font>
-                        <Font name="System Bold" size="28"/>
+                        <Font name="System Bold" size="24"/>
                     </font>
                 </Label>
 
+                <!-- Container per il Toggle Switch (popolato da Java) -->
+                <HBox fx:id="roleSwitchContainer" alignment="CENTER_LEFT" spacing="10">
+                    <padding><Insets left="20"/></padding>
+                </HBox>
+
                 <Region HBox.hgrow="ALWAYS"/>
 
-                <VBox alignment="CENTER_RIGHT" spacing="5">
-                    <Label fx:id="welcomeLabel" text="Welcome, User!" styleClass="welcome-label">
-                        <font>
-                            <Font size="14"/>
-                        </font>
-                    </Label>
-                    <Label fx:id="roleLabel" text="Player" styleClass="role-label">
-                        <font>
-                            <Font size="12"/>
-                        </font>
-                    </Label>
-                </VBox>
-
-                <Button fx:id="logoutButton" text="Logout" onAction="#handleLogout"
-                        styleClass="secondary-button" prefWidth="100"/>
+                <HBox alignment="CENTER_RIGHT" spacing="15">
+                    <VBox alignment="CENTER_RIGHT" spacing="2">
+                        <Label fx:id="welcomeLabel" text="Welcome" styleClass="welcome-label"/>
+                        <Label fx:id="roleLabel" text="Player" styleClass="role-label"/>
+                    </VBox>
+                    <Button fx:id="logoutButton" text="Esci" onAction="#handleLogout"
+                            styleClass="logout-button"/>
+                </HBox>
             </HBox>
+
+            <!-- Hero Section (Barra di Ricerca) -->
+            <VBox fx:id="heroContainer" alignment="CENTER" styleClass="hero-section">
+                <!-- Il contenitore dei filtri verrà iniettato qui da Java -->
+                <VBox fx:id="filterContainer" alignment="CENTER" fillWidth="false" spacing="10">
+                    <!-- Populated dynamically -->
+                </VBox>
+            </VBox>
         </VBox>
     </top>
 
     <center>
-        <VBox fx:id="mainContentBox" spacing="15" styleClass="content-container">
-            <padding>
-                <Insets top="10" right="30" bottom="20" left="30"/>
-            </padding>
+        <ScrollPane fx:id="mainScrollPane" fitToWidth="true" styleClass="custom-scroll" vbarPolicy="AS_NEEDED" hbarPolicy="NEVER">
+            <VBox fx:id="mainContentBox" spacing="20" styleClass="content-container">
+                <padding>
+                    <Insets top="10" right="40" bottom="40" left="40"/>
+                </padding>
 
-            <VBox fx:id="organizerActionsBox" spacing="10" styleClass="actions-container" visible="false" managed="false">
-                <Label text="Quick Actions" styleClass="section-title">
-                    <font>
-                        <Font name="System Bold" size="16"/>
-                    </font>
-                </Label>
+                <!-- Azioni Organizzatore (Visibile solo se Organizer) -->
+                <VBox fx:id="organizerActionsBox" spacing="15" styleClass="actions-container" visible="false" managed="false">
+                    <Label text="Gestione Rapida" styleClass="section-title"/>
+                    <HBox spacing="15">
+                        <Button fx:id="organizeMatchButton" text="+ Crea Partita"
+                                onAction="#handleOrganizeMatch" styleClass="primary-action-button"
+                                prefWidth="200" prefHeight="50"/>
+                        <Button fx:id="bookFieldButton" text="Prenota Campo"
+                                onAction="#handleBookField" styleClass="secondary-action-button"
+                                prefWidth="200" prefHeight="50"/>
+                    </HBox>
+                </VBox>
 
-                <HBox spacing="10">
-                    <Button fx:id="organizeMatchButton" text="Organize New Match"
-                            onAction="#handleOrganizeMatch" styleClass="primary-button"
-                            prefWidth="200" prefHeight="40"/>
-                    <Button fx:id="bookFieldButton" text="Book a Field"
-                            onAction="#handleBookField" styleClass="secondary-button"
-                            prefWidth="180" prefHeight="40"/>
-                </HBox>
+                <!-- Sezione Partite -->
+                <VBox spacing="20">
+                    <HBox alignment="CENTER_LEFT">
+                        <Label fx:id="matchesTitle" text="Esplora partite" styleClass="section-title"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Button fx:id="refreshButton" text="Aggiorna" onAction="#handleRefresh"
+                                styleClass="text-button"/>
+                    </HBox>
+
+                    <!-- GRID VIEW (FlowPane) -->
+                    <FlowPane fx:id="matchesContainer" styleClass="matches-grid" 
+                              hgap="25" vgap="25" prefWrapLength="900" 
+                              alignment="TOP_LEFT">
+                        <!-- Le Match Cards verticali vengono aggiunte qui -->
+                    </FlowPane>
+                </VBox>
             </VBox>
-
-            <VBox spacing="10" VBox.vgrow="ALWAYS">
-                <HBox alignment="CENTER_LEFT" spacing="10">
-                    <Label fx:id="matchesTitle" text="Available Matches" styleClass="section-title">
-                        <font>
-                            <Font name="System Bold" size="16"/>
-                        </font>
-                    </Label>
-
-                    <Region HBox.hgrow="ALWAYS"/>
-
-                    <Button fx:id="refreshButton" text="Refresh" onAction="#handleRefresh"
-                            styleClass="secondary-button" prefWidth="100"/>
-                </HBox>
-
-                <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" styleClass="matches-scroll">
-                    <VBox fx:id="matchesContainer" spacing="10" styleClass="matches-list">
-                        <padding>
-                            <Insets top="10" right="10" bottom="10" left="10"/>
-                        </padding>
-                    </VBox>
-                </ScrollPane>
-            </VBox>
-        </VBox>
+        </ScrollPane>
     </center>
 
     <bottom>
-        <HBox alignment="CENTER" styleClass="footer-container">
+        <HBox alignment="CENTER_RIGHT" styleClass="footer-container">
             <padding>
-                <Insets top="10" right="20" bottom="10" left="20"/>
+                <Insets top="5" right="20" bottom="5" left="20"/>
             </padding>
-            <Label fx:id="statusLabel" text="Ready" styleClass="status-label">
-                <font>
-                    <Font size="11"/>
-                </font>
-            </Label>
+            <Label fx:id="statusLabel" text="Pronto" styleClass="status-label"/>
         </HBox>
     </bottom>
 </BorderPane>

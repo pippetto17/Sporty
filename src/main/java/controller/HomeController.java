@@ -77,4 +77,15 @@ public class HomeController {
     public void bookFieldStandalone() {
         applicationController.navigateToBookFieldStandalone(currentUser);
     }
+
+    public void joinMatch(int matchId) {
+        MatchBean matchBean = getMatches().stream()
+                .filter(m -> m.getMatchId() == matchId)
+                .findFirst()
+                .orElse(null);
+
+        if (matchBean != null) {
+            applicationController.navigateToJoinMatch(matchBean, currentUser);
+        }
+    }
 }

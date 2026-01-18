@@ -1,6 +1,7 @@
 package view.organizematchview;
 
 import controller.ApplicationController;
+import model.bean.MatchBean;
 import view.View;
 
 import java.time.LocalDate;
@@ -14,6 +15,7 @@ public interface OrganizeMatchView extends View {
     void displayNewMatchForm();
     void displayError(String message);
     void displaySuccess(String message);
+    void displayRecap(MatchBean matchBean);
 
     default LocalTime parseTime(String timeStr) {
         if (timeStr == null) return null;

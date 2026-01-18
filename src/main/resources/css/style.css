@@ -1,349 +1,380 @@
-/* SPORTY - Dark Mode Green Palette */
+/* SPORTY - Modern Dark UI - Final Fixes */
 
-/* Global */
-.root-container, .main-container {
+.root-container {
     -fx-background-color: #0f1419;
-    -fx-font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+    /* Sfondo scuro globale */
+    -fx-font-family: 'Segoe UI', system-ui, sans-serif;
 }
 
-/* Header */
-.header-container {
+/* ScrollPane Fix: rimuove sfondo bianco default */
+.scroll-pane,
+.scroll-pane .viewport {
+    -fx-background-color: #0f1419;
+    -fx-background: #0f1419;
+}
+
+/* --- SCROLLBAR PERSONALIZZATA --- */
+.custom-scroll .scroll-bar:vertical,
+.custom-scroll .scroll-bar:horizontal {
+    -fx-background-color: transparent;
+}
+
+.custom-scroll .scroll-bar:vertical .track,
+.custom-scroll .scroll-bar:horizontal .track {
     -fx-background-color: #1a1f26;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 10, 0, 0, 2);
-    -fx-padding: 24 32;
+    -fx-border-radius: 4;
+}
+
+.custom-scroll .scroll-bar:vertical .thumb,
+.custom-scroll .scroll-bar:horizontal .thumb {
+    -fx-background-color: #374151;
+    -fx-background-radius: 4;
+}
+
+.custom-scroll .scroll-bar:vertical .thumb:hover,
+.custom-scroll .scroll-bar:horizontal .thumb:hover {
+    -fx-background-color: #4b5563;
+}
+
+.custom-scroll .corner {
+    -fx-background-color: transparent;
+}
+
+/* --- HEADER & TOGGLE --- */
+.header-container {
+    -fx-background-color: #0f1419;
+    -fx-border-color: #1f2937;
+    -fx-border-width: 0 0 1 0;
 }
 
 .title-label {
     -fx-text-fill: #10b981;
     -fx-font-weight: 800;
-    -fx-font-size: 32px;
-    -fx-letter-spacing: -1px;
+}
+
+/* Toggle Switch Container */
+.toggle-container {
+    -fx-background-color: #1f2937;
+    -fx-background-radius: 20;
+    -fx-padding: 3;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 5, 0, 0, 1);
+}
+
+.toggle-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #9ca3af;
+    -fx-background-radius: 18;
+    -fx-font-size: 12px;
+    -fx-font-weight: 700;
+    -fx-cursor: hand;
+    -fx-padding: 6 12;
+}
+
+.toggle-button:hover {
+    -fx-text-fill: #d1d5db;
+}
+
+.toggle-button.active {
+    -fx-background-color: #10b981;
+    -fx-text-fill: white;
+    -fx-effect: dropshadow(gaussian, rgba(16, 185, 129, 0.4), 8, 0, 0, 1);
 }
 
 .welcome-label {
-    -fx-text-fill: #e5e7eb;
+    -fx-text-fill: #f3f4f6;
     -fx-font-weight: 600;
-    -fx-font-size: 15px;
+    -fx-font-size: 14px;
 }
 
 .role-label {
     -fx-text-fill: #9ca3af;
-    -fx-font-size: 13px;
-    -fx-font-weight: 500;
+    -fx-font-size: 11px;
 }
 
-/* Toggle Switch */
-.role-switch-container {
-    -fx-background-color: #1f2937;
-    -fx-background-radius: 24;
-    -fx-padding: 4;
-    -fx-spacing: 2;
-}
-
-.role-switch-button {
+.logout-button {
     -fx-background-color: transparent;
+    -fx-text-fill: #ef4444;
+    -fx-border-color: #ef4444;
+    -fx-border-radius: 8;
+    -fx-border-width: 1;
+    -fx-cursor: hand;
+    -fx-font-size: 12px;
+}
+
+.logout-button:hover {
+    -fx-background-color: rgba(239, 68, 68, 0.1);
+}
+
+/* --- HERO & SEARCH CAPSULE --- */
+.hero-section {
+    -fx-background-color: #0f1419;
+    -fx-padding: 30 0 30 0;
+}
+
+/* Capsula */
+.search-capsule {
+    -fx-background-color: #1f2937;
+    -fx-background-radius: 40;
+    -fx-border-radius: 40;
+    -fx-border-color: #374151;
+    -fx-border-width: 1;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.4), 20, 0, 5, 5);
+    -fx-padding: 5;
+    -fx-min-width: 700px;
+    -fx-pref-height: 66px;
+    -fx-alignment: center-left;
+}
+
+.search-capsule:hover {
+    -fx-border-color: #4b5563;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.5), 25, 0, 5, 8);
+}
+
+/* Container Campi - Incorporati */
+/* FIX: Flex grow per riempire lo spazio */
+.search-field-container {
+    -fx-padding: 5 15;
+    -fx-background-radius: 35;
+    -fx-cursor: hand;
+    -fx-alignment: center-left;
+    -fx-min-height: 54px;
+    /* Altezza piena */
+}
+
+.search-field-container:hover {
+    -fx-background-color: #2c3542;
+}
+
+.search-label-small {
     -fx-text-fill: #9ca3af;
-    -fx-background-radius: 20;
-    -fx-padding: 8 20;
-    -fx-font-size: 13px;
-    -fx-font-weight: 600;
-    -fx-cursor: hand;
+    -fx-font-size: 11px;
+    -fx-font-weight: 700;
+    -fx-padding: 0 0 0 5;
+    /* Allineamento col testo sotto */
 }
 
-.role-switch-button:hover { -fx-text-fill: #d1d5db; }
+/* FIX INPUTS - Espansione e Trasparenza Totale */
+.integrated-combo,
+.integrated-date {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-border-width: 0;
+    -fx-pref-height: 30px;
+    -fx-padding: 0;
+    /* Reset padding */
+}
 
-.role-switch-button.active {
-    -fx-background-color: #10b981;
+/* Forza il testo interno ad occupare tutto lo spazio */
+.integrated-combo .text-field,
+.integrated-date .text-field {
     -fx-text-fill: white;
-    -fx-effect: dropshadow(gaussian, rgba(16, 185, 129, 0.4), 8, 0, 0, 2);
-}
-
-/* Buttons */
-.primary-button, .secondary-button, .success-button, .danger-button {
-    -fx-text-fill: white;
     -fx-font-weight: 600;
-    -fx-cursor: hand;
-    -fx-padding: 12 24;
-    -fx-background-radius: 12;
+    -fx-font-size: 15px;
+    -fx-background-color: transparent;
+    -fx-padding: 0 5;
+    /* Piccolo padding laterale */
+    -fx-pref-width: 1000px;
+    /* Hack per forzare larghezza massima */
 }
 
-.primary-button {
+/* Rimuove completamente bordi e background dai pulsanti freccia/calendario */
+.integrated-combo .arrow-button,
+.integrated-date .arrow-button {
+    -fx-background-color: transparent;
+    -fx-border-width: 0;
+    -fx-padding: 0 5;
+}
+
+.integrated-combo .arrow,
+.integrated-date .arrow {
+    -fx-background-color: #6b7280;
+    -fx-mark-color: #6b7280;
+}
+
+.search-separator {
+    -fx-border-color: #4b5563;
+    -fx-border-width: 0 1 0 0;
+    -fx-pref-height: 35;
+    -fx-max-height: 35;
+    -fx-margin: 0 5;
+}
+
+.search-action-button {
     -fx-background-color: #10b981;
-    -fx-effect: dropshadow(gaussian, rgba(16, 185, 129, 0.4), 12, 0, 0, 4);
+    -fx-background-radius: 30;
+    -fx-text-fill: white;
+    -fx-font-weight: 700;
+    -fx-font-size: 16px;
+    -fx-padding: 0 30;
+    -fx-cursor: hand;
+    -fx-min-height: 54px;
+    -fx-effect: dropshadow(gaussian, rgba(16, 185, 129, 0.4), 10, 0, 0, 2);
 }
 
-.primary-button:hover {
+.search-action-button:hover {
     -fx-background-color: #059669;
-    -fx-effect: dropshadow(gaussian, rgba(16, 185, 129, 0.6), 16, 0, 0, 6);
 }
 
-.secondary-button {
-    -fx-background-color: #374151;
+/* --- AZIONI PRINCIPALI (Organizer) --- */
+.primary-action-button {
+    -fx-background-color: linear-gradient(to right, #10b981, #059669);
+    -fx-text-fill: white;
+    -fx-font-weight: 700;
+    -fx-font-size: 15px;
+    -fx-background-radius: 12;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(16, 185, 129, 0.4), 10, 0, 0, 3);
+}
+
+.primary-action-button:hover {
+    -fx-effect: dropshadow(gaussian, rgba(16, 185, 129, 0.6), 15, 0, 0, 5);
+    -fx-translate-y: -1;
+}
+
+.secondary-action-button {
+    -fx-background-color: #1f2937;
     -fx-text-fill: #10b981;
     -fx-border-color: #10b981;
-    -fx-border-width: 1.5;
+    -fx-border-width: 2;
     -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-font-weight: 700;
+    -fx-font-size: 15px;
+    -fx-cursor: hand;
 }
 
-.secondary-button:hover {
-    -fx-background-color: #4b5563;
-    -fx-border-color: #34d399;
-    -fx-text-fill: #34d399;
+.secondary-action-button:hover {
+    -fx-background-color: rgba(16, 185, 129, 0.1);
 }
 
-.success-button, .danger-button {
-    -fx-padding: 8 16;
-    -fx-background-radius: 6;
+/* --- CARDS & SPORTS --- */
+.matches-grid {
+    -fx-background-color: transparent;
+    -fx-padding: 10;
 }
 
-.success-button { -fx-background-color: #10b981; }
-.success-button:hover { -fx-background-color: #059669; }
-.danger-button { -fx-background-color: #ef4444; }
-.danger-button:hover { -fx-background-color: #dc2626; }
-
-.success-button:disabled, .danger-button:disabled {
-    -fx-opacity: 0.5;
-    -fx-cursor: default;
-}
-
-/* Content & Cards */
-.content-container { -fx-background-color: transparent; }
-
-.actions-container, .form-container, .detail-container {
-    -fx-background-color: #1a1f26;
+.match-card {
+    -fx-background-color: #1f2937;
     -fx-background-radius: 16;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 12, 0, 0, 2);
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 10, 0, 0, 2);
+    -fx-min-width: 260px;
+    -fx-max-width: 260px;
+    -fx-min-height: 310px;
+    -fx-cursor: hand;
 }
 
-.actions-container { -fx-padding: 20; }
-.detail-container { -fx-padding: 24; }
+.match-card:hover {
+    -fx-translate-y: -6;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 18, 0, 0, 6);
+}
+
+/* SPORT BANNERS - Definizione Colori */
+.card-image-area {
+    -fx-background-radius: 16 16 0 0;
+    -fx-min-height: 150px;
+    -fx-max-height: 150px;
+    -fx-alignment: center;
+}
+
+/* Gradienti specifici per sport */
+.sport-default {
+    -fx-background-color: linear-gradient(to bottom right, #374151, #1f2937);
+}
+
+.sport-soccer {
+    -fx-background-color: linear-gradient(to bottom right, #059669, #065f46);
+}
+
+/* Verde */
+.sport-basket {
+    -fx-background-color: linear-gradient(to bottom right, #d97706, #92400e);
+}
+
+/* Arancio */
+.sport-tennis {
+    -fx-background-color: linear-gradient(to bottom right, #65a30d, #365314);
+}
+
+/* Lime */
+.sport-volley {
+    -fx-background-color: linear-gradient(to bottom right, #7c3aed, #5b21b6);
+}
+
+/* Viola */
+.sport-rugby {
+    -fx-background-color: linear-gradient(to bottom right, #b91c1c, #7f1d1d);
+}
+
+/* Rosso */
+
+/* Contenuto Card */
+.card-content {
+    -fx-padding: 16;
+}
+
+.card-title {
+    -fx-text-fill: #f3f4f6;
+    -fx-font-weight: 700;
+    -fx-font-size: 17px;
+}
+
+.card-subtitle {
+    -fx-text-fill: #9ca3af;
+    -fx-font-size: 13px;
+}
+
+.card-detail-text {
+    -fx-text-fill: #d1d5db;
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+}
+
+.card-price-badge {
+    -fx-background-color: rgba(0, 0, 0, 0.4);
+    -fx-background-radius: 20;
+    -fx-text-fill: white;
+    -fx-font-weight: 800;
+    -fx-padding: 5 10;
+    -fx-font-size: 13px;
+    -fx-border-color: rgba(255, 255, 255, 0.2);
+    -fx-border-radius: 20;
+}
+
+/* Barre progresso colorate in base allo sport */
+.card-progress-bar .track {
+    -fx-background-color: #374151;
+    -fx-background-radius: 4;
+}
+
+.sport-soccer-bar .bar {
+    -fx-background-color: #10b981;
+}
+
+.sport-basket-bar .bar {
+    -fx-background-color: #f59e0b;
+}
+
+.sport-tennis-bar .bar {
+    -fx-background-color: #84cc16;
+}
+
+.sport-volley-bar .bar {
+    -fx-background-color: #a78bfa;
+}
+
+.sport-default-bar .bar {
+    -fx-background-color: #9ca3af;
+}
 
 .section-title {
     -fx-text-fill: #f3f4f6;
-    -fx-font-weight: 700;
-    -fx-font-size: 18px;
-    -fx-letter-spacing: -0.5px;
+    -fx-font-size: 22px;
+    -fx-font-weight: 800;
 }
 
-/* Match & Field Cards */
-.matches-scroll, .matches-scroll .viewport, .matches-list { -fx-background-color: transparent; }
-
-.match-card, .field-card {
-    -fx-background-color: #1a1f26;
-    -fx-background-radius: 16;
-    -fx-border-color: #374151;
-    -fx-border-radius: 16;
-    -fx-border-width: 1;
-    -fx-padding: 20;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 12, 0, 0, 2);
-}
-
-.match-card:hover, .field-card:hover {
-    -fx-background-color: #1f2937;
-    -fx-border-color: #10b981;
-    -fx-border-width: 2;
+.text-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #10b981;
     -fx-cursor: hand;
-    -fx-effect: dropshadow(gaussian, rgba(16, 185, 129, 0.3), 16, 0, 0, 4);
+    -fx-underline: true;
 }
-
-.field-card.selected {
-    -fx-background-color: rgba(16, 185, 129, 0.1);
-    -fx-border-color: #10b981;
-    -fx-border-width: 2;
-}
-
-.match-title, .field-name {
-    -fx-text-fill: #f3f4f6;
-    -fx-font-weight: 700;
-    -fx-font-size: 16px;
-}
-
-.match-info, .field-detail {
-    -fx-text-fill: #9ca3af;
-    -fx-font-size: 13px;
-    -fx-font-weight: 500;
-}
-
-.field-price {
-    -fx-text-fill: #10b981;
-    -fx-font-weight: 700;
-    -fx-font-size: 18px;
-}
-
-.status-badge {
-    -fx-background-color: #10b981;
-    -fx-text-fill: white;
-    -fx-background-radius: 8;
-    -fx-padding: 6 12;
-    -fx-font-size: 11px;
-    -fx-font-weight: 700;
-    -fx-letter-spacing: 0.5px;
-}
-
-/* Footer */
-.footer-container {
-    -fx-background-color: #1a1f26;
-    -fx-border-color: #374151;
-    -fx-border-width: 1 0 0 0;
-}
-
-.status-label {
-    -fx-text-fill: #6b7280;
-    -fx-font-size: 12px;
-    -fx-font-weight: 500;
-}
-
-/* Form Elements */
-.custom-text-field, .custom-combo-box, .custom-date-picker {
-    -fx-background-color: #1f2937;
-    -fx-text-fill: #e5e7eb;
-    -fx-border-color: #374151;
-    -fx-border-radius: 12;
-    -fx-background-radius: 12;
-}
-
-.custom-text-field { -fx-padding: 12; }
-
-.custom-text-field:focused {
-    -fx-border-color: #10b981;
-    -fx-border-width: 2;
-}
-
-.field-label {
-    -fx-text-fill: #d1d5db;
-    -fx-font-weight: 600;
-    -fx-font-size: 13px;
-}
-
-/* Message Labels */
-.message-label {
-    -fx-font-size: 13px;
-    -fx-padding: 12 16;
-    -fx-background-radius: 12;
-    -fx-font-weight: 500;
-}
-
-.message-label.error {
-    -fx-background-color: rgba(239, 68, 68, 0.2);
-    -fx-text-fill: #fca5a5;
-}
-
-.message-label.success {
-    -fx-background-color: rgba(16, 185, 129, 0.2);
-    -fx-text-fill: #6ee7b7;
-}
-
-.message-label.info {
-    -fx-background-color: #1e3a8a;
-    -fx-text-fill: #bfdbfe;
-    -fx-border-color: #1d4ed8;
-}
-
-/* Scrollbar */
-
-/* Scrollbar */
-.scroll-pane .scroll-bar:vertical { -fx-background-color: transparent; }
-.scroll-pane .scroll-bar:vertical .track { -fx-background-color: #1f2937; -fx-background-radius: 8; }
-.scroll-pane .scroll-bar:vertical .thumb { -fx-background-color: #4b5563; -fx-background-radius: 8; }
-.scroll-pane .scroll-bar:vertical .thumb:hover { -fx-background-color: #6b7280; }
-
-/* Additional Components */
-.subtitle-label, .info-label {
-    -fx-text-fill: #9ca3af;
-    -fx-font-size: 12px;
-}
-
-.info-label { -fx-font-style: italic; }
-
-.custom-spinner {
-    -fx-background-color: #1f2937;
-    -fx-border-color: #374151;
-    -fx-border-radius: 12;
-}
-
-.summary-box, .match-info-box {
-    -fx-background-color: rgba(16, 185, 129, 0.1);
-    -fx-background-radius: 12;
-    -fx-border-color: #10b981;
-    -fx-border-radius: 12;
-    -fx-border-width: 1;
-}
-
-.summary-box { -fx-padding: 16; }
-
-.summary-label, .summary-value, .match-info-text {
-    -fx-font-size: 13px;
-    -fx-font-weight: 600;
-}
-
-.summary-label { -fx-text-fill: #d1d5db; }
-.summary-value, .match-info-text { -fx-text-fill: #10b981; }
-
-.sort-container {
-    -fx-background-color: #1a1f26;
-    -fx-background-radius: 12;
-    -fx-border-color: #374151;
-    -fx-border-radius: 12;
-    -fx-border-width: 1;
-    -fx-padding: 12;
-}
-
-/* Detail Views */
-.detail-header { -fx-background-color: #1a1f26; -fx-padding: 12; }
-
-.detail-title, .detail-sport {
-    -fx-text-fill: #10b981;
-    -fx-font-weight: 700;
-}
-
-.detail-title { -fx-font-size: 24px; }
-.detail-sport { -fx-font-size: 18px; }
-
-.detail-info-title {
-    -fx-text-fill: #e5e7eb;
-    -fx-font-weight: 600;
-    -fx-font-size: 14px;
-}
-
-.detail-info-value {
-    -fx-text-fill: #9ca3af;
-    -fx-font-size: 14px;
-}
-
-.map-container { -fx-background-color: #1a1f26; -fx-padding: 12; }
-
-.map-title {
-    -fx-text-fill: #10b981;
-    -fx-font-weight: 600;
-    -fx-font-size: 14px;
-}
-
-.field-label-bold {
-    -fx-text-fill: #10b981;
-    -fx-font-weight: 700;
-}
-
-/* Field Manager Dashboard */
-.stat-card {
-    -fx-background-color: #1f2937;
-    -fx-border-color: #374151;
-    -fx-border-radius: 8;
-    -fx-background-radius: 8;
-    -fx-padding: 20;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 5, 0, 0, 2);
-}
-
-.stat-label {
-    -fx-font-size: 12px;
-    -fx-text-fill: #9ca3af;
-    -fx-font-weight: normal;
-}
-
-.stat-value {
-    -fx-font-size: 32px;
-    -fx-font-weight: bold;
-    -fx-text-fill: #10b981;
-}
-
-.stat-value.pending { -fx-text-fill: #ef4444; }
-

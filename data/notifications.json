@@ -1,0 +1,434 @@
+[
+  {
+    "recipient": "manager4",
+    "sender": "organizer4",
+    "type": "MATCH_CREATED",
+    "title": "Nuova partita organizzata!",
+    "message": "organizer4 ha organizzato una partita di FOOTBALL_11 al campo \u0027Campo Ovest\u0027 per il 2026-01-29 alle 17:00",
+    "timestamp": "2026-01-19T00:08:55.796783",
+    "read": false
+  },
+  {
+    "recipient": "manager1",
+    "sender": "organizer1",
+    "type": "MATCH_CREATED",
+    "title": "Nuova partita organizzata!",
+    "message": "organizer1 ha organizzato una partita di FOOTBALL_5 al campo \u0027Campo Nord\u0027 per il 2026-01-25 alle 18:00",
+    "timestamp": "2026-01-19T00:08:55.856023",
+    "read": false
+  },
+  {
+    "recipient": "manager3",
+    "sender": "organizer3",
+    "type": "MATCH_CREATED",
+    "title": "Nuova partita organizzata!",
+    "message": "organizer3 ha organizzato una partita di BASKETBALL al campo \u0027Campo Est\u0027 per il 2026-01-28 alle 19:00",
+    "timestamp": "2026-01-19T00:08:55.863042",
+    "read": true
+  },
+  {
+    "recipient": "manager5",
+    "sender": "player5",
+    "type": "BOOKING_CREATED",
+    "title": "Nuova prenotazione!",
+    "message": "player5 ha prenotato il campo \u0027Campo Test\u0027 per il 2026-01-30 alle 16:00",
+    "timestamp": "2026-01-19T00:08:55.88824",
+    "read": false
+  },
+  {
+    "recipient": "manager1",
+    "sender": "player1",
+    "type": "BOOKING_CREATED",
+    "title": "Nuova prenotazione!",
+    "message": "player1 ha prenotato il campo \u0027Campo Centrale\u0027 per il 2026-01-26 alle 20:00",
+    "timestamp": "2026-01-19T00:08:56.441176",
+    "read": false
+  },
+  {
+    "recipient": "manager2",
+    "sender": "player2",
+    "type": "BOOKING_CREATED",
+    "title": "Nuova prenotazione!",
+    "message": "player2 ha prenotato il campo \u0027Campo Sud\u0027 per il 2026-01-27 alle 14:00",
+    "timestamp": "2026-01-19T00:08:56.448817",
+    "read": false
+  },
+  {
+    "recipient": "manager4",
+    "sender": "organizer4",
+    "type": "MATCH_CREATED",
+    "title": "Nuova partita organizzata!",
+    "message": "organizer4 ha organizzato una partita di FOOTBALL_11 al campo \u0027Campo Ovest\u0027 per il 2026-01-29 alle 17:00",
+    "timestamp": "2026-01-19T00:09:03.71336",
+    "read": false
+  },
+  {
+    "recipient": "manager1",
+    "sender": "organizer1",
+    "type": "MATCH_CREATED",
+    "title": "Nuova partita organizzata!",
+    "message": "organizer1 ha organizzato una partita di FOOTBALL_5 al campo \u0027Campo Nord\u0027 per il 2026-01-25 alle 18:00",
+    "timestamp": "2026-01-19T00:09:03.722079",
+    "read": false
+  },
+  {
+    "recipient": "manager3",
+    "sender": "organizer3",
+    "type": "MATCH_CREATED",
+    "title": "Nuova partita organizzata!",
+    "message": "organizer3 ha organizzato una partita di BASKETBALL al campo \u0027Campo Est\u0027 per il 2026-01-28 alle 19:00",
+    "timestamp": "2026-01-19T00:09:03.727225",
+    "read": true
+  },
+  {
+    "recipient": "manager5",
+    "sender": "player5",
+    "type": "BOOKING_CREATED",
+    "title": "Nuova prenotazione!",
+    "message": "player5 ha prenotato il campo \u0027Campo Test\u0027 per il 2026-01-30 alle 16:00",
+    "timestamp": "2026-01-19T00:09:03.732687",
+    "read": false
+  },
+  {
+    "recipient": "manager1",
+    "sender": "player1",
+    "type": "BOOKING_CREATED",
+    "title": "Nuova prenotazione!",
+    "message": "player1 ha prenotato il campo \u0027Campo Centrale\u0027 per il 2026-01-26 alle 20:00",
+    "timestamp": "2026-01-19T00:09:04.242285",
+    "read": false
+  },
+  {
+    "recipient": "manager2",
+    "sender": "player2",
+    "type": "BOOKING_CREATED",
+    "title": "Nuova prenotazione!",
+    "message": "player2 ha prenotato il campo \u0027Campo Sud\u0027 per il 2026-01-27 alle 14:00",
+    "timestamp": "2026-01-19T00:09:04.245837",
+    "read": false
+  },
+  {
+    "recipient": "manager4",
+    "sender": "organizer4",
+    "type": "MATCH_CREATED",
+    "title": "Nuova partita organizzata!",
+    "message": "organizer4 ha organizzato una partita di FOOTBALL_11 al campo \u0027Campo Ovest\u0027 per il 2026-01-29 alle 17:00",
+    "timestamp": "2026-01-19T00:09:42.261579",
+    "read": false
+  },
+  {
+    "recipient": "manager1",
+    "sender": "organizer1",
+    "type": "MATCH_CREATED",
+    "title": "Nuova partita organizzata!",
+    "message": "organizer1 ha organizzato una partita di FOOTBALL_5 al campo \u0027Campo Nord\u0027 per il 2026-01-25 alle 18:00",
+    "timestamp": "2026-01-19T00:09:42.270338",
+    "read": false
+  },
+  {
+    "recipient": "manager3",
+    "sender": "organizer3",
+    "type": "MATCH_CREATED",
+    "title": "Nuova partita organizzata!",
+    "message": "organizer3 ha organizzato una partita di BASKETBALL al campo \u0027Campo Est\u0027 per il 2026-01-28 alle 19:00",
+    "timestamp": "2026-01-19T00:09:42.273844",
+    "read": true
+  },
+  {
+    "recipient": "manager5",
+    "sender": "player5",
+    "type": "BOOKING_CREATED",
+    "title": "Nuova prenotazione!",
+    "message": "player5 ha prenotato il campo \u0027Campo Test\u0027 per il 2026-01-30 alle 16:00",
+    "timestamp": "2026-01-19T00:09:42.287319",
+    "read": false
+  },
+  {
+    "recipient": "manager1",
+    "sender": "player1",
+    "type": "BOOKING_CREATED",
+    "title": "Nuova prenotazione!",
+    "message": "player1 ha prenotato il campo \u0027Campo Centrale\u0027 per il 2026-01-26 alle 20:00",
+    "timestamp": "2026-01-19T00:09:42.798843",
+    "read": false
+  },
+  {
+    "recipient": "manager2",
+    "sender": "player2",
+    "type": "BOOKING_CREATED",
+    "title": "Nuova prenotazione!",
+    "message": "player2 ha prenotato il campo \u0027Campo Sud\u0027 per il 2026-01-27 alle 14:00",
+    "timestamp": "2026-01-19T00:09:42.808297",
+    "read": false
+  },
+  {
+    "recipient": "manager4",
+    "sender": "organizer4",
+    "type": "MATCH_CREATED",
+    "title": "Nuova partita organizzata!",
+    "message": "organizer4 ha organizzato una partita di FOOTBALL_11 al campo \u0027Campo Ovest\u0027 per il 2026-01-29 alle 17:00",
+    "timestamp": "2026-01-19T00:09:49.568794",
+    "read": false
+  },
+  {
+    "recipient": "manager1",
+    "sender": "organizer1",
+    "type": "MATCH_CREATED",
+    "title": "Nuova partita organizzata!",
+    "message": "organizer1 ha organizzato una partita di FOOTBALL_5 al campo \u0027Campo Nord\u0027 per il 2026-01-25 alle 18:00",
+    "timestamp": "2026-01-19T00:09:49.577309",
+    "read": false
+  },
+  {
+    "recipient": "manager3",
+    "sender": "organizer3",
+    "type": "MATCH_CREATED",
+    "title": "Nuova partita organizzata!",
+    "message": "organizer3 ha organizzato una partita di BASKETBALL al campo \u0027Campo Est\u0027 per il 2026-01-28 alle 19:00",
+    "timestamp": "2026-01-19T00:09:49.580568",
+    "read": true
+  },
+  {
+    "recipient": "manager5",
+    "sender": "player5",
+    "type": "BOOKING_CREATED",
+    "title": "Nuova prenotazione!",
+    "message": "player5 ha prenotato il campo \u0027Campo Test\u0027 per il 2026-01-30 alle 16:00",
+    "timestamp": "2026-01-19T00:09:49.589032",
+    "read": false
+  },
+  {
+    "recipient": "manager1",
+    "sender": "player1",
+    "type": "BOOKING_CREATED",
+    "title": "Nuova prenotazione!",
+    "message": "player1 ha prenotato il campo \u0027Campo Centrale\u0027 per il 2026-01-26 alle 20:00",
+    "timestamp": "2026-01-19T00:09:50.099757",
+    "read": false
+  },
+  {
+    "recipient": "manager2",
+    "sender": "player2",
+    "type": "BOOKING_CREATED",
+    "title": "Nuova prenotazione!",
+    "message": "player2 ha prenotato il campo \u0027Campo Sud\u0027 per il 2026-01-27 alle 14:00",
+    "timestamp": "2026-01-19T00:09:50.103898",
+    "read": false
+  },
+  {
+    "recipient": "manager4",
+    "sender": "organizer4",
+    "type": "MATCH_CREATED",
+    "title": "Nuova partita organizzata!",
+    "message": "organizer4 ha organizzato una partita di FOOTBALL_11 al campo \u0027Campo Ovest\u0027 per il 2026-01-29 alle 17:00",
+    "timestamp": "2026-01-19T00:09:57.044353",
+    "read": false
+  },
+  {
+    "recipient": "manager1",
+    "sender": "organizer1",
+    "type": "MATCH_CREATED",
+    "title": "Nuova partita organizzata!",
+    "message": "organizer1 ha organizzato una partita di FOOTBALL_5 al campo \u0027Campo Nord\u0027 per il 2026-01-25 alle 18:00",
+    "timestamp": "2026-01-19T00:09:57.058285",
+    "read": false
+  },
+  {
+    "recipient": "manager3",
+    "sender": "organizer3",
+    "type": "MATCH_CREATED",
+    "title": "Nuova partita organizzata!",
+    "message": "organizer3 ha organizzato una partita di BASKETBALL al campo \u0027Campo Est\u0027 per il 2026-01-28 alle 19:00",
+    "timestamp": "2026-01-19T00:09:57.06508",
+    "read": true
+  },
+  {
+    "recipient": "manager5",
+    "sender": "player5",
+    "type": "BOOKING_CREATED",
+    "title": "Nuova prenotazione!",
+    "message": "player5 ha prenotato il campo \u0027Campo Test\u0027 per il 2026-01-30 alle 16:00",
+    "timestamp": "2026-01-19T00:09:57.079434",
+    "read": false
+  },
+  {
+    "recipient": "manager1",
+    "sender": "player1",
+    "type": "BOOKING_CREATED",
+    "title": "Nuova prenotazione!",
+    "message": "player1 ha prenotato il campo \u0027Campo Centrale\u0027 per il 2026-01-26 alle 20:00",
+    "timestamp": "2026-01-19T00:09:57.591048",
+    "read": false
+  },
+  {
+    "recipient": "manager2",
+    "sender": "player2",
+    "type": "BOOKING_CREATED",
+    "title": "Nuova prenotazione!",
+    "message": "player2 ha prenotato il campo \u0027Campo Sud\u0027 per il 2026-01-27 alle 14:00",
+    "timestamp": "2026-01-19T00:09:57.594624",
+    "read": false
+  },
+  {
+    "recipient": "manager4",
+    "sender": "organizer4",
+    "type": "MATCH_CREATED",
+    "title": "Nuova partita organizzata!",
+    "message": "organizer4 ha organizzato una partita di FOOTBALL_11 al campo \u0027Campo Ovest\u0027 per il 2026-01-29 alle 17:00",
+    "timestamp": "2026-01-19T00:13:10.663313",
+    "read": false
+  },
+  {
+    "recipient": "manager1",
+    "sender": "organizer1",
+    "type": "MATCH_CREATED",
+    "title": "Nuova partita organizzata!",
+    "message": "organizer1 ha organizzato una partita di FOOTBALL_5 al campo \u0027Campo Nord\u0027 per il 2026-01-25 alle 18:00",
+    "timestamp": "2026-01-19T00:13:10.669974",
+    "read": false
+  },
+  {
+    "recipient": "manager3",
+    "sender": "organizer3",
+    "type": "MATCH_CREATED",
+    "title": "Nuova partita organizzata!",
+    "message": "organizer3 ha organizzato una partita di BASKETBALL al campo \u0027Campo Est\u0027 per il 2026-01-28 alle 19:00",
+    "timestamp": "2026-01-19T00:13:10.673173",
+    "read": true
+  },
+  {
+    "recipient": "manager5",
+    "sender": "player5",
+    "type": "BOOKING_CREATED",
+    "title": "Nuova prenotazione!",
+    "message": "player5 ha prenotato il campo \u0027Campo Test\u0027 per il 2026-01-30 alle 16:00",
+    "timestamp": "2026-01-19T00:13:10.682083",
+    "read": false
+  },
+  {
+    "recipient": "manager1",
+    "sender": "player1",
+    "type": "BOOKING_CREATED",
+    "title": "Nuova prenotazione!",
+    "message": "player1 ha prenotato il campo \u0027Campo Centrale\u0027 per il 2026-01-26 alle 20:00",
+    "timestamp": "2026-01-19T00:13:11.192374",
+    "read": false
+  },
+  {
+    "recipient": "manager2",
+    "sender": "player2",
+    "type": "BOOKING_CREATED",
+    "title": "Nuova prenotazione!",
+    "message": "player2 ha prenotato il campo \u0027Campo Sud\u0027 per il 2026-01-27 alle 14:00",
+    "timestamp": "2026-01-19T00:13:11.195459",
+    "read": false
+  },
+  {
+    "recipient": "manager4",
+    "sender": "organizer4",
+    "type": "MATCH_CREATED",
+    "title": "Nuova partita organizzata!",
+    "message": "organizer4 ha organizzato una partita di FOOTBALL_11 al campo \u0027Campo Ovest\u0027 per il 2026-01-29 alle 17:00",
+    "timestamp": "2026-01-19T00:15:00.095959",
+    "read": false
+  },
+  {
+    "recipient": "manager1",
+    "sender": "organizer1",
+    "type": "MATCH_CREATED",
+    "title": "Nuova partita organizzata!",
+    "message": "organizer1 ha organizzato una partita di FOOTBALL_5 al campo \u0027Campo Nord\u0027 per il 2026-01-25 alle 18:00",
+    "timestamp": "2026-01-19T00:15:00.104288",
+    "read": false
+  },
+  {
+    "recipient": "manager3",
+    "sender": "organizer3",
+    "type": "MATCH_CREATED",
+    "title": "Nuova partita organizzata!",
+    "message": "organizer3 ha organizzato una partita di BASKETBALL al campo \u0027Campo Est\u0027 per il 2026-01-28 alle 19:00",
+    "timestamp": "2026-01-19T00:15:00.108294",
+    "read": true
+  },
+  {
+    "recipient": "manager5",
+    "sender": "player5",
+    "type": "BOOKING_CREATED",
+    "title": "Nuova prenotazione!",
+    "message": "player5 ha prenotato il campo \u0027Campo Test\u0027 per il 2026-01-30 alle 16:00",
+    "timestamp": "2026-01-19T00:15:00.118991",
+    "read": false
+  },
+  {
+    "recipient": "manager1",
+    "sender": "player1",
+    "type": "BOOKING_CREATED",
+    "title": "Nuova prenotazione!",
+    "message": "player1 ha prenotato il campo \u0027Campo Centrale\u0027 per il 2026-01-26 alle 20:00",
+    "timestamp": "2026-01-19T00:15:00.626902",
+    "read": false
+  },
+  {
+    "recipient": "manager2",
+    "sender": "player2",
+    "type": "BOOKING_CREATED",
+    "title": "Nuova prenotazione!",
+    "message": "player2 ha prenotato il campo \u0027Campo Sud\u0027 per il 2026-01-27 alle 14:00",
+    "timestamp": "2026-01-19T00:15:00.629196",
+    "read": false
+  },
+  {
+    "recipient": "manager4",
+    "sender": "organizer4",
+    "type": "MATCH_CREATED",
+    "title": "Nuova partita organizzata!",
+    "message": "organizer4 ha organizzato una partita di FOOTBALL_11 al campo \u0027Campo Ovest\u0027 per il 2026-01-29 alle 17:00",
+    "timestamp": "2026-01-19T00:41:02.405019",
+    "read": false
+  },
+  {
+    "recipient": "manager1",
+    "sender": "organizer1",
+    "type": "MATCH_CREATED",
+    "title": "Nuova partita organizzata!",
+    "message": "organizer1 ha organizzato una partita di FOOTBALL_5 al campo \u0027Campo Nord\u0027 per il 2026-01-25 alle 18:00",
+    "timestamp": "2026-01-19T00:41:02.420253",
+    "read": false
+  },
+  {
+    "recipient": "manager3",
+    "sender": "organizer3",
+    "type": "MATCH_CREATED",
+    "title": "Nuova partita organizzata!",
+    "message": "organizer3 ha organizzato una partita di BASKETBALL al campo \u0027Campo Est\u0027 per il 2026-01-28 alle 19:00",
+    "timestamp": "2026-01-19T00:41:02.425454",
+    "read": true
+  },
+  {
+    "recipient": "manager5",
+    "sender": "player5",
+    "type": "BOOKING_CREATED",
+    "title": "Nuova prenotazione!",
+    "message": "player5 ha prenotato il campo \u0027Campo Test\u0027 per il 2026-01-30 alle 16:00",
+    "timestamp": "2026-01-19T00:41:02.434041",
+    "read": false
+  },
+  {
+    "recipient": "manager1",
+    "sender": "player1",
+    "type": "BOOKING_CREATED",
+    "title": "Nuova prenotazione!",
+    "message": "player1 ha prenotato il campo \u0027Campo Centrale\u0027 per il 2026-01-26 alle 20:00",
+    "timestamp": "2026-01-19T00:41:02.943306",
+    "read": false
+  },
+  {
+    "recipient": "manager2",
+    "sender": "player2",
+    "type": "BOOKING_CREATED",
+    "title": "Nuova prenotazione!",
+    "message": "player2 ha prenotato il campo \u0027Campo Sud\u0027 per il 2026-01-27 alle 14:00",
+    "timestamp": "2026-01-19T00:41:02.946105",
+    "read": false
+  }
+]

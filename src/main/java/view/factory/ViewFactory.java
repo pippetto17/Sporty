@@ -5,11 +5,11 @@ import view.addfieldview.AddFieldView;
 import view.bookfieldview.BookFieldView;
 import view.fieldmanagerview.FieldManagerView;
 import view.homeview.HomeView;
+import view.joinmatchview.JoinMatchView;
 import view.loginview.LoginView;
 import view.myfieldsview.MyFieldsView;
 import view.organizematchview.OrganizeMatchView;
 import view.paymentview.PaymentView;
-import view.recapview.RecapView;
 
 public interface ViewFactory {
     LoginView createLoginView(LoginController loginController);
@@ -22,12 +22,11 @@ public interface ViewFactory {
 
     PaymentView createPaymentView(PaymentController paymentController);
 
-    RecapView createRecapView();
-
     FieldManagerView createFieldManagerView(FieldManagerController controller);
 
-    // Field Manager additional views
     AddFieldView createAddFieldView(FieldManagerController controller);
 
     MyFieldsView createMyFieldsView(FieldManagerController controller);
+
+    JoinMatchView createJoinMatchView(JoinMatchController controller);
 }

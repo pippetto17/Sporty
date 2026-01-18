@@ -12,6 +12,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import model.bean.FieldBean;
+import model.bean.MatchBean;
 import model.domain.Sport;
 import model.utils.Constants;
 
@@ -57,9 +58,22 @@ public class GraphicOrganizeMatchView implements OrganizeMatchView {
     @FXML
     private Button searchFieldsButton;
     @FXML
-    private FieldBean selectedField;
+    private VBox recapBox;
+    @FXML
+    private Label recapSportLabel;
+    @FXML
+    private Label recapDateLabel;
+    @FXML
+    private Label recapTimeLabel;
+    @FXML
+    private Label recapCityLabel;
+    @FXML
+    private Label recapStatusLabel;
+    @FXML
+    private Button inviteButton;
 
-    private boolean isUpdatingCityComboBox = false; // Flag per prevenire loop infinito
+    private FieldBean selectedField;
+    private boolean isUpdatingCityComboBox = false;
 
     public GraphicOrganizeMatchView(OrganizeMatchController organizeMatchController) {
         this.organizeMatchController = organizeMatchController;
@@ -102,7 +116,10 @@ public class GraphicOrganizeMatchView implements OrganizeMatchView {
     }
 
     private void initialize() {
-        // Initialize sport combo box
+        // BCE Criterion 3: First interaction loads all required entities into memory
+        organizeMatchController.initializeOrganizeMatch();
+
+        // Initialize sport combo box from controller
         sportComboBox.getItems().addAll(organizeMatchController.getAvailableSports());
         sportComboBox.setConverter(new StringConverter<Sport>() {
             @Override
@@ -119,10 +136,16 @@ public class GraphicOrganizeMatchView implements OrganizeMatchView {
         // Listen to sport selection to update participants info
         sportComboBox.setOnAction(e -> updateParticipantsInfo());
 
-        // Initialize city combo box with Italian cities from controller
-        cityComboBox.getItems().addAll(organizeMatchController.getCities());
+        // Initialize city combo box
+        cityComboBox.getItems().addAll(organizeMatchController.getAvailableCities());
         cityComboBox.setEditable(true);
         setupCityAutocomplete();
+
+        // Show preferred city suggestion if available
+        String preferredCity = organizeMatchController.getPreferredCity();
+        if (preferredCity != null) {
+            cityComboBox.setPromptText("Suggerito: " + preferredCity);
+        }
 
         // Initialize participants spinner (default 1-20, will be updated by sport
         // selection)
@@ -137,8 +160,6 @@ public class GraphicOrganizeMatchView implements OrganizeMatchView {
                 setDisable(empty || date.isBefore(LocalDate.now()));
             }
         });
-
-        organizeMatchController.startNewMatch();
     }
 
     private void setupCityAutocomplete() {
@@ -326,6 +347,63 @@ public class GraphicOrganizeMatchView implements OrganizeMatchView {
     @Override
     public void displaySuccess(String message) {
         showSuccess(message);
+    }
+
+    @Override
+    public void displayRecap(MatchBean matchBean) {
+        Platform.runLater(() -> {
+            if (matchBean == null) {
+                showError(Constants.ERROR_MATCHBEAN_NULL);
+                return;
+            }
+
+            // Nascondi form e mostra recap
+            sportComboBox.setVisible(false);
+            sportComboBox.setManaged(false);
+            datePicker.setVisible(false);
+            datePicker.setManaged(false);
+            timeField.setVisible(false);
+            timeField.setManaged(false);
+            cityComboBox.setVisible(false);
+            cityComboBox.setManaged(false);
+            participantsSpinner.setVisible(false);
+            participantsSpinner.setManaged(false);
+            participantsInfoLabel.setVisible(false);
+            participantsInfoLabel.setManaged(false);
+            summaryBox.setVisible(false);
+            summaryBox.setManaged(false);
+            searchFieldsButton.setVisible(false);
+            searchFieldsButton.setManaged(false);
+            messageLabel.setVisible(false);
+            messageLabel.setManaged(false);
+
+            // Popolamento recap
+            recapSportLabel.setText(matchBean.getSport() != null ? matchBean.getSport().getDisplayName() : "N/A");
+            recapDateLabel.setText(matchBean.getMatchDate() != null ? matchBean.getMatchDate().toString() : "N/A");
+            recapTimeLabel.setText(matchBean.getMatchTime() != null ? matchBean.getMatchTime().toString() : "N/A");
+            recapCityLabel.setText(matchBean.getCity());
+            recapStatusLabel.setText(matchBean.getStatus() != null ? matchBean.getStatus().toString() : "CONFIRMED");
+
+            recapBox.setVisible(true);
+            recapBox.setManaged(true);
+        });
+    }
+
+    @FXML
+    private void handleInvite() {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Invite Player");
+        alert.setHeaderText(null);
+        alert.setContentText("Invite player feature coming soon!");
+        alert.showAndWait();
+    }
+
+    @FXML
+    private void handleHomeFromRecap() {
+        stage.close();
+        for (int i = 0; i < 4; i++) {
+            organizeMatchController.navigateBack();
+        }
     }
 
     private void showError(String message) {

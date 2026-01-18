@@ -160,9 +160,18 @@ public class ApplicationController {
         pushView(paymentView);
     }
 
-    public void navigateToRecap(MatchBean match) {
-        view.recapview.RecapView view = viewFactory.createRecapView();
-        view.setMatchBean(match);
+    public void navigateToPaymentForJoin(MatchBean matchBean, User user) {
+        PaymentController paymentController = new PaymentController(this);
+        paymentController.setJoinMode(matchBean, user);
+        view.paymentview.PaymentView paymentView = viewFactory.createPaymentView(paymentController);
+        paymentView.setApplicationController(this);
+        pushView(paymentView);
+    }
+
+    public void navigateToJoinMatch(MatchBean matchBean, User user) {
+        JoinMatchController controller = new JoinMatchController(user, this);
+        controller.setMatch(matchBean);
+        view.joinmatchview.JoinMatchView view = viewFactory.createJoinMatchView(controller);
         view.setApplicationController(this);
         pushView(view);
     }
@@ -202,14 +211,17 @@ public class ApplicationController {
             return;
         }
 
-        View current = viewStack.pop(); // Rimuove e restituisce la testa
+        View current = viewStack.pop();
         current.close();
 
-        // Recupera la precedente senza rimuoverla e la mostra (controllo null per static analysis)
         View previous = viewStack.peek();
         if (previous != null) {
             previous.display();
         }
+    }
+
+    public View getCurrentView() {
+        return viewStack.peek();
     }
 
     public void logout() {

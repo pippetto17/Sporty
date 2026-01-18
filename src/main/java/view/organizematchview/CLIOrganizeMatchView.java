@@ -2,6 +2,7 @@ package view.organizematchview;
 
 import controller.ApplicationController;
 import controller.OrganizeMatchController;
+import model.bean.MatchBean;
 import model.domain.Sport;
 import model.utils.Constants;
 
@@ -146,7 +147,7 @@ public class CLIOrganizeMatchView implements OrganizeMatchView {
 
     private Sport selectSport() {
         System.out.println("\n--- SELECT SPORT ---");
-        Sport[] sports = organizeMatchController.getAvailableSports();
+        Sport[] sports = organizeMatchController.getAvailableSports().toArray(new Sport[0]);
 
         for (int i = 0; i < sports.length; i++) {
             System.out.println((i + 1) + ". " + sports[i].toString());
@@ -170,7 +171,8 @@ public class CLIOrganizeMatchView implements OrganizeMatchView {
 
         String dateInput = scanner.nextLine().trim();
         LocalDate date = parseDate(dateInput);
-        if (date == null) return null;
+        if (date == null)
+            return null;
 
         if (date.isBefore(java.time.LocalDate.now())) {
             displayError("Date cannot be in the past.");
@@ -192,7 +194,8 @@ public class CLIOrganizeMatchView implements OrganizeMatchView {
         System.out.println("\n--- SELECT CITY ---");
         System.out.print("Enter city name: ");
         String city = scanner.nextLine().trim();
-        if (city.isEmpty()) return null;
+        if (city.isEmpty())
+            return null;
         return city;
     }
 
@@ -226,6 +229,63 @@ public class CLIOrganizeMatchView implements OrganizeMatchView {
         System.out.println("City: " + organizeMatchController.getCurrentMatchBean().getCity());
         System.out.println("Participants: " + organizeMatchController.getCurrentMatchBean().getRequiredParticipants());
         System.out.println(Constants.SEPARATOR);
+    }
+
+    @Override
+    public void displayRecap(MatchBean matchBean) {
+        if (matchBean == null) {
+            displayError(Constants.ERROR_MATCHBEAN_NULL);
+            return;
+        }
+
+        System.out.println("\n" + Constants.SEPARATOR);
+        System.out.println("    MATCH CREATED SUCCESSFULLY!");
+        System.out.println(Constants.SEPARATOR);
+        System.out.println();
+        System.out.println("Match Details:");
+        System.out.println("  Sport:        " + (matchBean.getSport() != null ? matchBean.getSport().getDisplayName() : "N/A"));
+        System.out.println("  Date:         " + (matchBean.getMatchDate() != null ? matchBean.getMatchDate() : "N/A"));
+        System.out.println("  Time:         " + (matchBean.getMatchTime() != null ? matchBean.getMatchTime() : "N/A"));
+        System.out.println("  Location:     " + (matchBean.getCity() != null ? matchBean.getCity() : "N/A"));
+        System.out.println("  Organizer:    " + (matchBean.getOrganizerUsername() != null ? matchBean.getOrganizerUsername() : "N/A"));
+        System.out.println("  Players:      0/" + matchBean.getRequiredParticipants());
+
+        if (matchBean.getFieldId() != null) {
+            System.out.println("  Field:        " + matchBean.getFieldId());
+        }
+
+        if (matchBean.getPricePerPerson() != null) {
+            System.out.println("  Price/Person: €" + String.format("%.2f", matchBean.getPricePerPerson()));
+        }
+
+        System.out.println("  Status:       " + (matchBean.getStatus() != null ? matchBean.getStatus() : "CONFIRMED"));
+        System.out.println(Constants.SEPARATOR);
+
+        System.out.println("\nOptions:");
+        System.out.println("1. Invite players (coming soon)");
+        System.out.println("2. Back to Home");
+        System.out.print(Constants.PROMPT_CHOOSE_OPTION);
+
+        String choice = scanner.nextLine().trim();
+        handleRecapChoice(choice);
+    }
+
+    private void handleRecapChoice(String choice) {
+        switch (choice) {
+            case "1" -> {
+                System.out.println(Constants.INFO_INVITE_COMING_SOON);
+                displayRecap(organizeMatchController.getCurrentMatchBean());
+            }
+            case "2" -> {
+                for (int i = 0; i < 4; i++) {
+                    organizeMatchController.navigateBack();
+                }
+            }
+            default -> {
+                displayError("Invalid option. Please try again.");
+                displayRecap(organizeMatchController.getCurrentMatchBean());
+            }
+        }
     }
 
     @Override

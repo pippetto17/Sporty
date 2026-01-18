@@ -18,9 +18,12 @@ public class PaymentController {
     private static final Logger logger = Logger.getLogger(PaymentController.class.getName());
     private final ApplicationController applicationController;
     private final model.dao.MatchDAO matchDAO;
+    private final model.notification.NotificationService notificationService;
     private MatchBean matchBean;
     private model.bean.FieldBean fieldBean;
     private boolean bookingMode;
+    private boolean joinMode;
+    private model.domain.User joiningUser;
 
     public PaymentController(ApplicationController applicationController) {
         this.applicationController = applicationController;
@@ -29,21 +32,35 @@ public class PaymentController {
         } catch (SQLException e) {
             throw new DataAccessException(Constants.ERROR_DAO_INIT + e.getMessage(), e);
         }
+        this.notificationService = new model.notification.NotificationService();
     }
 
     public void setMatchBean(MatchBean matchBean) {
         this.matchBean = matchBean;
         this.bookingMode = false;
+        this.joinMode = false;
     }
 
     public void setBookingMode(model.bean.FieldBean fieldBean, MatchBean contextBean) {
         this.fieldBean = fieldBean;
         this.matchBean = contextBean;
         this.bookingMode = true;
+        this.joinMode = false;
+    }
+
+    public void setJoinMode(MatchBean matchBean, model.domain.User user) {
+        this.matchBean = matchBean;
+        this.joiningUser = user;
+        this.joinMode = true;
+        this.bookingMode = false;
     }
 
     public boolean isBookingMode() {
         return bookingMode;
+    }
+
+    public boolean isJoinMode() {
+        return joinMode;
     }
 
     public model.bean.FieldBean getFieldBean() {
@@ -59,15 +76,23 @@ public class PaymentController {
             return false;
 
         try {
-            if (bookingMode) {
+            if (joinMode) {
+                return processJoinPayment();
+            } else if (bookingMode) {
                 return processBookingPayment();
             } else {
                 return processMatchPayment();
             }
         } catch (Exception e) {
-            logger.log(Level.SEVERE, bookingMode ? "Error confirming booking" : Constants.ERROR_MATCH_CONFIRM, e);
+            logger.log(Level.SEVERE, getErrorMessage(), e);
             return false;
         }
+    }
+
+    private String getErrorMessage() {
+        if (joinMode) return "Error joining match";
+        if (bookingMode) return "Error confirming booking";
+        return Constants.ERROR_MATCH_CONFIRM;
     }
 
     private boolean processMatchPayment() throws ValidationException {
@@ -82,7 +107,36 @@ public class PaymentController {
             matchBean.setMatchId(match.getMatchId());
         }
 
-        applicationController.navigateToRecap(matchBean);
+        // Notifica Field Manager per creazione match
+        try {
+            if (match.getFieldId() != null) {
+                model.domain.Field field = model.dao.DAOFactory.getFieldDAO(applicationController.getPersistenceType())
+                        .findById(match.getFieldId());
+                if (field != null && field.getManagerId() != null) {
+                    notificationService.notifyMatchCreated(
+                            field.getManagerId(),
+                            match.getOrganizerUsername(),
+                            field.getName(),
+                            match.getMatchDate().toString(),
+                            match.getMatchTime().toString(),
+                            match.getSport().name());
+                }
+            }
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Could not send match notification: " + e.getMessage());
+        }
+
+        // Back to OrganizeMatchView e mostra recap
+        applicationController.back();
+        applicationController.back();
+        applicationController.back();
+
+        view.organizematchview.OrganizeMatchView organizeView =
+            (view.organizematchview.OrganizeMatchView) applicationController.getCurrentView();
+        if (organizeView != null) {
+            organizeView.displayRecap(matchBean);
+        }
+
         return true;
     }
 
@@ -105,9 +159,48 @@ public class PaymentController {
 
         bookingDAO.save(booking);
 
+        // Notifica Field Manager per nuova prenotazione
+        try {
+            model.domain.Field field = model.dao.DAOFactory.getFieldDAO(applicationController.getPersistenceType())
+                    .findById(booking.getFieldId());
+            if (field != null && field.getManagerId() != null) {
+                notificationService.notifyBookingCreated(
+                        field.getManagerId(),
+                        booking.getRequesterUsername(),
+                        field.getName(),
+                        booking.getBookingDate().toString(),
+                        booking.getStartTime().toString());
+            }
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Could not send notification: " + e.getMessage());
+        }
+
         // Torna alla home: Payment -> BookField -> Home
         applicationController.back(); // chiude Payment
         applicationController.back(); // chiude BookField, torna a Home
+        return true;
+    }
+
+    private boolean processJoinPayment() throws ValidationException {
+        if (matchBean == null || joiningUser == null)
+            throw new ValidationException("Match and user required for join");
+
+        model.domain.Match match = matchDAO.findById(matchBean.getMatchId());
+        if (match == null)
+            throw new ValidationException(Constants.ERROR_MATCH_NOT_FOUND);
+
+        if (!match.addParticipant(joiningUser.getUsername())) {
+            throw new ValidationException("Cannot join match");
+        }
+
+        matchDAO.save(match);
+
+        // Aggiorna matchBean con nuova lista partecipanti
+        matchBean.setParticipants(match.getParticipants());
+
+        // Torna alla home: Payment -> JoinMatch -> Home
+        applicationController.back(); // chiude Payment
+        applicationController.back(); // chiude JoinMatch, torna a Home
         return true;
     }
 

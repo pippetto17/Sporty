@@ -131,6 +131,42 @@
                 <!-- Error/Success Message -->
                 <Label fx:id="messageLabel" wrapText="true" styleClass="message-label"/>
 
+                <!-- Recap Section (hidden initially) -->
+                <VBox fx:id="recapBox" spacing="15" visible="false" managed="false"
+                      style="-fx-background-color: #2a2a2a; -fx-padding: 20; -fx-background-radius: 10;">
+                    <Label text="✅ MATCH ORGANIZED" style="-fx-text-fill: green; -fx-font-size: 20; -fx-font-weight: bold;"/>
+
+                    <Separator/>
+
+                    <Label text="Match Details" style="-fx-font-weight: bold; -fx-font-size: 14;"/>
+
+                    <GridPane hgap="15" vgap="10">
+                        <Label text="Sport:" GridPane.columnIndex="0" GridPane.rowIndex="0" style="-fx-font-weight: bold;"/>
+                        <Label fx:id="recapSportLabel" text="-" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+
+                        <Label text="Date:" GridPane.columnIndex="0" GridPane.rowIndex="1" style="-fx-font-weight: bold;"/>
+                        <Label fx:id="recapDateLabel" text="-" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+
+                        <Label text="Time:" GridPane.columnIndex="0" GridPane.rowIndex="2" style="-fx-font-weight: bold;"/>
+                        <Label fx:id="recapTimeLabel" text="-" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+
+                        <Label text="Location:" GridPane.columnIndex="0" GridPane.rowIndex="3" style="-fx-font-weight: bold;"/>
+                        <Label fx:id="recapCityLabel" text="-" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+
+                        <Label text="Status:" GridPane.columnIndex="0" GridPane.rowIndex="4" style="-fx-font-weight: bold;"/>
+                        <Label fx:id="recapStatusLabel" text="CONFIRMED" GridPane.columnIndex="1" GridPane.rowIndex="4" style="-fx-text-fill: green;"/>
+                    </GridPane>
+
+                    <Separator/>
+
+                    <HBox spacing="15" alignment="CENTER">
+                        <Button fx:id="inviteButton" text="✉️ Invite Player" onAction="#handleInvite"
+                                styleClass="primary-button" prefWidth="180" prefHeight="35"/>
+                        <Button text="🏠 Home" onAction="#handleHomeFromRecap"
+                                styleClass="secondary-button" prefWidth="120" prefHeight="35"/>
+                    </HBox>
+                </VBox>
+
                 <!-- Action Buttons -->
                 <HBox spacing="12" alignment="CENTER">
                     <padding>
@@ -146,4 +182,3 @@
         </ScrollPane>
     </center>
 </BorderPane>
-

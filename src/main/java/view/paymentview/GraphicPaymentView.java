@@ -157,7 +157,7 @@ public class GraphicPaymentView implements PaymentView {
         payButton.setDisable(true);
         payButton.setText("Processing...");
 
-        // Run in background to avoid freezing UI if service sleeps
+        // Run in background to avoid freezing UI if notification sleeps
         new Thread(() -> {
             try {
                 boolean success = paymentController.processPayment(paymentBean);

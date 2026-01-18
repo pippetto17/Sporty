@@ -85,11 +85,13 @@ public class CLIHomeView implements HomeView {
     public void displayMenu() {
         if (homeController.getCurrentUser().isPlayer()) {
             System.out.println("1. View available matches");
-            System.out.println("2. Logout");
+            System.out.println("2. Join match");
+            System.out.println("3. Logout");
         } else if (homeController.getCurrentUser().isOrganizer()) {
             System.out.println("1. View available matches");
             System.out.println("2. Organize match");
-            System.out.println("3. Logout");
+            System.out.println("3. Book field");
+            System.out.println("4. Logout");
         }
     }
 
@@ -100,8 +102,24 @@ public class CLIHomeView implements HomeView {
                 displayMatches(matches);
             }
             case "2" -> {
+                java.util.List<model.bean.MatchBean> matches = homeController.getMatches();
+                displayMatches(matches);
+                if (matches != null && !matches.isEmpty()) {
+                    System.out.print("\nEnter match number to join (0 to cancel): ");
+                    try {
+                        int matchNum = Integer.parseInt(scanner.nextLine().trim());
+                        if (matchNum > 0 && matchNum <= matches.size()) {
+                            model.bean.MatchBean selectedMatch = matches.get(matchNum - 1);
+                            homeController.joinMatch(selectedMatch.getMatchId());
+                        }
+                    } catch (NumberFormatException e) {
+                        System.out.println("Invalid input");
+                    }
+                }
+            }
+            case "3" -> {
                 applicationController.logout();
-                return false; // Ferma il loop
+                return false;
             }
             default -> System.out.println(Constants.ERROR_INVALID_OPTION);
         }

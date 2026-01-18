@@ -11,6 +11,10 @@ import model.utils.Utils;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static model.utils.Utils.ITALIAN_CITIES;
 
@@ -23,6 +27,11 @@ public class OrganizeMatchController {
     private final ApplicationController applicationController;
     private final model.dao.MatchDAO matchDAO;
     private MatchBean currentMatchBean;
+
+    // BCE Criterion 3: Preloaded data (stored after initialization)
+    private List<Sport> availableSports;
+    private List<String> availableCities;
+    private String preferredCity;
 
     public OrganizeMatchController(User organizer, ApplicationController applicationController) {
         this.organizer = organizer;
@@ -37,6 +46,47 @@ public class OrganizeMatchController {
     public void startNewMatch() {
         this.currentMatchBean = new MatchBean();
         this.currentMatchBean.setOrganizerUsername(organizer.getUsername());
+    }
+
+    /**
+     * BCE Criterion 3: First interaction loads all required entities into memory.
+     * This method MUST be called at the start of the use case.
+     */
+    public void initializeOrganizeMatch() {
+        // 1. Load available sports
+        this.availableSports = Arrays.asList(Sport.values());
+
+        // 2. Load available cities
+        this.availableCities = ITALIAN_CITIES;
+
+        // 3. Load organizer's previous matches (for suggestions)
+        List<MatchBean> previousMatches = matchDAO.findByOrganizer(organizer.getUsername())
+                .stream()
+                .map(model.converter.MatchConverter::toBean)
+                .toList();
+
+        // 4. Derive preferred city from history (most frequently used)
+        this.preferredCity = previousMatches.stream()
+                .collect(Collectors.groupingBy(MatchBean::getCity, Collectors.counting()))
+                .entrySet().stream()
+                .max(Map.Entry.comparingByValue())
+                .map(Map.Entry::getKey)
+                .orElse(null);
+
+        // 5. Start new match (as part of initialization)
+        startNewMatch();
+    }
+
+    public List<Sport> getAvailableSports() {
+        return availableSports != null ? availableSports : Arrays.asList(Sport.values());
+    }
+
+    public List<String> getAvailableCities() {
+        return availableCities != null ? availableCities : ITALIAN_CITIES;
+    }
+
+    public String getPreferredCity() {
+        return preferredCity;
     }
 
     public MatchBean getCurrentMatchBean() {
@@ -86,7 +136,7 @@ public class OrganizeMatchController {
         applicationController.navigateToBookField(currentMatchBean);
     }
 
-    public Sport[] getAvailableSports() {
+    public Sport[] getAvailableSportsArray() {
         return Sport.values();
     }
 

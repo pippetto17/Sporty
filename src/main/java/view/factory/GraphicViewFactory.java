@@ -7,6 +7,8 @@ import view.bookfieldview.BookFieldView;
 import view.bookfieldview.GraphicBookFieldView;
 import view.homeview.GraphicHomeView;
 import view.homeview.HomeView;
+import view.joinmatchview.GraphicJoinMatchView;
+import view.joinmatchview.JoinMatchView;
 import view.loginview.GraphicLoginView;
 import view.loginview.LoginView;
 import view.myfieldsview.GraphicMyFieldsView;
@@ -15,8 +17,6 @@ import view.organizematchview.GraphicOrganizeMatchView;
 import view.organizematchview.OrganizeMatchView;
 import view.paymentview.GraphicPaymentView;
 import view.paymentview.PaymentView;
-import view.recapview.GraphicRecapView;
-import view.recapview.RecapView;
 
 public class GraphicViewFactory implements ViewFactory {
 
@@ -47,10 +47,6 @@ public class GraphicViewFactory implements ViewFactory {
         return new GraphicPaymentView(paymentController);
     }
 
-    @Override
-    public RecapView createRecapView() {
-        return new GraphicRecapView();
-    }
 
     @Override
     public view.fieldmanagerview.FieldManagerView createFieldManagerView(controller.FieldManagerController controller) {
@@ -65,5 +61,10 @@ public class GraphicViewFactory implements ViewFactory {
     @Override
     public MyFieldsView createMyFieldsView(controller.FieldManagerController controller) {
         return new GraphicMyFieldsView(controller);
+    }
+
+    @Override
+    public JoinMatchView createJoinMatchView(JoinMatchController controller) {
+        return new GraphicJoinMatchView(controller);
     }
 }
