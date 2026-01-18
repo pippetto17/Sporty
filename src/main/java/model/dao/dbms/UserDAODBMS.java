@@ -1,11 +1,14 @@
 package model.dao.dbms;
 
+import exception.DataAccessException;
 import model.dao.UserDAO;
 import model.domain.User;
-import exception.DataAccessException;
 import model.utils.Constants;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 

@@ -1,11 +1,11 @@
 package controller;
 
+import exception.DataAccessException;
+import exception.ValidationException;
 import model.bean.MatchBean;
 import model.domain.Sport;
 import model.domain.User;
 import model.utils.Constants;
-import exception.DataAccessException;
-import exception.ValidationException;
 
 import java.sql.SQLException;
 import java.time.LocalDate;

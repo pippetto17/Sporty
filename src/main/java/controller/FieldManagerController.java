@@ -1,9 +1,9 @@
 package controller;
 
 import exception.ValidationException;
+import model.bean.BookingBean;
 import model.bean.FieldBean;
 import model.bean.TimeSlotBean;
-import model.bean.BookingBean;
 import model.dao.DAOFactory;
 import model.domain.User;
 

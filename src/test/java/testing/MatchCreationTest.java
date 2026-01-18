@@ -3,13 +3,15 @@ package testing;
 import model.bean.MatchBean;
 import model.dao.DAOFactory;
 import model.domain.Sport;
-
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
-import static org.junit.jupiter.api.Assertions.*;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * Test suite per la creazione di Match.

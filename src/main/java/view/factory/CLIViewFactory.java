@@ -1,29 +1,24 @@
 package view.factory;
 
-import controller.LoginController;
-import controller.HomeController;
-import controller.OrganizeMatchController;
-import controller.BookFieldController;
-import controller.FieldManagerController;
-import view.loginview.LoginView;
-import view.loginview.CLILoginView;
-import view.homeview.HomeView;
-import view.homeview.CLIHomeView;
-import view.organizematchview.OrganizeMatchView;
-import view.organizematchview.CLIOrganizeMatchView;
+import controller.*;
+import view.addfieldview.AddFieldView;
+import view.addfieldview.CLIAddFieldView;
 import view.bookfieldview.BookFieldView;
 import view.bookfieldview.CLIBookFieldView;
+import view.fieldmanagerview.CLIFieldManagerView;
+import view.fieldmanagerview.FieldManagerView;
+import view.homeview.CLIHomeView;
+import view.homeview.HomeView;
+import view.loginview.CLILoginView;
+import view.loginview.LoginView;
+import view.myfieldsview.CLIMyFieldsView;
+import view.myfieldsview.MyFieldsView;
+import view.organizematchview.CLIOrganizeMatchView;
+import view.organizematchview.OrganizeMatchView;
 import view.paymentview.CLIPaymentView;
 import view.paymentview.PaymentView;
 import view.recapview.CLIRecapView;
 import view.recapview.RecapView;
-import controller.PaymentController;
-import view.fieldmanagerview.CLIFieldManagerView;
-import view.fieldmanagerview.FieldManagerView;
-import view.addfieldview.AddFieldView;
-import view.addfieldview.CLIAddFieldView;
-import view.myfieldsview.MyFieldsView;
-import view.myfieldsview.CLIMyFieldsView;
 
 public class CLIViewFactory implements ViewFactory {
 

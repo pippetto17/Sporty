@@ -1,10 +1,10 @@
 package controller;
 
 import model.bean.MatchBean;
-import model.domain.User;
+import model.dao.MatchDAO;
 import model.domain.Role;
 import model.domain.Sport;
-import model.dao.MatchDAO;
+import model.domain.User;
 
 import java.time.LocalDate;
 import java.util.List;

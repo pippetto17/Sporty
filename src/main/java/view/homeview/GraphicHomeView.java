@@ -13,8 +13,8 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import model.utils.Constants;
 
@@ -123,25 +123,24 @@ public class GraphicHomeView implements HomeView {
     }
 
     @Override
+    public List<model.bean.MatchBean> getMatches() {
+        return homeController.getMatches();
+    }
+
+    @Override
     public void showMatchDetails(int matchId) {
         try {
-            // Get match details from controller
-            model.bean.MatchBean match = homeController.getMatches().stream()
-                    .filter(m -> m.getMatchId() == matchId)
-                    .findFirst()
-                    .orElse(null);
+            model.bean.MatchBean match = findMatchById(matchId);
 
             if (match == null) {
                 updateStatus("Match not found");
                 return;
             }
 
-            // Create dialog
             Dialog<ButtonType> dialog = new Dialog<>();
             dialog.setTitle("Match Details");
             dialog.setHeaderText(match.getSport().getDisplayName());
 
-            // Create content
             VBox content = new VBox(10);
             content.setPadding(new Insets(20));
             content.getChildren().addAll(

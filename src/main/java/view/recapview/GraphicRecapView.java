@@ -13,8 +13,8 @@ import javafx.stage.Stage;
 import model.bean.MatchBean;
 
 import java.io.IOException;
-import java.util.logging.Logger;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class GraphicRecapView implements RecapView {
     private static final Logger logger = Logger.getLogger(GraphicRecapView.class.getName());

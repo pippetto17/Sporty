@@ -11,7 +11,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import model.bean.UserBean;
-import model.domain.User;
 import model.utils.Constants;
 
 import java.io.IOException;
@@ -138,7 +137,7 @@ public class GraphicLoginView extends Application implements LoginView {
     @FXML
     private void handleLogin() {
         UserBean userBean = getUserCredentials();
-        User user = loginController.login(userBean);
+        model.domain.User user = loginController.login(userBean);
         if (user != null) {
             displayLoginSuccess(user.getUsername());
             // Navigate to home
@@ -200,10 +199,7 @@ public class GraphicLoginView extends Application implements LoginView {
 
             int roleCode = LoginController.getRoleCodeFromString(selectedRole);
 
-            model.domain.User tempUser = new model.domain.User();
-            tempUser.setUsername(username);
-            tempUser.setPassword(password);
-            UserBean userBean = model.converter.UserConverter.toUserBean(tempUser);
+            UserBean userBean = new UserBean(username, password);
 
             loginController.register(userBean, name, surname, roleCode);
 
@@ -245,10 +241,10 @@ public class GraphicLoginView extends Application implements LoginView {
 
     @Override
     public UserBean getUserCredentials() {
-        model.domain.User tempUser = new model.domain.User();
-        tempUser.setUsername(usernameField.getText());
-        tempUser.setPassword(passwordField.getText());
-        return model.converter.UserConverter.toUserBean(tempUser);
+        UserBean userBean = new UserBean();
+        userBean.setUsername(usernameField.getText());
+        userBean.setPassword(passwordField.getText());
+        return userBean;
     }
 
     @Override

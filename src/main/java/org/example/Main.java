@@ -1,8 +1,8 @@
 package org.example;
 
-import java.util.logging.Logger;
-
 import controller.ApplicationController;
+
+import java.util.logging.Logger;
 
 public class Main {
     private static final Logger logger = Logger.getLogger(Main.class.getName());

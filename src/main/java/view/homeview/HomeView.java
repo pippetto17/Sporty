@@ -17,10 +17,14 @@ public interface HomeView extends View {
 
     void refreshMatches();
 
-    /**
-     * Show match details in a dialog/popup.
-     * 
-     * @param matchId ID of the match to show details for
-     */
+    List<MatchBean> getMatches();
+
+    default MatchBean findMatchById(int matchId) {
+        return getMatches().stream()
+                .filter(m -> m.getMatchId() == matchId)
+                .findFirst()
+                .orElse(null);
+    }
+
     void showMatchDetails(int matchId);
 }

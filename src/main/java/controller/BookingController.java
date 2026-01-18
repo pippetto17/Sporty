@@ -1,10 +1,10 @@
 package controller;
 
+import exception.ValidationException;
 import model.bean.BookingBean;
 import model.dao.DAOFactory;
 import model.domain.BookingType;
 import model.domain.User;
-import exception.ValidationException;
 
 import java.time.LocalDate;
 import java.time.LocalTime;

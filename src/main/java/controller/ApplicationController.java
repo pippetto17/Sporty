@@ -2,12 +2,12 @@ package controller;
 
 import model.bean.MatchBean;
 import model.dao.DAOFactory;
-import model.domain.User;
 import model.domain.Role;
+import model.domain.User;
 import view.View;
-import view.factory.ViewFactory;
 import view.factory.CLIViewFactory;
 import view.factory.GraphicViewFactory;
+import view.factory.ViewFactory;
 
 import java.util.ArrayDeque;
 import java.util.Deque;

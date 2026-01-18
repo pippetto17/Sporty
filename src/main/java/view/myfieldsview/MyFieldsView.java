@@ -2,6 +2,7 @@ package view.myfieldsview;
 
 import model.bean.FieldBean;
 import view.View;
+
 import java.util.List;
 
 /**

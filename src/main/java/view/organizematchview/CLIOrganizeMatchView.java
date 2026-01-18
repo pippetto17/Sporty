@@ -7,8 +7,6 @@ import model.utils.Constants;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.Scanner;
 
 public class CLIOrganizeMatchView implements OrganizeMatchView {
@@ -170,39 +168,32 @@ public class CLIOrganizeMatchView implements OrganizeMatchView {
         System.out.println("\n--- SELECT DATE ---");
         System.out.print("Enter match date (format: dd/MM/yyyy, e.g., 15/01/2026): ");
 
-        try {
-            String dateInput = scanner.nextLine().trim();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-            LocalDate date = LocalDate.parse(dateInput, formatter);
+        String dateInput = scanner.nextLine().trim();
+        LocalDate date = parseDate(dateInput);
+        if (date == null) return null;
 
-            if (date.isBefore(LocalDate.now())) {
-                displayError("Date cannot be in the past.");
-                return null;
-            }
-
-            return date;
-        } catch (DateTimeParseException e) {
+        if (date.isBefore(java.time.LocalDate.now())) {
+            displayError("Date cannot be in the past.");
             return null;
         }
+
+        return date;
     }
 
     private LocalTime selectTime() {
         System.out.println("\n--- SELECT TIME ---");
         System.out.print("Enter match time (format: HH:mm, e.g., 18:30): ");
 
-        try {
-            String timeInput = scanner.nextLine().trim();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
-            return LocalTime.parse(timeInput, formatter);
-        } catch (DateTimeParseException e) {
-            return null;
-        }
+        String timeInput = scanner.nextLine().trim();
+        return parseTime(timeInput);
     }
 
     private String enterCity() {
         System.out.println("\n--- SELECT CITY ---");
         System.out.print("Enter city name: ");
-        return scanner.nextLine().trim();
+        String city = scanner.nextLine().trim();
+        if (city.isEmpty()) return null;
+        return city;
     }
 
     private int enterParticipants(Sport sport) {
@@ -235,5 +226,15 @@ public class CLIOrganizeMatchView implements OrganizeMatchView {
         System.out.println("City: " + organizeMatchController.getCurrentMatchBean().getCity());
         System.out.println("Participants: " + organizeMatchController.getCurrentMatchBean().getRequiredParticipants());
         System.out.println(Constants.SEPARATOR);
+    }
+
+    @Override
+    public java.time.LocalDate parseDate(String s) {
+        return OrganizeMatchView.super.parseDate(s);
+    }
+
+    @Override
+    public java.time.LocalTime parseTime(String s) {
+        return OrganizeMatchView.super.parseTime(s);
     }
 }

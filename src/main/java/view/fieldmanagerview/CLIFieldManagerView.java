@@ -1,7 +1,7 @@
 package view.fieldmanagerview;
 
-import controller.FieldManagerController;
 import controller.ApplicationController;
+import controller.FieldManagerController;
 import model.bean.BookingBean;
 import model.domain.User;
 

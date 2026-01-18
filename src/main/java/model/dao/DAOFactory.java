@@ -1,17 +1,8 @@
 package model.dao;
 
-import model.dao.dbms.ConnectionFactory;
-import model.dao.dbms.BookingDAODBMS;
-import model.dao.dbms.FieldDAODBMS;
-import model.dao.dbms.MatchDAODBMS;
-import model.dao.dbms.TimeSlotDAODBMS;
-import model.dao.dbms.UserDAODBMS;
+import model.dao.dbms.*;
 import model.dao.filesystem.UserDAOFileSystem;
-import model.dao.memory.BookingDAOMemory;
-import model.dao.memory.FieldDAOMemory;
-import model.dao.memory.MatchDAOMemory;
-import model.dao.memory.TimeSlotDAOMemory;
-import model.dao.memory.UserDAOMemory;
+import model.dao.memory.*;
 
 import java.sql.Connection;
 import java.sql.SQLException;

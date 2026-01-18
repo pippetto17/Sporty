@@ -1,10 +1,10 @@
 package model.dao.dbms;
 
+import exception.DataAccessException;
 import model.dao.MatchDAO;
 import model.domain.Match;
-import model.domain.Sport;
 import model.domain.MatchStatus;
-import exception.DataAccessException;
+import model.domain.Sport;
 import model.utils.Constants;
 
 import java.sql.*;

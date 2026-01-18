@@ -133,20 +133,20 @@ public class CLIHomeView implements HomeView {
     }
 
     @Override
+    public java.util.List<model.bean.MatchBean> getMatches() {
+        return homeController.getMatches();
+    }
+
+    @Override
     public void showMatchDetails(int matchId) {
         try {
-            // Get match details from controller
-            model.bean.MatchBean match = homeController.getMatches().stream()
-                    .filter(m -> m.getMatchId() == matchId)
-                    .findFirst()
-                    .orElse(null);
+            model.bean.MatchBean match = findMatchById(matchId);
 
             if (match == null) {
                 System.out.println("Match not found");
                 return;
             }
 
-            // Display details inline
             System.out.println("\n" + Constants.SEPARATOR);
             System.out.println("MATCH DETAILS");
             System.out.println(Constants.SEPARATOR);

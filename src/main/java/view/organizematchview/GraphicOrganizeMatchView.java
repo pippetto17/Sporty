@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -269,15 +268,6 @@ public class GraphicOrganizeMatchView implements OrganizeMatchView {
             return false;
         }
         return true;
-    }
-
-    private LocalTime parseTime(String timeStr) {
-        try {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
-            return LocalTime.parse(timeStr.trim(), formatter);
-        } catch (DateTimeParseException e) {
-            return null;
-        }
     }
 
     private void showSummary(Sport sport, LocalDate date, LocalTime time, String city, int participants) {

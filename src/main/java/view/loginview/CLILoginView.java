@@ -78,10 +78,9 @@ public class CLILoginView implements LoginView {
         if (user != null) {
             displayLoginSuccess(user.getUsername());
             System.out.println("Name: " + user.getName() + " " + user.getSurname());
-            System.out.println("Role: " + getRoleString(user.getRole()));
+            System.out.println("Role: " + model.domain.Role.fromCode(user.getRole()));
 
-            // Naviga alla home tramite ApplicationController
-            running = false; // Ferma il loop corrente
+            running = false;
             applicationController.navigateToHome(user);
         } else {
             displayLoginError(Constants.ERROR_INVALID_CREDENTIALS);
@@ -138,13 +137,5 @@ public class CLILoginView implements LoginView {
     @Override
     public void displayLoginError(String message) {
         System.out.println("\n✗ Error: " + message);
-    }
-
-    private String getRoleString(int role) {
-        return switch (role) {
-            case 1 -> "PLAYER";
-            case 2 -> "ORGANIZER";
-            default -> "UNKNOWN";
-        };
     }
 }
