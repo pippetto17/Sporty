@@ -78,10 +78,6 @@ public class CLIBookFieldView implements BookFieldView {
             System.out.printf("   Price: €%.2f/hour (€%.2f/person)%n",
                     field.getPricePerHour(), field.getPricePerPerson());
             System.out.printf("   Type: %s%n", field.isIndoor() ? "Indoor" : "Outdoor");
-
-            if (field.getLatitude() != null && field.getLongitude() != null) {
-                System.out.printf("   Location: %.4f, %.4f%n", field.getLatitude(), field.getLongitude());
-            }
         }
         System.out.println("\n" + SEPARATOR);
     }
@@ -106,11 +102,6 @@ public class CLIBookFieldView implements BookFieldView {
         System.out.printf("Price per hour: €%.2f%n", field.getPricePerHour());
         System.out.printf("Price per person: €%.2f%n", field.getPricePerPerson());
         System.out.println("Type: " + (field.isIndoor() ? "Indoor" : "Outdoor"));
-
-        if (field.getLatitude() != null && field.getLongitude() != null) {
-            System.out.printf("Coordinates: %.4f, %.4f%n", field.getLatitude(), field.getLongitude());
-            System.out.println("(Map view will be available in GUI version)");
-        }
         System.out.println(SEPARATOR);
     }
 

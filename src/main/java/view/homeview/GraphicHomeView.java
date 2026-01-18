@@ -21,12 +21,17 @@ import model.utils.Constants;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Objects;
 
+import static model.utils.Constants.CSS_MATCH_INFO;
+
+@SuppressWarnings("unused")
 public class GraphicHomeView implements HomeView {
     private final HomeController homeController;
     private ApplicationController applicationController;
     private Stage stage;
+
+    private static final String CSS_ACTIVE = "active";
 
     // FXML fields
     @FXML
@@ -52,9 +57,6 @@ public class GraphicHomeView implements HomeView {
     @FXML
     private Label statusLabel;
 
-    // CSS class name constants
-    private static final String MATCH_INFO_STYLE = "match-info";
-
     public GraphicHomeView(HomeController homeController) {
         this.homeController = homeController;
     }
@@ -78,8 +80,8 @@ public class GraphicHomeView implements HomeView {
 
                 // Load CSS
                 Scene scene = new Scene(root, 700, 600);
-                scene.getStylesheets().add(getClass().getResource("/css/style.css").toExternalForm());
-                scene.getStylesheets().add(getClass().getResource("/css/controls-dark.css").toExternalForm());
+                scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/css/style.css"), "style.css not found").toExternalForm());
+                scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/css/controls-dark.css"), "controls-dark.css not found").toExternalForm());
 
                 stage.setScene(scene);
                 stage.setResizable(true);
@@ -99,7 +101,7 @@ public class GraphicHomeView implements HomeView {
         displayWelcome();
 
         // Add role switch toggle if user is organizer
-        if (homeController.isOrganizer()) {
+        if (homeController.getCurrentUser().isOrganizer()) {
             addRoleSwitchToggle();
         }
 
@@ -150,7 +152,7 @@ public class GraphicHomeView implements HomeView {
                             + "/" + match.getRequiredParticipants()),
                     new Label("💰 Price: €"
                             + (match.getPricePerPerson() != null ? String.format("%.2f", match.getPricePerPerson())
-                                    : "Free")),
+                            : "Free")),
                     new Label("📊 Status: " + match.getStatus().name()));
 
             dialog.getDialogPane().setContent(content);
@@ -194,17 +196,17 @@ public class GraphicHomeView implements HomeView {
 
         // Set initial active state
         if (homeController.isViewingAsPlayer()) {
-            playerButton.getStyleClass().add("active");
+            playerButton.getStyleClass().add(CSS_ACTIVE);
         } else {
-            organizerButton.getStyleClass().add("active");
+            organizerButton.getStyleClass().add(CSS_ACTIVE);
         }
 
         // Handle player button click
         playerButton.setOnAction(e -> {
             if (!homeController.isViewingAsPlayer()) {
                 homeController.switchRole();
-                playerButton.getStyleClass().add("active");
-                organizerButton.getStyleClass().remove("active");
+                playerButton.getStyleClass().add(CSS_ACTIVE);
+                organizerButton.getStyleClass().remove(CSS_ACTIVE);
                 updateViewMode();
                 displayMatches(homeController.getMatches());
             }
@@ -214,8 +216,8 @@ public class GraphicHomeView implements HomeView {
         organizerButton.setOnAction(e -> {
             if (homeController.isViewingAsPlayer()) {
                 homeController.switchRole();
-                organizerButton.getStyleClass().add("active");
-                playerButton.getStyleClass().remove("active");
+                organizerButton.getStyleClass().add(CSS_ACTIVE);
+                playerButton.getStyleClass().remove(CSS_ACTIVE);
                 updateViewMode();
                 displayMatches(homeController.getMatches());
             }
@@ -293,7 +295,7 @@ public class GraphicHomeView implements HomeView {
         filterBox.getChildren().addAll(filterLabel, sportFilter, cityFilter, dateFilter, applyFilters, clearFilters);
 
         // Insert after role toggle (if exists) or at beginning
-        int insertIndex = homeController.isOrganizer() ? 1 : 0;
+        int insertIndex = homeController.getCurrentUser().isOrganizer() ? 1 : 0;
         mainContentBox.getChildren().add(insertIndex, filterBox);
     }
 
@@ -319,7 +321,7 @@ public class GraphicHomeView implements HomeView {
     /**
      * Updates the city ComboBox items based on user input for autocomplete
      * functionality.
-     * 
+     *
      * @param input the current text input from the user
      */
     private void updateCityComboBox(String input) {
@@ -335,7 +337,7 @@ public class GraphicHomeView implements HomeView {
             filteredCities.addAll(
                     ALL_CITIES.stream()
                             .filter(city -> city.toLowerCase().startsWith(input.toLowerCase()))
-                            .collect(Collectors.toList()));
+                            .toList());
         }
 
         cityFilter.setItems(filteredCities);
@@ -386,16 +388,16 @@ public class GraphicHomeView implements HomeView {
 
         // Date and time
         Label dateLabel = new Label("📅 " + match.getMatchDate() + " at " + match.getMatchTime());
-        dateLabel.getStyleClass().add(MATCH_INFO_STYLE);
+        dateLabel.getStyleClass().add(CSS_MATCH_INFO);
 
         // Players info
         int currentPlayers = match.getParticipants() != null ? match.getParticipants().size() : 0;
         Label playersLabel = new Label("👥 Players: " + currentPlayers + "/" + match.getRequiredParticipants());
-        playersLabel.getStyleClass().add(MATCH_INFO_STYLE);
+        playersLabel.getStyleClass().add(CSS_MATCH_INFO);
 
         // Location
         Label locationLabel = new Label("📍 " + match.getCity());
-        locationLabel.getStyleClass().add(MATCH_INFO_STYLE);
+        locationLabel.getStyleClass().add(CSS_MATCH_INFO);
 
         // Status and price
         HBox statusBox = new HBox(10);

@@ -102,7 +102,8 @@ public class CLIOrganizeMatchView implements OrganizeMatchView {
         }
 
         // Validate and save match details
-        if (organizeMatchController.validateMatchDetails(selectedSport, selectedDate, selectedTime, city, participants)) {
+        if (organizeMatchController.validateMatchDetails(selectedSport, selectedDate, selectedTime, city,
+                participants)) {
             organizeMatchController.setMatchDetails(selectedSport, selectedDate, selectedTime, city, participants);
             displaySuccess("Match details saved successfully!");
             displayMatchSummary();
@@ -129,7 +130,7 @@ public class CLIOrganizeMatchView implements OrganizeMatchView {
         System.out.println("    MATCH ORGANIZATION");
         System.out.println(Constants.SEPARATOR);
         System.out.println("Organizer: " + organizeMatchController.getOrganizer().getName() +
-                          " " + organizeMatchController.getOrganizer().getSurname());
+                " " + organizeMatchController.getOrganizer().getSurname());
         System.out.println(Constants.SEPARATOR);
     }
 
@@ -236,4 +237,3 @@ public class CLIOrganizeMatchView implements OrganizeMatchView {
         System.out.println(Constants.SEPARATOR);
     }
 }
-

@@ -20,8 +20,6 @@ public class FieldConverter {
         field.setSport(fieldBean.getSport());
         field.setAddress(fieldBean.getAddress());
         field.setCity(fieldBean.getCity());
-        field.setLatitude(fieldBean.getLatitude());
-        field.setLongitude(fieldBean.getLongitude());
         field.setPricePerHour(fieldBean.getPricePerHour());
         field.setIndoor(fieldBean.isIndoor());
         field.setManagerId(fieldBean.getManagerId());
@@ -42,8 +40,6 @@ public class FieldConverter {
         fieldBean.setSport(field.getSport());
         fieldBean.setAddress(field.getAddress());
         fieldBean.setCity(field.getCity());
-        fieldBean.setLatitude(field.getLatitude());
-        fieldBean.setLongitude(field.getLongitude());
         fieldBean.setPricePerHour(field.getPricePerHour());
         fieldBean.setIndoor(field.isIndoor());
         fieldBean.setManagerId(field.getManagerId());
@@ -57,7 +53,8 @@ public class FieldConverter {
         FieldBean fieldBean = toFieldBean(field);
         if (fieldBean != null && field.getPricePerHour() != null) {
             // Calculate price per person for 2 hours booking
-            double pricePerPerson = field.calculatePricePerPerson(participants, 2.0);
+            double pricePerPerson = model.utils.PriceCalculationUtils.calculatePricePerPerson(
+                    field.getPricePerHour(), 2.0, participants);
             fieldBean.setPricePerPerson(pricePerPerson);
         }
         return fieldBean;

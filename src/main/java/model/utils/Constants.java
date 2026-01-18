@@ -37,8 +37,6 @@ public final class Constants {
 
     // Error messages - Initialization
     public static final String ERROR_DAO_INIT = "Failed to initialize DAO: ";
-    public static final String ERROR_MATCH_SERVICE_INIT = "Errore nell'inizializzazione di MatchService: ";
-    public static final String ERROR_FIELD_SERVICE_INIT = "Errore nell'inizializzazione di FieldService: ";
     public static final String ERROR_MATCHBEAN_NULL = "MatchBean non può essere null";
     public static final String ERROR_LOAD_ORGANIZE_MATCH_VIEW = "Failed to load organize match view: ";
     public static final String ERROR_UNEXPECTED_LOADING_VIEW = "Unexpected error loading organize match view: ";
@@ -87,6 +85,77 @@ public final class Constants {
 
     // Dialog titles
     public static final String DIALOG_TITLE_ERROR = "Error";
+    public static final String DIALOG_TITLE_MATCH_DETAILS = "Match Details";
+    public static final String DIALOG_TITLE_LOGOUT = "Logout";
+    public static final String DIALOG_TITLE_BOOK_FIELD = "Book Field";
+
+    // UI Labels and Messages - Home View
+    public static final String LABEL_AVAILABLE_MATCHES = "Available Matches";
+    public static final String LABEL_MY_ORGANIZED_MATCHES = "My Organized Matches";
+    public static final String LABEL_NO_MATCHES = "No matches available";
+    public static final String LABEL_FILTERS = "Filters:";
+    public static final String LABEL_WELCOME_PREFIX = "Welcome, ";
+    public static final String LABEL_WELCOME_SUFFIX = "!";
+
+    // Button Labels
+    public static final String BTN_PLAYER = "Player";
+    public static final String BTN_ORGANIZER = "Organizer";
+    public static final String BTN_APPLY = "Apply";
+    public static final String BTN_CLEAR = "Clear";
+    public static final String BTN_REFRESH = "Refresh";
+
+    // Prompt Text
+    public static final String PROMPT_SPORT = "Sport";
+    public static final String PROMPT_CITY = "City";
+    public static final String PROMPT_DATE = "Date";
+
+    // Status Messages - Home View
+    public static final String STATUS_READY = "Ready";
+    public static final String STATUS_MATCH_NOT_FOUND = "Match not found";
+    public static final String STATUS_OPENING_ORGANIZE_MATCH = "Opening organize match...";
+    public static final String STATUS_OPENING_BOOK_FIELD = "Opening book field...";
+    public static final String STATUS_REFRESHING = "Refreshing...";
+    public static final String STATUS_LOGGING_OUT = "Logging out...";
+    public static final String STATUS_FILTERS_CLEARED = "Filters cleared";
+
+    // Match Details Dialog Labels
+    public static final String MATCH_DETAIL_DATE = "📅 Date: ";
+    public static final String MATCH_DETAIL_AT = " at ";
+    public static final String MATCH_DETAIL_CITY = "📍 City: ";
+    public static final String MATCH_DETAIL_ORGANIZER = "👤 Organizer: ";
+    public static final String MATCH_DETAIL_PLAYERS = "👥 Players: ";
+    public static final String MATCH_DETAIL_PRICE = "💰 Price: €";
+    public static final String MATCH_DETAIL_STATUS = "📊 Status: ";
+    public static final String MATCH_DETAIL_FREE = "Free";
+    public static final String MATCH_DETAIL_SEPARATOR = "/";
+
+    // Match Card Labels
+    public static final String MATCH_CARD_SPORT_PREFIX = "⚽ ";
+    public static final String MATCH_CARD_DATE_PREFIX = "📅 ";
+    public static final String MATCH_CARD_PLAYERS_PREFIX = "👥 Players: ";
+    public static final String MATCH_CARD_LOCATION_PREFIX = "📍 ";
+
+    // Messages
+    public static final String MSG_BOOK_FIELD_COMING_SOON = "Book field feature coming soon!";
+    public static final String MSG_LOGOUT_CONFIRM = "Are you sure you want to logout?";
+    public static final String MSG_FILTERS_APPLIED_PREFIX = "Filters applied - ";
+    public static final String MSG_FILTERS_APPLIED_SUFFIX = " matches found";
+    public static final String MSG_MATCHES_LOADED_SUFFIX = " matches loaded";
+    public static final String MSG_ERROR_MATCH_DETAILS = "Error showing match details: ";
+
+    // Window Titles
+    public static final String WINDOW_TITLE_SPORTY_HOME = "Sporty - Home";
+
+    // Error Messages - Home View
+    public static final String ERROR_LOAD_HOME_VIEW = "Failed to load home view: ";
+
+    // FXML Paths
+    public static final String FXML_PATH_HOME = "/fxml/home.fxml";
+
+    // CSS Paths
+    public static final String CSS_PATH_STYLE = "/css/style.css";
+    public static final String CSS_PATH_CONTROLS_DARK = "/css/controls-dark.css";
+    public static final String CSS_PATH_FIELD_MANAGER = "/css/field_manager.css";
 
     // CSS class names
     public static final String CSS_SECONDARY_BUTTON = "secondary-button";
@@ -94,6 +163,18 @@ public final class Constants {
     public static final String CSS_FIELD_DETAIL = "field-detail";
     public static final String CSS_ERROR = "error";
     public static final String CSS_SUCCESS = "success";
+    public static final String CSS_INFO = "info";
+    public static final String CSS_FIELD_LABEL = "field-label";
+    public static final String CSS_CUSTOM_TEXT_FIELD = "custom-text-field";
+    public static final String CSS_CUSTOM_COMBO_BOX = "custom-combo-box";
+    public static final String CSS_CUSTOM_DATE_PICKER = "custom-date-picker";
+    public static final String CSS_PRIMARY_BUTTON = "primary-button";
+    public static final String CSS_MATCH_CARD = "match-card";
+    public static final String CSS_MATCH_TITLE = "match-title";
+    public static final String CSS_STATUS_BADGE = "status-badge";
+    public static final String CSS_ROLE_SWITCH_CONTAINER = "role-switch-container";
+    public static final String CSS_ROLE_SWITCH_BUTTON = "role-switch-button";
+    public static final String CSS_ACTIVE = "active";
 
     // Role names
     public static final String ROLE_PLAYER = "Player";

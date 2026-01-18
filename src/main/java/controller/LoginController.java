@@ -1,6 +1,7 @@
 package controller;
 
-import exception.ServiceInitializationException;
+import exception.DataAccessException;
+import exception.ValidationException;
 import model.bean.UserBean;
 import model.dao.DAOFactory;
 import model.dao.UserDAO;
@@ -16,7 +17,7 @@ public class LoginController {
         try {
             this.userDAO = DAOFactory.getUserDAO(persistenceType);
         } catch (SQLException e) {
-            throw new ServiceInitializationException(Constants.ERROR_DAO_INIT + e.getMessage(), e);
+            throw new DataAccessException(Constants.ERROR_DAO_INIT + e.getMessage(), e);
         }
     }
 
@@ -36,28 +37,28 @@ public class LoginController {
         return userDAO.authenticate(username, password);
     }
 
-    public void register(UserBean userBean, String name, String surname, int role) {
+    public void register(UserBean userBean, String name, String surname, int role) throws ValidationException {
         String username = userBean.getUsername();
         String password = userBean.getPassword();
 
         // Validazione
         if (username == null || username.isEmpty()) {
-            throw new IllegalArgumentException(Constants.ERROR_USERNAME_EMPTY);
+            throw new ValidationException(Constants.ERROR_USERNAME_EMPTY);
         }
         if (password == null || password.isEmpty()) {
-            throw new IllegalArgumentException(Constants.ERROR_PASSWORD_EMPTY);
+            throw new ValidationException(Constants.ERROR_PASSWORD_EMPTY);
         }
         if (name == null || name.isEmpty()) {
-            throw new IllegalArgumentException(Constants.ERROR_NAME_EMPTY);
+            throw new ValidationException(Constants.ERROR_NAME_EMPTY);
         }
         if (surname == null || surname.isEmpty()) {
-            throw new IllegalArgumentException(Constants.ERROR_SURNAME_EMPTY);
+            throw new ValidationException(Constants.ERROR_SURNAME_EMPTY);
         }
 
         // Verifica se l'utente esiste già - usa UserDAO per operazioni CRUD
         User existingUser = userDAO.findByUsername(username);
         if (existingUser != null) {
-            throw new IllegalArgumentException(Constants.ERROR_USERNAME_EXISTS);
+            throw new ValidationException(Constants.ERROR_USERNAME_EXISTS);
         }
 
         // Creazione nuovo utente - usa UserDAO per salvare
@@ -71,9 +72,9 @@ public class LoginController {
      * @param roleString Role display name (from Constants)
      * @return Role code
      */
-    public static int getRoleCodeFromString(String roleString) {
+    public static int getRoleCodeFromString(String roleString) throws ValidationException {
         if (roleString == null) {
-            throw new IllegalArgumentException("Role cannot be null");
+            throw new ValidationException("Role cannot be null");
         }
         if (roleString.equals(Constants.ROLE_PLAYER)) {
             return model.domain.Role.PLAYER.getCode();
@@ -82,7 +83,7 @@ public class LoginController {
         } else if (roleString.equals(Constants.ROLE_FIELD_MANAGER)) {
             return model.domain.Role.FIELD_MANAGER.getCode();
         } else {
-            throw new IllegalArgumentException("Unknown role: " + roleString);
+            throw new ValidationException("Unknown role: " + roleString);
         }
     }
 }

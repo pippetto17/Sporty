@@ -1,14 +1,10 @@
 package testing;
 
-import model.bean.MatchBean;
 import model.dao.DAOFactory;
-import model.domain.Sport;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
-import java.time.LocalDate;
-import java.time.LocalTime;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**

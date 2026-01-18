@@ -1,17 +1,17 @@
 package controller;
 
+import exception.ValidationException;
 import model.bean.FieldBean;
 import model.bean.MatchBean;
 import model.utils.Constants;
-import exception.ServiceInitializationException;
+import exception.DataAccessException;
 
 import java.sql.SQLException;
 import java.util.List;
 
 /**
  * Controller per la gestione della selezione del campo sportivo.
- * Si occupa dell'orchestrazione tra la view e il service layer,
- * delegando la logica di business a FieldService.
+ * Si occupa dell'orchestrazione tra la view e il DAO layer.
  */
 public class BookFieldController {
     private final ApplicationController applicationController;
@@ -25,7 +25,7 @@ public class BookFieldController {
         try {
             this.fieldDAO = model.dao.DAOFactory.getFieldDAO(applicationController.getPersistenceType());
         } catch (SQLException e) {
-            throw new ServiceInitializationException(Constants.ERROR_FIELD_SERVICE_INIT + e.getMessage(), e);
+            throw new DataAccessException(Constants.ERROR_DAO_INIT + e.getMessage(), e);
         }
     }
 
@@ -83,9 +83,9 @@ public class BookFieldController {
                 .toList();
     }
 
-    public void proceedToPayment() {
+    public void proceedToPayment() throws ValidationException {
         if (selectedField == null)
-            throw new IllegalStateException(Constants.ERROR_NO_FIELD_SELECTED);
+            throw new ValidationException(Constants.ERROR_NO_FIELD_SELECTED);
 
         if (currentMatchBean.getPricePerPerson() == null) {
             currentMatchBean.setPricePerPerson(selectedField.getPricePerPerson());

@@ -36,9 +36,9 @@ public class CLIHomeView implements HomeView {
 
             String choice = scanner.nextLine();
 
-            if (homeController.isPlayer()) {
+            if (homeController.getCurrentUser().isPlayer()) {
                 running = handlePlayerChoice(choice);
-            } else if (homeController.isOrganizer()) {
+            } else if (homeController.getCurrentUser().isOrganizer()) {
                 running = handleOrganizerChoice(choice);
             }
         }
@@ -83,10 +83,10 @@ public class CLIHomeView implements HomeView {
 
     @Override
     public void displayMenu() {
-        if (homeController.isPlayer()) {
+        if (homeController.getCurrentUser().isPlayer()) {
             System.out.println("1. View available matches");
             System.out.println("2. Logout");
-        } else if (homeController.isOrganizer()) {
+        } else if (homeController.getCurrentUser().isOrganizer()) {
             System.out.println("1. View available matches");
             System.out.println("2. Organize match");
             System.out.println("3. Logout");

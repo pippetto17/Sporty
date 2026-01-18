@@ -3,7 +3,8 @@ package controller;
 import model.bean.MatchBean;
 import model.bean.PaymentBean;
 import model.utils.Constants;
-import exception.ServiceInitializationException;
+import exception.DataAccessException;
+import exception.ValidationException;
 
 import java.sql.SQLException;
 import java.util.logging.Level;
@@ -11,8 +12,7 @@ import java.util.logging.Logger;
 
 /**
  * Controller per la gestione del pagamento.
- * Orchestrare il flusso di pagamento tra la view e i service,
- * delegando la logica di business ai service appropriati.
+ * Orchestra il flusso di pagamento tra la view e il DAO layer.
  */
 public class PaymentController {
     private static final Logger logger = Logger.getLogger(PaymentController.class.getName());
@@ -25,7 +25,7 @@ public class PaymentController {
         try {
             this.matchDAO = model.dao.DAOFactory.getMatchDAO(applicationController.getPersistenceType());
         } catch (SQLException e) {
-            throw new ServiceInitializationException(Constants.ERROR_MATCH_SERVICE_INIT + e.getMessage(), e);
+            throw new DataAccessException(Constants.ERROR_DAO_INIT + e.getMessage(), e);
         }
     }
 
@@ -37,7 +37,7 @@ public class PaymentController {
         return matchBean;
     }
 
-    public boolean processPayment(PaymentBean paymentBean) {
+    public boolean processPayment(PaymentBean paymentBean) throws ValidationException {
         // Simple mock payment logic (KISS)
         boolean success = paymentBean != null &&
                 paymentBean.getCardNumber() != null &&
@@ -46,7 +46,7 @@ public class PaymentController {
         if (success) {
             try {
                 if (matchBean == null)
-                    throw new IllegalArgumentException("MatchBean cannot be null");
+                    throw new ValidationException("MatchBean cannot be null");
                 matchBean.setStatus(model.domain.MatchStatus.CONFIRMED);
 
                 model.domain.Match match = model.converter.MatchConverter.toEntity(matchBean);

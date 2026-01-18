@@ -45,6 +45,7 @@ public class CLIMyFieldsView implements MyFieldsView {
 
         System.out.println();
         double totalRevenue = 0;
+        boolean hasPrice = false;
 
         for (int i = 0; i < fields.size(); i++) {
             FieldBean field = fields.get(i);
@@ -57,21 +58,26 @@ public class CLIMyFieldsView implements MyFieldsView {
             }
 
             System.out.println("   Location: " + field.getAddress() + ", " + field.getCity());
-            System.out.println("   Price: €" + String.format("%.2f", field.getPricePerHour()) + "/hour");
+
+            Double price = field.getPricePerHour();
+            if (price != null) {
+                System.out.println("   Price: €" + String.format("%.2f", price) + "/hour");
+                totalRevenue += price;
+                hasPrice = true;
+            } else {
+                System.out.println("   Price: N/A");
+            }
 
             if (field.isAutoApprove()) {
                 System.out.println("   ✓ Auto-approve enabled");
             }
-
-            // TODO: Add statistics when available
-            // System.out.println(" Bookings: X | Revenue: €X.XX");
 
             System.out.println();
         }
 
         System.out.println("─".repeat(50));
         System.out.println("Total Fields: " + fields.size());
-        if (totalRevenue > 0) {
+        if (hasPrice) {
             System.out.println("Total Revenue: €" + String.format("%.2f", totalRevenue));
         }
         System.out.println();

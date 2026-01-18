@@ -1,5 +1,6 @@
 package controller;
 
+import exception.ValidationException;
 import model.bean.FieldBean;
 import model.bean.TimeSlotBean;
 import model.bean.BookingBean;
@@ -20,9 +21,9 @@ public class FieldManagerController {
     private final model.dao.TimeSlotDAO timeSlotDAO;
 
     public FieldManagerController(User fieldManager, DAOFactory.PersistenceType persistenceType)
-            throws SQLException {
-        if (fieldManager.getRole() != model.domain.Role.FIELD_MANAGER.getCode()) {
-            throw new IllegalArgumentException("User must be a field manager");
+            throws SQLException, ValidationException {
+        if (!fieldManager.isFieldManager()) {
+            throw new ValidationException("User must be a field manager");
         }
 
         this.fieldManager = fieldManager;

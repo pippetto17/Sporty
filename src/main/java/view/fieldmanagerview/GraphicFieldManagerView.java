@@ -30,14 +30,33 @@ public class GraphicFieldManagerView implements FieldManagerView {
 
     // UI Elements (Raggruppati per pulizia)
     @FXML
-    private Label managerNameLabel, totalFieldsLabel, pendingRequestsLabel, todayBookingsLabel, messageLabel;
+    private Label managerNameLabel;
+    @FXML
+    private Label totalFieldsLabel;
+    @FXML
+    private Label pendingRequestsLabel;
+    @FXML
+    private Label todayBookingsLabel;
+    @FXML
+    private Label messageLabel;
     @FXML
     private TableView<BookingBean> bookingsTable;
     @FXML
-    private TableColumn<BookingBean, String> fieldNameColumn, requesterColumn, dateColumn, timeColumn, typeColumn,
-            priceColumn;
+    private TableColumn<BookingBean, String> fieldNameColumn;
     @FXML
-    private Button approveButton, rejectButton;
+    private TableColumn<BookingBean, String> requesterColumn;
+    @FXML
+    private TableColumn<BookingBean, String> dateColumn;
+    @FXML
+    private TableColumn<BookingBean, String> timeColumn;
+    @FXML
+    private TableColumn<BookingBean, String> typeColumn;
+    @FXML
+    private TableColumn<BookingBean, String> priceColumn;
+    @FXML
+    private Button approveButton;
+    @FXML
+    private Button rejectButton;
 
     private final ObservableList<BookingBean> bookingsList = FXCollections.observableArrayList();
 
@@ -74,9 +93,12 @@ public class GraphicFieldManagerView implements FieldManagerView {
     }
 
     private void loadStyles(Scene scene) {
-        String[] styles = { "/css/field_manager.css", "/css/style.css", "/css/controls-dark.css" };
+        String[] styles = { Constants.CSS_PATH_FIELD_MANAGER, Constants.CSS_PATH_STYLE, Constants.CSS_PATH_CONTROLS_DARK };
         for (String style : styles) {
-            scene.getStylesheets().add(getClass().getResource(style).toExternalForm());
+            var resource = getClass().getResource(style);
+            if (resource != null) {
+                scene.getStylesheets().add(resource.toExternalForm());
+            }
         }
     }
 
@@ -87,6 +109,7 @@ public class GraphicFieldManagerView implements FieldManagerView {
     }
 
     @FXML
+    @SuppressWarnings("unused") // Called by FXML loader
     private void initialize() {
         managerNameLabel.setText("Manager: " + manager.getName() + " " + manager.getSurname());
         setupTable();
@@ -129,6 +152,7 @@ public class GraphicFieldManagerView implements FieldManagerView {
     }
 
     @FXML
+    @SuppressWarnings("unused")
     private void handleApprove() {
         BookingBean selected = bookingsTable.getSelectionModel().getSelectedItem();
         if (selected == null)
@@ -144,6 +168,7 @@ public class GraphicFieldManagerView implements FieldManagerView {
     }
 
     @FXML
+    @SuppressWarnings("unused") // Called by FXML
     private void handleReject() {
         BookingBean selected = bookingsTable.getSelectionModel().getSelectedItem();
         if (selected == null)
@@ -153,6 +178,17 @@ public class GraphicFieldManagerView implements FieldManagerView {
         dialog.setTitle("Reject Booking");
         dialog.setHeaderText("Rejecting request from " + selected.getRequesterUsername());
         dialog.setContentText("Reason:");
+
+        // Apply dark theme styling
+        javafx.scene.control.DialogPane dialogPane = dialog.getDialogPane();
+        dialogPane.getStylesheets().clear();
+        String[] styles = { Constants.CSS_PATH_FIELD_MANAGER, Constants.CSS_PATH_STYLE, Constants.CSS_PATH_CONTROLS_DARK };
+        for (String style : styles) {
+            var resource = getClass().getResource(style);
+            if (resource != null) {
+                dialogPane.getStylesheets().add(resource.toExternalForm());
+            }
+        }
 
         Optional<String> result = dialog.showAndWait();
 
@@ -173,26 +209,61 @@ public class GraphicFieldManagerView implements FieldManagerView {
     }
 
     @FXML
+    @SuppressWarnings("unused") // Called by FXML
     private void handleRefresh() {
         loadData();
         showMessage("Dashboard refreshed", false);
     }
 
     @FXML // Navigazione semplificata con null check inline
+    @SuppressWarnings("unused") // Called by FXML
     private void handleManageFields() {
         if (appController != null)
             appController.navigateToMyFields(controller);
     }
 
     @FXML
+    @SuppressWarnings("unused") // Called by FXML
     private void handleAddField() {
         if (appController != null)
             appController.navigateToAddField(controller);
     }
 
+    @FXML
+    @SuppressWarnings("unused") // Called by FXML
+    private void handleViewBookings() {
+        Alert alert = createStyledAlert(Alert.AlertType.INFORMATION, "Feature Coming Soon",
+                "This feature will be available in a future update.");
+        alert.showAndWait();
+    }
+
+    /**
+     * Creates a styled Alert dialog that matches the application's dark theme.
+     */
+    private Alert createStyledAlert(Alert.AlertType type, String title, String content) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+
+        // Apply dark theme styling
+        javafx.scene.control.DialogPane dialogPane = alert.getDialogPane();
+        dialogPane.getStylesheets().clear();
+
+        String[] styles = { Constants.CSS_PATH_FIELD_MANAGER, Constants.CSS_PATH_STYLE, Constants.CSS_PATH_CONTROLS_DARK };
+        for (String style : styles) {
+            var resource = getClass().getResource(style);
+            if (resource != null) {
+                dialogPane.getStylesheets().add(resource.toExternalForm());
+            }
+        }
+
+        return alert;
+    }
+
     // Unificato ShowError/Success/Info in un unico metodo logico
     private void showMessage(String msg, boolean isError) {
-        messageLabel.getStyleClass().removeAll(Constants.CSS_ERROR, Constants.CSS_SUCCESS, "info");
+        messageLabel.getStyleClass().removeAll(Constants.CSS_ERROR, Constants.CSS_SUCCESS, Constants.CSS_INFO);
         messageLabel.getStyleClass().add(isError ? Constants.CSS_ERROR : Constants.CSS_SUCCESS);
         messageLabel.setText(msg);
     }

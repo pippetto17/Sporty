@@ -6,7 +6,7 @@
 <?import javafx.scene.text.Font?>
 
 <BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
-            styleClass="root-container" prefWidth="650" prefHeight="700">
+            styleClass="root-container" prefWidth="700" prefHeight="750">
 
     <top>
         <VBox spacing="10" styleClass="header-container">
@@ -23,17 +23,17 @@
 
                 <Region HBox.hgrow="ALWAYS"/>
 
-                <Button fx:id="backButton" text="← Back" onAction="#handleBack"
-                       styleClass="secondary-button" prefWidth="90"/>
+                <Button fx:id="backButton" text="←" onAction="#handleBack"
+                       styleClass="secondary-button" prefWidth="50"/>
             </HBox>
         </VBox>
     </top>
 
     <center>
         <ScrollPane fitToWidth="true" styleClass="content-scroll">
-            <VBox spacing="20" styleClass="form-container">
+            <VBox spacing="25" styleClass="form-container">
                 <padding>
-                    <Insets top="25" right="35" bottom="25" left="35"/>
+                    <Insets top="30" right="40" bottom="30" left="40"/>
                 </padding>
 
                 <!-- Sport Selection -->

@@ -16,6 +16,10 @@ import java.util.List;
  */
 public class BookingDAODBMS implements BookingDAO {
 
+    private static final String BOOKINGS_COLUMNS = "booking_id, field_id, requester_username, booking_date, start_time, end_time, type, status, total_price, requested_at, confirmed_at, rejection_reason";
+    // Common prefix for selecting all booking columns from the bookings table
+    private static final String SELECT_BOOKINGS = "SELECT " + BOOKINGS_COLUMNS + " FROM bookings";
+
     @Override
     public void save(Booking booking) {
         String sql = """
@@ -60,7 +64,7 @@ public class BookingDAODBMS implements BookingDAO {
 
     @Override
     public Booking findById(int bookingId) {
-        String sql = "SELECT * FROM bookings WHERE booking_id = ?";
+        String sql = SELECT_BOOKINGS + " WHERE booking_id = ?";
 
         try (Connection conn = ConnectionFactory.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -79,7 +83,7 @@ public class BookingDAODBMS implements BookingDAO {
 
     @Override
     public List<Booking> findByFieldId(String fieldId) {
-        String sql = "SELECT * FROM bookings WHERE field_id = ? ORDER BY booking_date, start_time";
+        String sql = SELECT_BOOKINGS + " WHERE field_id = ? ORDER BY booking_date, start_time";
 
         try (Connection conn = ConnectionFactory.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -93,7 +97,7 @@ public class BookingDAODBMS implements BookingDAO {
 
     @Override
     public List<Booking> findByRequesterId(String username) {
-        String sql = "SELECT * FROM bookings WHERE requester_username = ? ORDER BY booking_date DESC, start_time";
+        String sql = SELECT_BOOKINGS + " WHERE requester_username = ? ORDER BY booking_date DESC, start_time";
 
         try (Connection conn = ConnectionFactory.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -108,11 +112,13 @@ public class BookingDAODBMS implements BookingDAO {
     @Override
     public List<Booking> findPendingByManagerId(String managerId) {
         String sql = """
-                SELECT b.* FROM bookings b
+                SELECT b.booking_id, b.field_id, b.requester_username, b.booking_date, b.start_time, b.end_time,
+                       b.type, b.status, b.total_price, b.requested_at, b.confirmed_at, b.rejection_reason
+                FROM bookings b
                 JOIN fields f ON b.field_id = f.field_id
                 WHERE f.manager_id = ? AND b.status = 0
                 ORDER BY b.requested_at ASC
-                """;
+                """.trim();
 
         try (Connection conn = ConnectionFactory.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -126,7 +132,7 @@ public class BookingDAODBMS implements BookingDAO {
 
     @Override
     public List<Booking> findByStatus(BookingStatus status) {
-        String sql = "SELECT * FROM bookings WHERE status = ? ORDER BY booking_date, start_time";
+        String sql = SELECT_BOOKINGS + " WHERE status = ? ORDER BY booking_date, start_time";
 
         try (Connection conn = ConnectionFactory.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -193,15 +199,13 @@ public class BookingDAODBMS implements BookingDAO {
         // Use domain method to set status (bypasses validation for loading from DB)
         BookingStatus status = BookingStatus.fromCode(rs.getInt("status"));
         try {
-            java.lang.reflect.Field statusField = Booking.class.getDeclaredField("status");
-            statusField.setAccessible(true);
-            statusField.set(booking, status);
-        } catch (Exception e) {
-            // Fallback if reflection fails
             booking.setStatus(status);
+        } catch (IllegalStateException ignored) {
+            // Ignore state transition errors when hydrating from persistence
         }
 
-        booking.setTotalPrice(rs.getDouble("total_price"));
+        double totalPrice = rs.getDouble("total_price");
+        booking.setTotalPrice(rs.wasNull() ? null : totalPrice);
 
         Timestamp requestedAt = rs.getTimestamp("requested_at");
         if (requestedAt != null) {

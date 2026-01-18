@@ -37,7 +37,7 @@
                 </VBox>
 
                 <Button fx:id="logoutButton" text="Logout" onAction="#handleLogout"
-                       styleClass="secondary-button" prefWidth="100"/>
+                        styleClass="secondary-button" prefWidth="100"/>
             </HBox>
         </VBox>
     </top>
@@ -57,11 +57,11 @@
 
                 <HBox spacing="10">
                     <Button fx:id="organizeMatchButton" text="Organize New Match"
-                           onAction="#handleOrganizeMatch" styleClass="primary-button"
-                           prefWidth="200" prefHeight="40"/>
+                            onAction="#handleOrganizeMatch" styleClass="primary-button"
+                            prefWidth="200" prefHeight="40"/>
                     <Button fx:id="bookFieldButton" text="Book a Field"
-                           onAction="#handleBookField" styleClass="secondary-button"
-                           prefWidth="180" prefHeight="40"/>
+                            onAction="#handleBookField" styleClass="secondary-button"
+                            prefWidth="180" prefHeight="40"/>
                 </HBox>
             </VBox>
 
@@ -76,7 +76,7 @@
                     <Region HBox.hgrow="ALWAYS"/>
 
                     <Button fx:id="refreshButton" text="Refresh" onAction="#handleRefresh"
-                           styleClass="secondary-button" prefWidth="100"/>
+                            styleClass="secondary-button" prefWidth="100"/>
                 </HBox>
 
                 <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" styleClass="matches-scroll">
@@ -103,4 +103,3 @@
         </HBox>
     </bottom>
 </BorderPane>
-

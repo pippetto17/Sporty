@@ -184,11 +184,6 @@ public class Match {
         return this.fieldId != null && !this.fieldId.isEmpty();
     }
 
-    public void calculatePricePerPerson(double fieldPricePerHour, double hoursBooked) {
-        this.pricePerPerson = model.utils.PriceCalculationUtils.calculatePricePerPerson(
-                fieldPricePerHour, hoursBooked, requiredParticipants);
-    }
-
     public void confirm() {
         if (!hasField()) {
             throw new IllegalStateException("Cannot confirm match without a field");

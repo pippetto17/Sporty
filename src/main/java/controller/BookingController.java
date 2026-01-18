@@ -4,8 +4,8 @@ import model.bean.BookingBean;
 import model.dao.DAOFactory;
 import model.domain.BookingType;
 import model.domain.User;
+import exception.ValidationException;
 
-import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -14,11 +14,12 @@ import java.util.List;
  * Controller for booking operations.
  * Handles booking requests, approvals, and cancellations.
  */
+@SuppressWarnings("unused")
 public class BookingController {
     private final User currentUser;
     private final model.dao.BookingDAO bookingDAO;
 
-    public BookingController(User currentUser, DAOFactory.PersistenceType persistenceType) throws SQLException {
+    public BookingController(User currentUser, DAOFactory.PersistenceType persistenceType) {
         this.currentUser = currentUser;
         this.bookingDAO = DAOFactory.getBookingDAO(persistenceType);
     }
@@ -54,19 +55,15 @@ public class BookingController {
                 .toList();
     }
 
-    public List<BookingBean> getPendingRequests() {
-        if (currentUser.getRole() != model.domain.Role.FIELD_MANAGER.getCode()) {
-            throw new IllegalStateException("Only field managers can view pending requests");
-        }
+    public List<BookingBean> getPendingRequests() throws ValidationException {
+        validateFieldManager();
         return bookingDAO.findPendingByManagerId(currentUser.getUsername()).stream()
                 .map(model.converter.BookingConverter::toBean)
                 .toList();
     }
 
-    public void approveBooking(int bookingId) {
-        if (currentUser.getRole() != model.domain.Role.FIELD_MANAGER.getCode()) {
-            throw new IllegalStateException("Only field managers can approve bookings");
-        }
+    public void approveBooking(int bookingId) throws ValidationException {
+        validateFieldManager();
         model.domain.Booking booking = bookingDAO.findById(bookingId);
         if (booking != null) {
             booking.setStatus(model.domain.BookingStatus.CONFIRMED);
@@ -74,14 +71,15 @@ public class BookingController {
         }
     }
 
-    public void rejectBooking(int bookingId, String reason) {
-        if (currentUser.getRole() != model.domain.Role.FIELD_MANAGER.getCode()) {
-            throw new IllegalStateException("Only field managers can reject bookings");
-        }
+    public void rejectBooking(int bookingId, String reason) throws ValidationException {
+        validateFieldManager();
         model.domain.Booking booking = bookingDAO.findById(bookingId);
         if (booking != null) {
             booking.setStatus(model.domain.BookingStatus.REJECTED);
-            // Optionally save reason if supported by domain/DAO
+            // Save rejection reason if domain supports it
+            if (reason != null && !reason.isBlank()) {
+                booking.setRejectionReason(reason);
+            }
             bookingDAO.save(booking);
         }
     }
@@ -102,5 +100,11 @@ public class BookingController {
 
     public User getCurrentUser() {
         return currentUser;
+    }
+
+    private void validateFieldManager() throws ValidationException {
+        if (!currentUser.isFieldManager()) {
+            throw new ValidationException("Only field managers can perform this operation");
+        }
     }
 }

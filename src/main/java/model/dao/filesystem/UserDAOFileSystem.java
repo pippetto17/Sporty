@@ -31,7 +31,8 @@ public class UserDAOFileSystem implements UserDAO {
         }
 
         try (Reader reader = new FileReader(file)) {
-            Type userListType = new TypeToken<ArrayList<User>>(){}.getType();
+            Type userListType = new TypeToken<ArrayList<User>>() {
+            }.getType();
             users = gson.fromJson(reader, userListType);
             if (users == null) {
                 users = new ArrayList<>();
@@ -79,4 +80,3 @@ public class UserDAOFileSystem implements UserDAO {
         saveUsers();
     }
 }
-

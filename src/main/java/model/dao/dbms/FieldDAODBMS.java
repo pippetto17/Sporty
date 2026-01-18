@@ -21,7 +21,7 @@ public class FieldDAODBMS implements FieldDAO {
 
     @Override
     public List<Field> findAll() {
-        String sql = "SELECT field_id, name, sport, address, city, latitude, longitude, price_per_hour, availability, indoor, manager_id, structure_name, auto_approve FROM fields ORDER BY name";
+        String sql = "SELECT field_id, name, sport, address, city, price_per_hour, availability, indoor, manager_id, structure_name, auto_approve FROM fields ORDER BY name";
         List<Field> fields = new ArrayList<>();
 
         try (PreparedStatement stmt = connection.prepareStatement(sql);
@@ -39,7 +39,7 @@ public class FieldDAODBMS implements FieldDAO {
 
     @Override
     public Field findById(String fieldId) {
-        String sql = "SELECT field_id, name, sport, address, city, latitude, longitude, price_per_hour, availability, indoor, manager_id, structure_name, auto_approve FROM fields WHERE field_id = ?";
+        String sql = "SELECT field_id, name, sport, address, city, price_per_hour, availability, indoor, manager_id, structure_name, auto_approve FROM fields WHERE field_id = ?";
 
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, fieldId);
@@ -56,7 +56,7 @@ public class FieldDAODBMS implements FieldDAO {
 
     @Override
     public List<Field> findByCity(String city) {
-        String sql = "SELECT field_id, name, sport, address, city, latitude, longitude, price_per_hour, availability, indoor, manager_id, structure_name, auto_approve FROM fields WHERE city = ? ORDER BY name";
+        String sql = "SELECT field_id, name, sport, address, city, price_per_hour, availability, indoor, manager_id, structure_name, auto_approve FROM fields WHERE city = ? ORDER BY name";
         List<Field> fields = new ArrayList<>();
 
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
@@ -75,7 +75,7 @@ public class FieldDAODBMS implements FieldDAO {
 
     @Override
     public List<Field> findBySport(Sport sport) {
-        String sql = "SELECT field_id, name, sport, address, city, latitude, longitude, price_per_hour, availability, indoor, manager_id, structure_name, auto_approve FROM fields WHERE sport = ? ORDER BY name";
+        String sql = "SELECT field_id, name, sport, address, city, price_per_hour, availability, indoor, manager_id, structure_name, auto_approve FROM fields WHERE sport = ? ORDER BY name";
         List<Field> fields = new ArrayList<>();
 
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
@@ -97,7 +97,7 @@ public class FieldDAODBMS implements FieldDAO {
         // Returns all fields matching sport and city
         // Note: Availability checking against actual bookings will be implemented in
         // future version
-        String sql = "SELECT field_id, name, sport, address, city, latitude, longitude, price_per_hour, availability, indoor, manager_id, structure_name, auto_approve FROM fields WHERE sport = ? AND city = ? ORDER BY price_per_hour";
+        String sql = "SELECT field_id, name, sport, address, city, price_per_hour, availability, indoor, manager_id, structure_name, auto_approve FROM fields WHERE sport = ? AND city = ? ORDER BY price_per_hour";
         List<Field> fields = new ArrayList<>();
 
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
@@ -118,7 +118,7 @@ public class FieldDAODBMS implements FieldDAO {
     @Override
     public List<Field> findByManagerId(String managerId) {
         String sql = """
-                SELECT field_id, name, sport, address, city, latitude, longitude,
+                SELECT field_id, name, sport, address, city,
                        price_per_hour, availability, indoor, manager_id, structure_name, auto_approve
                 FROM fields
                 WHERE manager_id = ?
@@ -143,16 +143,14 @@ public class FieldDAODBMS implements FieldDAO {
     @Override
     public void save(Field field) {
         String sql = """
-                INSERT INTO fields (field_id, name, sport, address, city, latitude, longitude,
+                INSERT INTO fields (field_id, name, sport, address, city,
                                    price_per_hour, availability, indoor, manager_id, structure_name, auto_approve)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON DUPLICATE KEY UPDATE
                     name = VALUES(name),
                     sport = VALUES(sport),
                     address = VALUES(address),
                     city = VALUES(city),
-                    latitude = VALUES(latitude),
-                    longitude = VALUES(longitude),
                     price_per_hour = VALUES(price_per_hour),
                     availability = VALUES(availability),
                     indoor = VALUES(indoor),
@@ -168,36 +166,24 @@ public class FieldDAODBMS implements FieldDAO {
             stmt.setString(4, field.getAddress());
             stmt.setString(5, field.getCity());
 
-            if (field.getLatitude() != null) {
-                stmt.setDouble(6, field.getLatitude());
-            } else {
-                stmt.setNull(6, Types.DOUBLE);
-            }
-
-            if (field.getLongitude() != null) {
-                stmt.setDouble(7, field.getLongitude());
-            } else {
-                stmt.setNull(7, Types.DOUBLE);
-            }
-
-            stmt.setDouble(8, field.getPricePerHour());
-            stmt.setString(9, field.getAvailability());
-            stmt.setBoolean(10, field.isIndoor());
+            stmt.setDouble(6, field.getPricePerHour());
+            stmt.setString(7, field.getAvailability());
+            stmt.setBoolean(8, field.isIndoor());
 
             // Field Manager fields
             if (field.getManagerId() != null) {
-                stmt.setString(11, field.getManagerId());
+                stmt.setString(9, field.getManagerId());
             } else {
-                stmt.setNull(11, Types.VARCHAR);
+                stmt.setNull(9, Types.VARCHAR);
             }
 
             if (field.getStructureName() != null) {
-                stmt.setString(12, field.getStructureName());
+                stmt.setString(10, field.getStructureName());
             } else {
-                stmt.setNull(12, Types.VARCHAR);
+                stmt.setNull(10, Types.VARCHAR);
             }
 
-            stmt.setBoolean(13, field.getAutoApprove() != null && field.getAutoApprove());
+            stmt.setBoolean(11, field.getAutoApprove() != null && field.getAutoApprove());
 
             stmt.executeUpdate();
         } catch (SQLException e) {
@@ -224,12 +210,6 @@ public class FieldDAODBMS implements FieldDAO {
         field.setSport(Sport.fromCode(rs.getInt("sport")));
         field.setAddress(rs.getString("address"));
         field.setCity(rs.getString("city"));
-
-        double lat = rs.getDouble("latitude");
-        field.setLatitude(rs.wasNull() ? null : lat);
-
-        double lon = rs.getDouble("longitude");
-        field.setLongitude(rs.wasNull() ? null : lon);
 
         field.setPricePerHour(rs.getDouble("price_per_hour"));
         field.setAvailability(rs.getString("availability"));

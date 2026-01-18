@@ -134,13 +134,6 @@ public class Booking {
     }
 
     /**
-     * Calculate duration in hours.
-     */
-    public double getDurationHours() {
-        return model.utils.TimeUtils.calculateDurationHours(startTime, endTime);
-    }
-
-    /**
      * Check if booking is active (confirmed and in future).
      */
     public boolean isActive() {

@@ -25,6 +25,9 @@ public class GraphicMyFieldsView implements MyFieldsView {
     private Label messageLabel;
     private controller.ApplicationController applicationController;
 
+    // CSS class constants
+    private static final String CSS_FIELD_DETAIL = "field-detail";
+
     public GraphicMyFieldsView(FieldManagerController controller) {
         this.controller = controller;
     }
@@ -43,8 +46,16 @@ public class GraphicMyFieldsView implements MyFieldsView {
             VBox root = createLayout();
 
             Scene scene = new Scene(root, 800, 600);
-            scene.getStylesheets().add(getClass().getResource("/css/style.css").toExternalForm());
-            scene.getStylesheets().add(getClass().getResource("/css/controls-dark.css").toExternalForm());
+
+            var styleResource = getClass().getResource("/css/style.css");
+            if (styleResource != null) {
+                scene.getStylesheets().add(styleResource.toExternalForm());
+            }
+
+            var controlsResource = getClass().getResource("/css/controls-dark.css");
+            if (controlsResource != null) {
+                scene.getStylesheets().add(controlsResource.toExternalForm());
+            }
 
             stage.setScene(scene);
             stage.setResizable(true);
@@ -155,17 +166,17 @@ public class GraphicMyFieldsView implements MyFieldsView {
 
         // Sport and structure
         Label sportLabel = new Label(field.getSport().getDisplayName());
-        sportLabel.getStyleClass().add("field-detail");
+        sportLabel.getStyleClass().add(CSS_FIELD_DETAIL);
 
         if (field.getStructureName() != null) {
             Label structureLabel = new Label("📍 " + field.getStructureName());
-            structureLabel.getStyleClass().add("field-detail");
+            structureLabel.getStyleClass().add(CSS_FIELD_DETAIL);
             card.getChildren().add(structureLabel);
         }
 
         // Location
         Label locationLabel = new Label(field.getAddress() + ", " + field.getCity());
-        locationLabel.getStyleClass().add("field-detail");
+        locationLabel.getStyleClass().add(CSS_FIELD_DETAIL);
 
         // Price
         Label priceLabel = new Label(String.format("€%.2f/hour", field.getPricePerHour()));
@@ -199,14 +210,17 @@ public class GraphicMyFieldsView implements MyFieldsView {
         return card;
     }
 
+    @SuppressWarnings("unused") // Parameter will be used when edit functionality is implemented
     private void handleEdit(FieldBean field) {
         displayError("Edit functionality coming soon!");
     }
 
+    @SuppressWarnings("unused") // Parameter will be used when availability functionality is implemented
     private void handleAvailability(FieldBean field) {
         displayError("Availability management coming in Phase 2!");
     }
 
+    @SuppressWarnings("unused") // Parameter will be used when view bookings functionality is implemented
     private void handleViewBookings(FieldBean field) {
         displayError("View bookings functionality coming soon!");
     }

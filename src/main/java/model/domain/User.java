@@ -72,6 +72,10 @@ public class User {
         return this.role == Role.ORGANIZER.getCode();
     }
 
+    public boolean isFieldManager() {
+        return this.role == Role.FIELD_MANAGER.getCode();
+    }
+
     public boolean matchesPassword(String passwordToCheck) {
         return this.password != null && this.password.equals(passwordToCheck);
     }
@@ -86,4 +90,3 @@ public class User {
                 '}';
     }
 }
-

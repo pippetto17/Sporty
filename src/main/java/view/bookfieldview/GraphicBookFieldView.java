@@ -206,10 +206,9 @@ public class GraphicBookFieldView implements BookFieldView {
         if (selectedField == null)
             return;
 
-        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
-        confirm.setTitle("Confirm Booking");
-        confirm.setHeaderText("Book " + selectedField.getName() + "?");
-        confirm.setContentText("Total per person: €" + String.format("%.2f", selectedField.getPricePerPerson()));
+        Alert confirm = createStyledAlert(Alert.AlertType.CONFIRMATION, "Confirm Booking",
+                "Book " + selectedField.getName() + "?\n\nTotal per person: €"
+                        + String.format("%.2f", selectedField.getPricePerPerson()));
 
         confirm.showAndWait().ifPresent(response -> {
             if (response == ButtonType.OK) {
@@ -240,10 +239,7 @@ public class GraphicBookFieldView implements BookFieldView {
     // Unico metodo helper per tutti i messaggi
     private void showAlert(String title, String content, Alert.AlertType type) {
         Platform.runLater(() -> {
-            Alert alert = new Alert(type);
-            alert.setTitle(title);
-            alert.setHeaderText(null);
-            alert.setContentText(content);
+            Alert alert = createStyledAlert(type, title, content);
             alert.showAndWait();
         });
     }
@@ -273,6 +269,32 @@ public class GraphicBookFieldView implements BookFieldView {
     }
 
     private static final String ERROR_TITLE = "Error";
+
+    /**
+     * Creates a styled Alert dialog that matches the application's dark theme.
+     */
+    private Alert createStyledAlert(Alert.AlertType type, String title, String content) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+
+        // Apply dark theme styling
+        javafx.scene.control.DialogPane dialogPane = alert.getDialogPane();
+        dialogPane.getStylesheets().clear();
+
+        var styleResource = getClass().getResource("/css/style.css");
+        if (styleResource != null) {
+            dialogPane.getStylesheets().add(styleResource.toExternalForm());
+        }
+
+        var controlsResource = getClass().getResource("/css/controls-dark.css");
+        if (controlsResource != null) {
+            dialogPane.getStylesheets().add(controlsResource.toExternalForm());
+        }
+
+        return alert;
+    }
 
     @Override
     public void displayError(String message) {

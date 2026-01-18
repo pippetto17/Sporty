@@ -35,14 +35,6 @@ public class HomeController {
         return Role.fromCode(currentUser.getRole());
     }
 
-    public boolean isOrganizer() {
-        return currentUser.isOrganizer();
-    }
-
-    public boolean isPlayer() {
-        return currentUser.isPlayer();
-    }
-
     public boolean isViewingAsPlayer() {
         return viewAsPlayer;
     }

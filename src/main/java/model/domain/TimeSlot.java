@@ -94,18 +94,8 @@ public class TimeSlot {
         return model.utils.TimeUtils.timeRangesOverlap(startTime, endTime, otherStart, otherEnd);
     }
 
-    /**
-     * Check if this slot is available for booking.
-     */
     public boolean isAvailable() {
         return status == SlotStatus.AVAILABLE;
-    }
-
-    /**
-     * Calculate duration in hours.
-     */
-    public double getDurationHours() {
-        return model.utils.TimeUtils.calculateDurationHours(startTime, endTime);
     }
 
     @Override

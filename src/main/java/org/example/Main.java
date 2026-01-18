@@ -13,7 +13,6 @@ public class Main {
             app.start();
         } catch (Exception e) {
             logger.severe("Fatal Error during execution: " + e.getMessage());
-            e.printStackTrace();
         }
     }
 }

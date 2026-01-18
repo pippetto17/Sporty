@@ -25,8 +25,6 @@ public class FieldDAOMemory implements FieldDAO {
         Field field = new Field(id, name, sport, address, city);
         field.setPricePerHour(price);
         field.setIndoor(indoor);
-        field.setLatitude(45.4642); // Default mock coordinates
-        field.setLongitude(9.1900);
         field.setAvailability("available");
         fields.put(field.getFieldId(), field);
     }
@@ -76,8 +74,6 @@ public class FieldDAOMemory implements FieldDAO {
         Field field20 = new Field("F009", "Budget Field Barona", Sport.FOOTBALL_5, "Via Lorenteggio 255", DEMO_CITY);
         field20.setPricePerHour(30.0);
         field20.setIndoor(false);
-        field20.setLatitude(45.4408);
-        field20.setLongitude(9.1402);
         field20.setAvailability("available");
         fields.put(field20.getFieldId(), field20);
     }

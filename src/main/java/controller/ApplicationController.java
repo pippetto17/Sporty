@@ -23,9 +23,7 @@ public class ApplicationController {
     private ViewFactory viewFactory;
     private DAOFactory.PersistenceType persistenceType;
 
-    // Il costruttore ora è vuoto perché la configurazione avviene in start()
-    public ApplicationController() {
-    }
+    // Default constructor implicit — runtime initialization happens in start()
 
     public void start() {
         // 1. Wizard di configurazione (Console)
@@ -51,7 +49,7 @@ public class ApplicationController {
 
         if (isDemo) {
             this.persistenceType = DAOFactory.PersistenceType.MEMORY;
-            logger.info("App started in DEMO mode");
+            logger.info(() -> "App started in DEMO mode");
         } else {
             // Scelta Storage (Solo per FULL)
             System.out.println("Select storage:\n1. FileSystem\n2. Database (DBMS)");
@@ -62,7 +60,8 @@ public class ApplicationController {
                     ? DAOFactory.PersistenceType.DBMS
                     : DAOFactory.PersistenceType.FILESYSTEM;
 
-            logger.info("App started with persistence: " + persistenceType);
+            // Use lambda supplier to avoid unnecessary string concatenation when logger level is higher
+            logger.info(() -> String.format("App started with persistence: %s", persistenceType));
         }
     }
 
@@ -100,8 +99,6 @@ public class ApplicationController {
             var controller = new HomeController(user, this, matchDAO);
             view.homeview.HomeView view = viewFactory.createHomeView(controller);
 
-            // Collega dipendenze circolari se necessario
-            // controller.setHomeView(view);
             view.setApplicationController(this);
 
             pushView(view);
@@ -153,60 +150,11 @@ public class ApplicationController {
 
     // Metodi specifici per Field Manager
     public void navigateToAddField(FieldManagerController controller) {
+        // Crea la view per l'aggiunta del campo e la mostra.
+        // L'interfaccia AddFieldView non dichiara setApplicationController, quindi
+        // non la invochiamo qui per evitare errori di compilazione.
         view.addfieldview.AddFieldView view = viewFactory.createAddFieldView(controller);
-        // Assuming AddFieldView has setApplicationController (It should, derived from
-        // earlier analysis of other views, but verifying context)
-        // Wait, did I check generic View? No. But safer to try. If error, I'll see.
-        // Actually, looking at ViewFactory, AddFieldView is a specific type.
-        // I will assume it follows pattern. If compilation fails here, I'll fix it.
-        // But wait, did I verify AddFieldView? I only verified PaymentView,
-        // BookFieldView etc.
-        // Let's assume consistent pattern.
-        // Wait, if AddFieldView does NOT have it, compiling will fail.
-        // But generic View failed anyway.
-        // I'll skip setApplicationController if it's not needed? No, navigation back
-        // usually needs it.
-        // I'll check AddFieldView.java quickly? No, I'll batch it.
-        // If I'm wrong, I'll fix it later.
-        // Actually, let's remove the setApplicationController call from pushView FIRST,
-        // so the build might pass if specific views don't need it.
-        // BUT most do.
-        // I'll add casting/set call.
-        // Wait. CLIViewFactory returns objects.
-        // I'll assume AddFieldView has it.
-        // Ah, looking at ApplicationController, navigateToAddField takes
-        // FieldManagerController.
-        // Usually views need AppController for 'back'.
-
-        // Let's actually CHECK AddFieldView first? No, too many steps. I'll act.
-        // Reverting to cautious approach: Check AddFieldView.
-        // I'll execute without checking AddFieldView/MyFieldsView to save steps, hoping
-        // for consistency.
-        // If error, I fix.
-        // But I need to modify navigateToAddField.
-
-        // Wait! navigateToAddField in file:
-        // pushView(viewFactory.createAddFieldView(controller));
-
-        // I'll just expand it.
-        // But what if AddFieldView doesn't have the method?
-        // Then the line I add will error.
-        // But the line I REMOVE (view.setApplicationController) was erroring ANYWAY.
-        // So moving the error to specific place is effectively progress (or same
-        // state).
-
-        // But if AddFieldView extends View, and View doesn't have it...
-
-        // Okay.
-        // I'll proceed with MultiReplace.
-
-        // Wait, navigateToAddField Replacement:
-        // view.addfieldview.AddFieldView view =
-        // viewFactory.createAddFieldView(controller);
-        // // view.setApplicationController(this); // Is this valid?
-
-        // Looking at file list (find_by_name "View.java" earlier), AddFieldView exists.
-        // I'll assume it follows pattern.
+        pushView(view);
     }
 
     public void navigateToMyFields(FieldManagerController controller) {
@@ -223,8 +171,8 @@ public class ApplicationController {
             viewStack.peek().close();
         }
 
-        // view.setApplicationController(this); // REMOVED: View interface does not
-        // define this.
+        // Manteniamo la responsabilità di impostare application controller sulle singole view
+        // (se necessario) e non qui, perché l'interfaccia View non lo dichiara.
         viewStack.push(view); // 'push' è equivalente a 'addFirst' in ArrayDeque
         view.display();
     }
@@ -238,8 +186,11 @@ public class ApplicationController {
         View current = viewStack.pop(); // Rimuove e restituisce la testa
         current.close();
 
-        // Recupera la precedente senza rimuoverla e la mostra
-        viewStack.peek().display();
+        // Recupera la precedente senza rimuoverla e la mostra (controllo null per static analysis)
+        View previous = viewStack.peek();
+        if (previous != null) {
+            previous.display();
+        }
     }
 
     public void logout() {
@@ -258,8 +209,8 @@ public class ApplicationController {
     // --- UTILS ---
 
     private void logError(String message, Exception e) {
-        logger.log(Level.SEVERE, message + ": " + e.getMessage());
-        // De-commenta per debug profondo: e.printStackTrace();
+        // Use the throwable overload so the exception is logged with its stack trace
+        logger.log(Level.SEVERE, message, e);
     }
 
     public DAOFactory.PersistenceType getPersistenceType() {

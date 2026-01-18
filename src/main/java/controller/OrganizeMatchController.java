@@ -1,10 +1,12 @@
 package controller;
+package controller;
 
 import model.bean.MatchBean;
 import model.domain.Sport;
 import model.domain.User;
 import model.utils.Constants;
-import exception.ServiceInitializationException;
+import exception.DataAccessException;
+import exception.ValidationException;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -12,8 +14,7 @@ import java.time.LocalTime;
 
 /**
  * Controller per l'organizzazione di un nuovo match.
- * Gestisce il flusso di creazione del match, delegando
- * la validazione e la logica di business a MatchService.
+ * Gestisce il flusso di creazione del match, con validazione e accesso ai dati.
  */
 public class OrganizeMatchController {
     private final User organizer;
@@ -27,7 +28,7 @@ public class OrganizeMatchController {
         try {
             this.matchDAO = model.dao.DAOFactory.getMatchDAO(applicationController.getPersistenceType());
         } catch (SQLException e) {
-            throw new ServiceInitializationException(Constants.ERROR_MATCH_SERVICE_INIT + e.getMessage(), e);
+            throw new DataAccessException(Constants.ERROR_DAO_INIT + e.getMessage(), e);
         }
     }
 
@@ -55,9 +56,9 @@ public class OrganizeMatchController {
     /**
      * Save match logic moved here.
      */
-    public void saveMatch() {
+    public void saveMatch() throws ValidationException {
         if (currentMatchBean == null)
-            throw new IllegalArgumentException("MatchBean cannot be null");
+            throw new ValidationException("MatchBean cannot be null");
         try {
             model.domain.Match match = model.converter.MatchConverter.toEntity(currentMatchBean);
             matchDAO.save(match);
@@ -65,7 +66,7 @@ public class OrganizeMatchController {
                 currentMatchBean.setMatchId(match.getMatchId());
             }
         } catch (exception.DataAccessException e) {
-            throw new ServiceInitializationException("Error saving match: " + e.getMessage(), e);
+            throw new DataAccessException("Error saving match: " + e.getMessage(), e);
         }
     }
 

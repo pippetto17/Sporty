@@ -6,8 +6,6 @@ public class Field {
     private Sport sport;
     private String address;
     private String city;
-    private Double latitude;
-    private Double longitude;
     private Double pricePerHour;
     private String availability; // JSON or structured data of available time slots
     private boolean indoor;
@@ -67,22 +65,6 @@ public class Field {
 
     public void setCity(String city) {
         this.city = city;
-    }
-
-    public Double getLatitude() {
-        return latitude;
-    }
-
-    public void setLatitude(Double latitude) {
-        this.latitude = latitude;
-    }
-
-    public Double getLongitude() {
-        return longitude;
-    }
-
-    public void setLongitude(Double longitude) {
-        this.longitude = longitude;
     }
 
     public Double getPricePerHour() {
@@ -148,15 +130,6 @@ public class Field {
 
     public boolean supportsNumberOfPlayers(int numberOfPlayers) {
         return this.sport != null && this.sport.getRequiredPlayers() >= numberOfPlayers;
-    }
-
-    public double calculatePricePerPerson(int numberOfParticipants, double hoursBooked) {
-        return model.utils.PriceCalculationUtils.calculatePricePerPerson(
-                pricePerHour, hoursBooked, numberOfParticipants);
-    }
-
-    public boolean hasCoordinates() {
-        return latitude != null && longitude != null;
     }
 
     @Override

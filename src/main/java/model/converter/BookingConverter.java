@@ -44,6 +44,7 @@ public class BookingConverter {
      * Note: enriched fields (fieldName, requesterFullName) are not transferred
      * back.
      */
+    @SuppressWarnings("unused")
     public static Booking toBooking(BookingBean bean) {
         if (bean == null) {
             return null;
@@ -60,23 +61,24 @@ public class BookingConverter {
         // Convert type string back to enum
         booking.setType(BookingType.valueOf(bean.getType().toUpperCase().replace(" ", "_")));
 
-        // Note: Status should use setStatus with validation, but for bean conversion
-        // we need to set it directly. This is safe when loading from persistence.
+        // Convert status: try enum name first, then match by display name.
+        BookingStatus resolved = null;
         try {
-            java.lang.reflect.Field statusField = Booking.class.getDeclaredField("status");
-            statusField.setAccessible(true);
-            statusField.set(booking, BookingStatus.valueOf(bean.getStatus().toUpperCase().replace(" ", "_")));
-        } catch (Exception e) {
-            // Fallback: parse from display name
+            resolved = BookingStatus.valueOf(bean.getStatus().toUpperCase().replace(" ", "_"));
+        } catch (IllegalArgumentException ignored) {
             for (BookingStatus status : BookingStatus.values()) {
                 if (status.getDisplayName().equals(bean.getStatus())) {
-                    try {
-                        booking.setStatus(status);
-                    } catch (IllegalStateException ignored) {
-                        // Ignore state transition errors when loading from persistence
-                    }
+                    resolved = status;
                     break;
                 }
+            }
+        }
+
+        if (resolved != null) {
+            try {
+                booking.setStatus(resolved);
+            } catch (IllegalStateException ignored) {
+                // Ignore state transition errors when hydrating from persistence
             }
         }
 

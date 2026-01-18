@@ -73,7 +73,7 @@
     <HBox spacing="15" alignment="CENTER">
         <Button text="➕ Add New Field" onAction="#handleAddField" styleClass="success-button"/>
         <Button text="📋 My Fields" onAction="#handleManageFields" styleClass="primary-button"/>
-        <Button text="Set Availability" onAction="#handleSetAvailability"/>
+        <Button text="Set Availability" onAction="#handleViewBookings"/>
         <Button text="View All Bookings" onAction="#handleViewBookings"/>
     </HBox>
 

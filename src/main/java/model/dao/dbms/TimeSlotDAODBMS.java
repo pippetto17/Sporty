@@ -16,6 +16,8 @@ import java.util.List;
  */
 public class TimeSlotDAODBMS implements TimeSlotDAO {
 
+    private static final String TIME_SLOTS_COLUMNS = "slot_id, field_id, day_of_week, start_time, end_time, status, booking_id";
+
     @Override
     public void save(TimeSlot slot) {
         String sql = """
@@ -57,7 +59,7 @@ public class TimeSlotDAODBMS implements TimeSlotDAO {
 
     @Override
     public List<TimeSlot> findByFieldId(String fieldId) {
-        String sql = "SELECT * FROM time_slots WHERE field_id = ? ORDER BY day_of_week, start_time";
+        String sql = "SELECT " + TIME_SLOTS_COLUMNS + " FROM time_slots WHERE field_id = ? ORDER BY day_of_week, start_time";
 
         try (Connection conn = ConnectionFactory.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -72,10 +74,10 @@ public class TimeSlotDAODBMS implements TimeSlotDAO {
     @Override
     public List<TimeSlot> findAvailableSlots(String fieldId, DayOfWeek day) {
         String sql = """
-                SELECT * FROM time_slots
+                SELECT %s FROM time_slots
                 WHERE field_id = ? AND day_of_week = ? AND status = 'AVAILABLE'
                 ORDER BY start_time
-                """;
+                """.formatted(TIME_SLOTS_COLUMNS);
 
         try (Connection conn = ConnectionFactory.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -106,10 +108,10 @@ public class TimeSlotDAODBMS implements TimeSlotDAO {
     @Override
     public List<TimeSlot> findConflicting(String fieldId, DayOfWeek day, LocalTime start, LocalTime end) {
         String sql = """
-                SELECT * FROM time_slots
+                SELECT %s FROM time_slots
                 WHERE field_id = ? AND day_of_week = ?
                 AND start_time < ? AND end_time > ?
-                """;
+                """.formatted(TIME_SLOTS_COLUMNS);
 
         try (Connection conn = ConnectionFactory.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {

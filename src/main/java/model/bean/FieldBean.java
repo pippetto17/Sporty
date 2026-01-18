@@ -8,8 +8,6 @@ public class FieldBean {
     private Sport sport;
     private String address;
     private String city;
-    private Double latitude;
-    private Double longitude;
     private Double pricePerHour;
     private Double pricePerPerson; // Calculated based on match participants
     private boolean indoor;
@@ -68,22 +66,6 @@ public class FieldBean {
 
     public void setCity(String city) {
         this.city = city;
-    }
-
-    public Double getLatitude() {
-        return latitude;
-    }
-
-    public void setLatitude(Double latitude) {
-        this.latitude = latitude;
-    }
-
-    public Double getLongitude() {
-        return longitude;
-    }
-
-    public void setLongitude(Double longitude) {
-        this.longitude = longitude;
     }
 
     public Double getPricePerHour() {

@@ -13,6 +13,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import model.bean.FieldBean;
 import model.domain.Sport;
+import model.utils.Constants;
 
 import java.util.Arrays;
 import java.util.List;
@@ -53,8 +54,17 @@ public class GraphicAddFieldView implements AddFieldView {
             VBox root = createLayout();
 
             Scene scene = new Scene(root, 500, 550);
-            scene.getStylesheets().add(getClass().getResource("/css/style.css").toExternalForm());
-            scene.getStylesheets().add(getClass().getResource("/css/controls-dark.css").toExternalForm());
+
+            // Load stylesheets with null checks
+            var styleResource = getClass().getResource("/css/style.css");
+            if (styleResource != null) {
+                scene.getStylesheets().add(styleResource.toExternalForm());
+            }
+
+            var controlsResource = getClass().getResource("/css/controls-dark.css");
+            if (controlsResource != null) {
+                scene.getStylesheets().add(controlsResource.toExternalForm());
+            }
 
             stage.setScene(scene);
             stage.setResizable(false);
@@ -90,57 +100,57 @@ public class GraphicAddFieldView implements AddFieldView {
 
         // Structure Name
         Label structureLabel = new Label("Structure Name:");
-        structureLabel.getStyleClass().add("field-label");
+        structureLabel.getStyleClass().add(Constants.CSS_FIELD_LABEL);
         structureNameField = new TextField();
         structureNameField.setPromptText("e.g., City Sports Center");
-        structureNameField.getStyleClass().add("custom-text-field");
+        structureNameField.getStyleClass().add(Constants.CSS_CUSTOM_TEXT_FIELD);
         structureNameField.setPrefWidth(300);
         grid.add(structureLabel, 0, row);
         grid.add(structureNameField, 1, row++);
 
         // Field Name
         Label nameLabel = new Label("Field Name:");
-        nameLabel.getStyleClass().add("field-label");
+        nameLabel.getStyleClass().add(Constants.CSS_FIELD_LABEL);
         fieldNameField = new TextField();
         fieldNameField.setPromptText("e.g., Court 1");
-        fieldNameField.getStyleClass().add("custom-text-field");
+        fieldNameField.getStyleClass().add(Constants.CSS_CUSTOM_TEXT_FIELD);
         grid.add(nameLabel, 0, row);
         grid.add(fieldNameField, 1, row++);
 
         // Address
         Label addressLabel = new Label("Address:");
-        addressLabel.getStyleClass().add("field-label");
+        addressLabel.getStyleClass().add(Constants.CSS_FIELD_LABEL);
         addressField = new TextField();
         addressField.setPromptText("e.g., Via Roma 123");
-        addressField.getStyleClass().add("custom-text-field");
+        addressField.getStyleClass().add(Constants.CSS_CUSTOM_TEXT_FIELD);
         grid.add(addressLabel, 0, row);
         grid.add(addressField, 1, row++);
 
         // City
         Label cityLabel = new Label("City:");
-        cityLabel.getStyleClass().add("field-label");
+        cityLabel.getStyleClass().add(Constants.CSS_FIELD_LABEL);
         cityComboBox = new ComboBox<>();
         cityComboBox.getItems().addAll(CITIES);
         cityComboBox.setPromptText("Select city");
-        cityComboBox.getStyleClass().add("custom-combo-box");
+        cityComboBox.getStyleClass().add(Constants.CSS_CUSTOM_COMBO_BOX);
         cityComboBox.setPrefWidth(300);
         grid.add(cityLabel, 0, row);
         grid.add(cityComboBox, 1, row++);
 
         // Sport
         Label sportLabel = new Label("Sport:");
-        sportLabel.getStyleClass().add("field-label");
+        sportLabel.getStyleClass().add(Constants.CSS_FIELD_LABEL);
         sportComboBox = new ComboBox<>();
         sportComboBox.getItems().addAll(Sport.values());
         sportComboBox.setPromptText("Select sport");
-        sportComboBox.getStyleClass().add("custom-combo-box");
+        sportComboBox.getStyleClass().add(Constants.CSS_CUSTOM_COMBO_BOX);
         sportComboBox.setPrefWidth(300);
         grid.add(sportLabel, 0, row);
         grid.add(sportComboBox, 1, row++);
 
         // Indoor/Outdoor
         Label typeLabel = new Label("Type:");
-        typeLabel.getStyleClass().add("field-label");
+        typeLabel.getStyleClass().add(Constants.CSS_FIELD_LABEL);
         ToggleGroup typeGroup = new ToggleGroup();
         indoorRadio = new RadioButton("Indoor");
         RadioButton outdoorRadio = new RadioButton("Outdoor");
@@ -153,10 +163,10 @@ public class GraphicAddFieldView implements AddFieldView {
 
         // Price
         Label priceLabel = new Label("Price per Hour (€):");
-        priceLabel.getStyleClass().add("field-label");
+        priceLabel.getStyleClass().add(Constants.CSS_FIELD_LABEL);
         priceField = new TextField();
         priceField.setPromptText("e.g., 25.00");
-        priceField.getStyleClass().add("custom-text-field");
+        priceField.getStyleClass().add(Constants.CSS_CUSTOM_TEXT_FIELD);
         grid.add(priceLabel, 0, row);
         grid.add(priceField, 1, row++);
 

@@ -25,100 +25,11 @@ public class CLIAddFieldView implements AddFieldView {
         System.out.println("=".repeat(50));
 
         try {
-            FieldBean field = new FieldBean();
-
-            // Structure Name
-            System.out.print("Structure Name: ");
-            String structureName = scanner.nextLine().trim();
-            if (structureName.isEmpty()) {
-                displayError("Structure name is required");
-                return;
-            }
-            field.setStructureName(structureName);
-
-            // Field Name
-            System.out.print("Field Name: ");
-            String fieldName = scanner.nextLine().trim();
-            if (fieldName.isEmpty()) {
-                displayError("Field name is required");
-                return;
-            }
-            field.setName(fieldName);
-
-            // Address
-            System.out.print("Address: ");
-            String address = scanner.nextLine().trim();
-            if (address.isEmpty()) {
-                displayError("Address is required");
-                return;
-            }
-            field.setAddress(address);
-
-            // City
-            System.out.print("City: ");
-            String city = scanner.nextLine().trim();
-            if (city.isEmpty()) {
-                displayError("City is required");
-                return;
-            }
-            field.setCity(city);
-
-            // Sport
-            System.out.println("\nAvailable Sports:");
-            Sport[] sports = Sport.values();
-            for (int i = 0; i < sports.length; i++) {
-                System.out.printf("%d - %s%n", i, sports[i].getDisplayName());
-            }
-            System.out.print("Select sport (number): ");
-            int sportIndex = Integer.parseInt(scanner.nextLine().trim());
-            if (sportIndex < 0 || sportIndex >= sports.length) {
-                displayError("Invalid sport selection");
-                return;
-            }
-            field.setSport(sports[sportIndex]);
-
-            // Indoor/Outdoor
-            System.out.print("Indoor (y/n): ");
-            String indoorInput = scanner.nextLine().trim().toLowerCase();
-            field.setIndoor(indoorInput.equals("y") || indoorInput.equals("yes"));
-
-            // Price
-            System.out.print("Price per hour (€): ");
-            double price = Double.parseDouble(scanner.nextLine().trim());
-            if (price <= 0) {
-                displayError("Price must be positive");
-                return;
-            }
-            field.setPricePerHour(price);
-
-            // Latitude (optional)
-            System.out.print("Latitude (press Enter to skip): ");
-            String latInput = scanner.nextLine().trim();
-            if (!latInput.isEmpty()) {
-                field.setLatitude(Double.parseDouble(latInput));
-            }
-
-            // Longitude (optional)
-            System.out.print("Longitude (press Enter to skip): ");
-            String lonInput = scanner.nextLine().trim();
-            if (!lonInput.isEmpty()) {
-                field.setLongitude(Double.parseDouble(lonInput));
-            }
-
-            // Auto-approve
-            System.out.print("Auto-approve bookings (y/n): ");
-            String autoApprove = scanner.nextLine().trim().toLowerCase();
-            field.setAutoApprove(autoApprove.equals("y") || autoApprove.equals("yes"));
-
-            // Confirm
-            System.out.print("\nConfirm creation (y/n): ");
-            String confirm = scanner.nextLine().trim().toLowerCase();
-            if (!confirm.equals("y") && !confirm.equals("yes")) {
-                System.out.println("Cancelled.");
+            FieldBean field = createFieldFromUserInput();
+            if (field == null) {
                 return;
             }
 
-            // Add field
             controller.addNewField(field);
             displaySuccess("Field added successfully!");
 
@@ -127,6 +38,111 @@ public class CLIAddFieldView implements AddFieldView {
         } catch (Exception e) {
             displayError("Error adding field: " + e.getMessage());
         }
+    }
+
+    private FieldBean createFieldFromUserInput() {
+        FieldBean field = new FieldBean();
+
+        if (!collectBasicInfo(field)) {
+            return null;
+        }
+
+        if (!collectSportInfo(field)) {
+            return null;
+        }
+
+        if (!collectPricingInfo(field)) {
+            return null;
+        }
+
+        collectAutoApprove(field);
+
+        if (!confirmCreation()) {
+            System.out.println("Cancelled.");
+            return null;
+        }
+
+        return field;
+    }
+
+    private boolean collectBasicInfo(FieldBean field) {
+        System.out.print("Structure Name: ");
+        String structureName = scanner.nextLine().trim();
+        if (structureName.isEmpty()) {
+            displayError("Structure name is required");
+            return false;
+        }
+        field.setStructureName(structureName);
+
+        System.out.print("Field Name: ");
+        String fieldName = scanner.nextLine().trim();
+        if (fieldName.isEmpty()) {
+            displayError("Field name is required");
+            return false;
+        }
+        field.setName(fieldName);
+
+        System.out.print("Address: ");
+        String address = scanner.nextLine().trim();
+        if (address.isEmpty()) {
+            displayError("Address is required");
+            return false;
+        }
+        field.setAddress(address);
+
+        System.out.print("City: ");
+        String city = scanner.nextLine().trim();
+        if (city.isEmpty()) {
+            displayError("City is required");
+            return false;
+        }
+        field.setCity(city);
+
+        return true;
+    }
+
+    private boolean collectSportInfo(FieldBean field) {
+        System.out.println("\nAvailable Sports:");
+        Sport[] sports = Sport.values();
+        for (int i = 0; i < sports.length; i++) {
+            System.out.printf("%d - %s%n", i, sports[i].getDisplayName());
+        }
+        System.out.print("Select sport (number): ");
+        int sportIndex = Integer.parseInt(scanner.nextLine().trim());
+        if (sportIndex < 0 || sportIndex >= sports.length) {
+            displayError("Invalid sport selection");
+            return false;
+        }
+        field.setSport(sports[sportIndex]);
+
+        System.out.print("Indoor (y/n): ");
+        String indoorInput = scanner.nextLine().trim().toLowerCase();
+        field.setIndoor(indoorInput.equals("y") || indoorInput.equals("yes"));
+
+        return true;
+    }
+
+    private boolean collectPricingInfo(FieldBean field) {
+        System.out.print("Price per hour (€): ");
+        double price = Double.parseDouble(scanner.nextLine().trim());
+        if (price <= 0) {
+            displayError("Price must be positive");
+            return false;
+        }
+        field.setPricePerHour(price);
+        return true;
+    }
+
+    private void collectAutoApprove(FieldBean field) {
+        System.out.print("Auto-approve bookings (y/n): ");
+        String autoApprove = scanner.nextLine().trim().toLowerCase();
+        field.setAutoApprove(autoApprove.equals("y") || autoApprove.equals("yes"));
+    }
+
+    private boolean confirmCreation() {
+        System.out.print("\nConfirm creation (y/n): ");
+        String confirm = scanner.nextLine().trim().toLowerCase();
+        return confirm.equals("y") || confirm.equals("yes");
     }
 
     @Override

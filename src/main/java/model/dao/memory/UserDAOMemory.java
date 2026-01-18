@@ -37,4 +37,3 @@ public class UserDAOMemory implements UserDAO {
         users.put(user.getUsername(), user);
     }
 }
-

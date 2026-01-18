@@ -23,8 +23,8 @@
 
                 <Region HBox.hgrow="ALWAYS"/>
 
-                <Button fx:id="backButton" text="← Back" onAction="#handleBack"
-                       styleClass="secondary-button" prefWidth="90"/>
+                <Button fx:id="backButton" text="←" onAction="#handleBack"
+                       styleClass="secondary-button" prefWidth="50"/>
             </HBox>
 
             <VBox spacing="8" styleClass="match-info-box">
@@ -55,7 +55,7 @@
                 </Label>
 
                 <ComboBox fx:id="sortComboBox" promptText="Select sorting"
-                         styleClass="custom-combo-box" prefWidth="200" onAction="#handleSort"/>
+                         styleClass="custom-combo-box" prefWidth="200"/>
 
                 <Region HBox.hgrow="ALWAYS"/>
 
