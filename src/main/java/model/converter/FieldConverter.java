@@ -53,7 +53,7 @@ public class FieldConverter {
         FieldBean fieldBean = toFieldBean(field);
         if (fieldBean != null && field.getPricePerHour() != null) {
             // Calculate price per person for 2 hours booking
-            double pricePerPerson = model.utils.PriceCalculationUtils.calculatePricePerPerson(
+            double pricePerPerson = model.utils.Utils.calculatePricePerPerson(
                     field.getPricePerHour(), 2.0, participants);
             fieldBean.setPricePerPerson(pricePerPerson);
         }

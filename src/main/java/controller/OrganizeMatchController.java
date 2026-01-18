@@ -6,10 +6,13 @@ import model.bean.MatchBean;
 import model.domain.Sport;
 import model.domain.User;
 import model.utils.Constants;
+import model.utils.Utils;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalTime;
+
+import static model.utils.Utils.ITALIAN_CITIES;
 
 /**
  * Controller per l'organizzazione di un nuovo match.
@@ -88,15 +91,15 @@ public class OrganizeMatchController {
     }
 
     public java.util.List<String> getCities() {
-        return model.utils.ItalianCities.CITIES;
+        return ITALIAN_CITIES;
     }
 
     public java.util.List<String> searchCitiesByPrefix(String prefix) {
-        return model.utils.ItalianCities.searchByPrefix(prefix);
+        return Utils.searchCitiesByPrefix(prefix);
     }
 
     public boolean isValidCity(String city) {
-        return model.utils.ItalianCities.isValidCity(city);
+        return model.utils.Utils.isValidCity(city);
     }
 
     public User getOrganizer() {

@@ -18,6 +18,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import model.bean.FieldBean;
 import model.bean.MatchBean;
+import view.ViewUtils;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -286,19 +287,7 @@ public class GraphicBookFieldView implements BookFieldView {
         alert.setHeaderText(null);
         alert.setContentText(content);
 
-        // Apply dark theme styling
-        javafx.scene.control.DialogPane dialogPane = alert.getDialogPane();
-        dialogPane.getStylesheets().clear();
-
-        var styleResource = getClass().getResource("/css/style.css");
-        if (styleResource != null) {
-            dialogPane.getStylesheets().add(styleResource.toExternalForm());
-        }
-
-        var controlsResource = getClass().getResource("/css/controls-dark.css");
-        if (controlsResource != null) {
-            dialogPane.getStylesheets().add(controlsResource.toExternalForm());
-        }
+        ViewUtils.applyStylesheets(alert.getDialogPane());
 
         return alert;
     }

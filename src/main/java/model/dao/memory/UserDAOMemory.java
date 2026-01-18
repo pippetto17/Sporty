@@ -1,7 +1,7 @@
 package model.dao.memory;
 
 import model.dao.UserDAO;
-import model.domain.DemoDataInitializer;
+import model.domain.Role;
 import model.domain.User;
 
 import java.util.HashMap;
@@ -12,10 +12,13 @@ public class UserDAOMemory implements UserDAO {
 
     public UserDAOMemory() {
         users = new HashMap<>();
-        // Initialize with demo data
-        for (User user : DemoDataInitializer.getDemoUsers()) {
-            users.put(user.getUsername(), user);
-        }
+        initializeDemoData();
+    }
+
+    private void initializeDemoData() {
+        users.put("demo", new User("demo", "demo123", "Demo", "Player", Role.PLAYER.getCode()));
+        users.put("organizer", new User("organizer", "org123", "Test", "Organizer", Role.ORGANIZER.getCode()));
+        users.put("fieldmanager", new User("fieldmanager", "fm123", "Test", "Field Manager", Role.FIELD_MANAGER.getCode()));
     }
 
     @Override

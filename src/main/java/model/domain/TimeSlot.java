@@ -91,7 +91,7 @@ public class TimeSlot {
      * Check if this slot overlaps with another time range.
      */
     public boolean overlapsWith(LocalTime otherStart, LocalTime otherEnd) {
-        return model.utils.TimeUtils.timeRangesOverlap(startTime, endTime, otherStart, otherEnd);
+        return model.utils.Utils.timeRangesOverlap(startTime, endTime, otherStart, otherEnd);
     }
 
     public boolean isAvailable() {

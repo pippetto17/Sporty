@@ -12,6 +12,7 @@ import javafx.scene.control.*;
 import javafx.stage.Stage;
 import model.bean.UserBean;
 import model.utils.Constants;
+import view.ViewUtils;
 
 import java.io.IOException;
 import java.util.logging.Logger;
@@ -121,10 +122,8 @@ public class GraphicLoginView extends Application implements LoginView {
             loader.setController(this);
             Parent root = loader.load();
 
-            // Load CSS
             Scene scene = new Scene(root, 450, 550);
-            scene.getStylesheets().add(getClass().getResource(Constants.CSS_PATH_STYLE).toExternalForm());
-            scene.getStylesheets().add(getClass().getResource(Constants.CSS_PATH_CONTROLS_DARK).toExternalForm());
+            ViewUtils.applyStylesheets(scene);
 
             primaryStage.setScene(scene);
             primaryStage.setResizable(false);
@@ -167,10 +166,8 @@ public class GraphicLoginView extends Application implements LoginView {
                 roleComboBox.setValue(Constants.ROLE_PLAYER);
             }
 
-            // Mantieni la stessa scene con CSS
             Scene scene = new Scene(root, 450, 650);
-            scene.getStylesheets().add(getClass().getResource(Constants.CSS_PATH_STYLE).toExternalForm());
-            scene.getStylesheets().add(getClass().getResource(Constants.CSS_PATH_CONTROLS_DARK).toExternalForm());
+            ViewUtils.applyStylesheets(scene);
 
             primaryStage.setScene(scene);
             primaryStage.setTitle("Sporty - Register");
@@ -229,8 +226,7 @@ public class GraphicLoginView extends Application implements LoginView {
             Parent root = loader.load();
 
             Scene scene = new Scene(root, 450, 550);
-            scene.getStylesheets().add(getClass().getResource(Constants.CSS_PATH_STYLE).toExternalForm());
-            scene.getStylesheets().add(getClass().getResource(Constants.CSS_PATH_CONTROLS_DARK).toExternalForm());
+            ViewUtils.applyStylesheets(scene);
 
             primaryStage.setScene(scene);
             primaryStage.setTitle("Sporty - Login");

@@ -14,6 +14,7 @@ import javafx.stage.Stage;
 import model.bean.BookingBean;
 import model.domain.User;
 import model.utils.Constants;
+import view.ViewUtils;
 
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
@@ -82,7 +83,7 @@ public class GraphicFieldManagerView implements FieldManagerView {
             loader.setController(this);
 
             Scene scene = new Scene(loader.load(), 1000, 700);
-            loadStyles(scene);
+            ViewUtils.applyStylesheets(scene);
 
             stage.setTitle("Field Manager Dashboard - Sporty");
             stage.setScene(scene);
@@ -92,15 +93,6 @@ public class GraphicFieldManagerView implements FieldManagerView {
         }
     }
 
-    private void loadStyles(Scene scene) {
-        String[] styles = { Constants.CSS_PATH_FIELD_MANAGER, Constants.CSS_PATH_STYLE, Constants.CSS_PATH_CONTROLS_DARK };
-        for (String style : styles) {
-            var resource = getClass().getResource(style);
-            if (resource != null) {
-                scene.getStylesheets().add(resource.toExternalForm());
-            }
-        }
-    }
 
     @Override
     public void close() {
@@ -179,16 +171,7 @@ public class GraphicFieldManagerView implements FieldManagerView {
         dialog.setHeaderText("Rejecting request from " + selected.getRequesterUsername());
         dialog.setContentText("Reason:");
 
-        // Apply dark theme styling
-        javafx.scene.control.DialogPane dialogPane = dialog.getDialogPane();
-        dialogPane.getStylesheets().clear();
-        String[] styles = { Constants.CSS_PATH_FIELD_MANAGER, Constants.CSS_PATH_STYLE, Constants.CSS_PATH_CONTROLS_DARK };
-        for (String style : styles) {
-            var resource = getClass().getResource(style);
-            if (resource != null) {
-                dialogPane.getStylesheets().add(resource.toExternalForm());
-            }
-        }
+        ViewUtils.applyStylesheets(dialog.getDialogPane());
 
         Optional<String> result = dialog.showAndWait();
 
@@ -246,17 +229,7 @@ public class GraphicFieldManagerView implements FieldManagerView {
         alert.setHeaderText(null);
         alert.setContentText(content);
 
-        // Apply dark theme styling
-        javafx.scene.control.DialogPane dialogPane = alert.getDialogPane();
-        dialogPane.getStylesheets().clear();
-
-        String[] styles = { Constants.CSS_PATH_FIELD_MANAGER, Constants.CSS_PATH_STYLE, Constants.CSS_PATH_CONTROLS_DARK };
-        for (String style : styles) {
-            var resource = getClass().getResource(style);
-            if (resource != null) {
-                dialogPane.getStylesheets().add(resource.toExternalForm());
-            }
-        }
+        ViewUtils.applyStylesheets(alert.getDialogPane());
 
         return alert;
     }

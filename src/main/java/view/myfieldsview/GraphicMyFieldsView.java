@@ -12,6 +12,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import model.bean.FieldBean;
+import view.ViewUtils;
 
 import java.util.List;
 
@@ -46,16 +47,7 @@ public class GraphicMyFieldsView implements MyFieldsView {
             VBox root = createLayout();
 
             Scene scene = new Scene(root, 800, 600);
-
-            var styleResource = getClass().getResource("/css/style.css");
-            if (styleResource != null) {
-                scene.getStylesheets().add(styleResource.toExternalForm());
-            }
-
-            var controlsResource = getClass().getResource("/css/controls-dark.css");
-            if (controlsResource != null) {
-                scene.getStylesheets().add(controlsResource.toExternalForm());
-            }
+            ViewUtils.applyStylesheets(scene);
 
             stage.setScene(scene);
             stage.setResizable(true);

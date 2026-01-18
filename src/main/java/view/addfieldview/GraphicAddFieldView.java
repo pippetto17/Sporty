@@ -14,6 +14,7 @@ import javafx.stage.Stage;
 import model.bean.FieldBean;
 import model.domain.Sport;
 import model.utils.Constants;
+import view.ViewUtils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -54,17 +55,7 @@ public class GraphicAddFieldView implements AddFieldView {
             VBox root = createLayout();
 
             Scene scene = new Scene(root, 500, 550);
-
-            // Load stylesheets with null checks
-            var styleResource = getClass().getResource("/css/style.css");
-            if (styleResource != null) {
-                scene.getStylesheets().add(styleResource.toExternalForm());
-            }
-
-            var controlsResource = getClass().getResource("/css/controls-dark.css");
-            if (controlsResource != null) {
-                scene.getStylesheets().add(controlsResource.toExternalForm());
-            }
+            ViewUtils.applyStylesheets(scene);
 
             stage.setScene(scene);
             stage.setResizable(false);

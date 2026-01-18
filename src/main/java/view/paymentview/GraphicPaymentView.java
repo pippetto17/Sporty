@@ -15,6 +15,7 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import model.bean.MatchBean;
 import model.bean.PaymentBean;
+import view.ViewUtils;
 
 import java.io.IOException;
 import java.util.logging.Logger;
@@ -69,8 +70,7 @@ public class GraphicPaymentView implements PaymentView {
                 Parent root = loader.load();
 
                 Scene scene = new Scene(root, 600, 500);
-                scene.getStylesheets().add(getClass().getResource("/css/style.css").toExternalForm());
-                scene.getStylesheets().add(getClass().getResource("/css/controls-dark.css").toExternalForm());
+                ViewUtils.applyStylesheets(scene);
 
                 stage.setScene(scene);
                 stage.show();

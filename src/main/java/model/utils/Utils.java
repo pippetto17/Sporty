@@ -1,22 +1,29 @@
 package model.utils;
 
+import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * Utility class containing lists of Italian cities
- */
-public class ItalianCities {
+public final class Utils {
 
-    private ItalianCities() {
-        // Private constructor to prevent instantiation
+    private Utils() {}
+
+    // Time utilities
+    public static boolean timeRangesOverlap(LocalTime start1, LocalTime end1, LocalTime start2, LocalTime end2) {
+        if (start1 == null || end1 == null || start2 == null || end2 == null) return false;
+        return start1.isBefore(end2) && end1.isAfter(start2);
     }
 
-    /**
-     * Lista completa delle città italiane principali
-     * Ordinata alfabeticamente per facilitare l'autocomplete
-     */
-    public static final List<String> CITIES = java.util.Collections.unmodifiableList(Arrays.asList(
+    // Price calculation
+    public static double calculatePricePerPerson(double pricePerHour, double hoursBooked, int participants) {
+        if (pricePerHour < 0 || hoursBooked <= 0 || participants <= 0) {
+            throw new IllegalArgumentException("Invalid parameters");
+        }
+        return (pricePerHour * hoursBooked) / participants;
+    }
+
+    // Italian cities
+    public static final List<String> ITALIAN_CITIES = java.util.Collections.unmodifiableList(Arrays.asList(
             "Agrigento", "Alessandria", "Ancona", "Aosta", "Arezzo", "Ascoli Piceno", "Asti",
             "Avellino", "Bari", "Barletta-Andria-Trani", "Belluno", "Benevento", "Bergamo",
             "Biella", "Bologna", "Bolzano", "Brescia", "Brindisi", "Cagliari", "Caltanissetta",
@@ -33,24 +40,15 @@ public class ItalianCities {
             "Terni", "Torino", "Trapani", "Trento", "Treviso", "Trieste", "Udine", "Varese",
             "Venezia", "Verbano-Cusio-Ossola", "Vercelli", "Verona", "Vibo Valentia", "Vicenza", "Viterbo"));
 
-    /**
-     * Cerca città che iniziano con il prefisso dato
-     */
-    public static List<String> searchByPrefix(String prefix) {
-        if (prefix == null || prefix.trim().isEmpty()) {
-            return CITIES;
-        }
-
-        String lowerPrefix = prefix.toLowerCase();
-        return CITIES.stream()
-                .filter(city -> city.toLowerCase().startsWith(lowerPrefix))
-                .toList();
+    public static List<String> searchCitiesByPrefix(String prefix) {
+        if (prefix == null || prefix.trim().isEmpty()) return ITALIAN_CITIES;
+        String lower = prefix.toLowerCase();
+        return ITALIAN_CITIES.stream().filter(c -> c.toLowerCase().startsWith(lower)).toList();
     }
 
-    /**
-     * Verifica se una città è valida
-     */
     public static boolean isValidCity(String city) {
-        return city != null && CITIES.contains(city);
+        if (city == null) return false;
+        return ITALIAN_CITIES.stream().anyMatch(c -> c.equalsIgnoreCase(city.trim()));
     }
 }
+

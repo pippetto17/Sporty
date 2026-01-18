@@ -155,7 +155,6 @@ public final class Constants {
     // CSS Paths
     public static final String CSS_PATH_STYLE = "/css/style.css";
     public static final String CSS_PATH_CONTROLS_DARK = "/css/controls-dark.css";
-    public static final String CSS_PATH_FIELD_MANAGER = "/css/field_manager.css";
 
     // CSS class names
     public static final String CSS_SECONDARY_BUTTON = "secondary-button";
