@@ -1,5 +1,4 @@
 package controller;
-package controller;
 
 import model.bean.MatchBean;
 import model.domain.Sport;
