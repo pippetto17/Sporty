@@ -20,7 +20,6 @@ public class Booking {
     private Double totalPrice;
     private LocalDateTime requestedAt;
     private LocalDateTime confirmedAt;
-    private String rejectionReason;
 
     public Booking() {
         this.status = BookingStatus.PENDING;
@@ -125,13 +124,6 @@ public class Booking {
         this.confirmedAt = confirmedAt;
     }
 
-    public String getRejectionReason() {
-        return rejectionReason;
-    }
-
-    public void setRejectionReason(String rejectionReason) {
-        this.rejectionReason = rejectionReason;
-    }
 
     /**
      * Check if booking is active (confirmed and in future).

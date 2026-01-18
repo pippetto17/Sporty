@@ -122,16 +122,8 @@ public class CLIFieldManagerView implements FieldManagerView {
         if (id == -1)
             return;
 
-        System.out.print("Reason for rejection: ");
-        String reason = scanner.nextLine().trim();
-
-        if (reason.isEmpty()) {
-            System.out.println("⚠ Reason is required.");
-            return;
-        }
-
         try {
-            controller.rejectBooking(id, reason);
+            controller.rejectBooking(id);
             System.out.println("✓ Booking " + id + " rejected.");
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());

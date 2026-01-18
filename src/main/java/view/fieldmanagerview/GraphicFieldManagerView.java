@@ -166,24 +166,8 @@ public class GraphicFieldManagerView implements FieldManagerView {
         if (selected == null)
             return;
 
-        TextInputDialog dialog = new TextInputDialog();
-        dialog.setTitle("Reject Booking");
-        dialog.setHeaderText("Rejecting request from " + selected.getRequesterUsername());
-        dialog.setContentText("Reason:");
-
-        ViewUtils.applyStylesheets(dialog.getDialogPane());
-
-        Optional<String> result = dialog.showAndWait();
-
-        // Guard Clause: esci se non c'è risultato o è vuoto
-        if (result.isEmpty() || result.get().trim().isEmpty()) {
-            if (result.isPresent())
-                showMessage("Reason required", true);
-            return;
-        }
-
         try {
-            controller.rejectBooking(selected.getBookingId(), result.get());
+            controller.rejectBooking(selected.getBookingId());
             showMessage("Booking rejected", false);
             loadData();
         } catch (Exception e) {

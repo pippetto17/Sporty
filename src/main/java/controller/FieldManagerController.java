@@ -139,19 +139,6 @@ public class FieldManagerController {
         }
     }
 
-    public void rejectBooking(int bookingId, String reason) {
-        // Overload to support reason, even if we don't store it in this simple version
-        // yet
-        // or if we add reason support to domain later.
-        // For now, delegate to simple reject or just save status.
-        model.domain.Booking booking = bookingDAO.findById(bookingId);
-        if (booking != null) {
-            booking.setStatus(model.domain.BookingStatus.REJECTED);
-            // Optionally store reason if Booking entity supports it
-            booking.setRejectionReason(reason);
-            bookingDAO.save(booking);
-        }
-    }
 
     public List<BookingBean> getFieldBookings(String fieldId) {
         return bookingDAO.findByFieldId(fieldId).stream()

@@ -73,4 +73,8 @@ public class HomeController {
     public void organizeMatch() {
         applicationController.navigateToOrganizeMatch(currentUser);
     }
+
+    public void bookFieldStandalone() {
+        applicationController.navigateToBookFieldStandalone(currentUser);
+    }
 }

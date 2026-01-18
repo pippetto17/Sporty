@@ -31,9 +31,18 @@ public class CLIBookFieldView implements BookFieldView {
         running = true;
         displayHeader();
 
-        // Search for available fields
-        System.out.println("\nSearching for available fields...");
-        List<FieldBean> fields = bookFieldController.searchAvailableFields();
+        List<FieldBean> fields;
+
+        if (bookFieldController.isStandaloneMode()) {
+            fields = promptStandaloneSearch();
+            if (fields == null) {
+                bookFieldController.navigateBack();
+                return;
+            }
+        } else {
+            System.out.println("\nSearching for available fields...");
+            fields = bookFieldController.searchAvailableFields();
+        }
 
         if (fields == null || fields.isEmpty()) {
             displayError("No fields available for the selected criteria.");
@@ -50,6 +59,60 @@ public class CLIBookFieldView implements BookFieldView {
             String choice = scanner.nextLine().trim();
             handleMenuChoice(choice);
         }
+    }
+
+    private List<FieldBean> promptStandaloneSearch() {
+        System.out.println("\n=== BOOK FIELD - SEARCH PARAMETERS ===");
+
+        System.out.print("Select sport (");
+        model.domain.Sport[] sports = model.domain.Sport.values();
+        for (int i = 0; i < sports.length; i++) {
+            System.out.print((i + 1) + "=" + sports[i].getDisplayName());
+            if (i < sports.length - 1) System.out.print(", ");
+        }
+        System.out.print("): ");
+
+        int sportChoice;
+        try {
+            sportChoice = Integer.parseInt(scanner.nextLine().trim());
+            if (sportChoice < 1 || sportChoice > sports.length) {
+                displayError("Invalid sport selection");
+                return null;
+            }
+        } catch (NumberFormatException e) {
+            displayError("Invalid input");
+            return null;
+        }
+
+        System.out.print("Enter city: ");
+        String city = scanner.nextLine().trim();
+        if (city.isEmpty()) {
+            displayError("City cannot be empty");
+            return null;
+        }
+
+        System.out.print("Enter date (yyyy-mm-dd): ");
+        String dateStr = scanner.nextLine().trim();
+        try {
+            java.time.LocalDate date = java.time.LocalDate.parse(dateStr);
+            bookFieldController.getCurrentMatchBean().setMatchDate(date);
+        } catch (Exception e) {
+            displayError("Invalid date format");
+            return null;
+        }
+
+        System.out.print("Enter time (HH:mm): ");
+        String timeStr = scanner.nextLine().trim();
+        try {
+            java.time.LocalTime time = java.time.LocalTime.parse(timeStr);
+            bookFieldController.getCurrentMatchBean().setMatchTime(time);
+        } catch (Exception e) {
+            displayError("Invalid time format");
+            return null;
+        }
+
+        System.out.println("\nSearching for available fields...");
+        return bookFieldController.searchFieldsForDirectBooking(sports[sportChoice - 1], city);
     }
 
     @Override

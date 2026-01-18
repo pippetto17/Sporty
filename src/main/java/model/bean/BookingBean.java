@@ -21,7 +21,6 @@ public class BookingBean {
     private Double totalPrice;
     private LocalDateTime requestedAt;
     private LocalDateTime confirmedAt;
-    private String rejectionReason;
 
     // Getters and Setters
 
@@ -129,13 +128,6 @@ public class BookingBean {
         this.confirmedAt = confirmedAt;
     }
 
-    public String getRejectionReason() {
-        return rejectionReason;
-    }
-
-    public void setRejectionReason(String rejectionReason) {
-        this.rejectionReason = rejectionReason;
-    }
 
     @Override
     public String toString() {

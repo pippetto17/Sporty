@@ -440,11 +440,7 @@ public class GraphicHomeView implements HomeView {
     @FXML
     private void handleBookField() {
         updateStatus("Opening book field...");
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Book Field");
-        alert.setHeaderText(null);
-        alert.setContentText("Book field feature coming soon!");
-        alert.showAndWait();
+        homeController.bookFieldStandalone();
     }
 
     @FXML

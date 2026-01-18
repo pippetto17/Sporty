@@ -84,6 +84,14 @@ public class GraphicPaymentView implements PaymentView {
 
     @FXML
     public void initialize() {
+        if (paymentController.isBookingMode()) {
+            initializeBookingMode();
+        } else {
+            initializeMatchMode();
+        }
+    }
+
+    private void initializeMatchMode() {
         MatchBean match = paymentController.getMatchBean();
         if (match != null) {
             matchInfoLabel.setText(String.format("Payment for: %s - %s @ %s",
@@ -91,27 +99,36 @@ public class GraphicPaymentView implements PaymentView {
 
             Double price = match.getPricePerPerson();
             if (price != null) {
-                // Populate shares combo box (1 to required participants)
                 Integer[] shares = new Integer[match.getRequiredParticipants()];
                 for (int i = 0; i < shares.length; i++) {
                     shares[i] = i + 1;
                 }
                 sharesComboBox.setItems(FXCollections.observableArrayList(shares));
-                sharesComboBox.setValue(1); // Default
-
-                updateTotalAmount();
+                sharesComboBox.setValue(1);
+                sharesComboBox.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+                    if (newVal != null) updateAmount();
+                });
+                updateAmount();
             }
         }
-
-        // Add listener to update total when shares change
-        sharesComboBox.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
-            if (newVal != null) {
-                updateTotalAmount();
-            }
-        });
     }
 
-    private void updateTotalAmount() {
+    private void initializeBookingMode() {
+        model.bean.FieldBean field = paymentController.getFieldBean();
+        MatchBean context = paymentController.getMatchBean();
+
+        if (field != null && context != null) {
+            matchInfoLabel.setText(String.format("Booking: %s - %s on %s @ %s",
+                    field.getName(), field.getCity(),
+                    context.getMatchDate(), context.getMatchTime()));
+
+            sharesComboBox.setVisible(false);
+            double totalPrice = field.getPricePerHour() * 2;
+            amountLabel.setText(String.format("Total Amount: €%.2f (2h slot)", totalPrice));
+        }
+    }
+
+    private void updateAmount() {
         Double price = paymentController.getMatchBean().getPricePerPerson();
         Integer shares = sharesComboBox.getValue();
         if (price != null && shares != null) {

@@ -22,8 +22,8 @@ public class MatchDAODBMS implements MatchDAO {
     public void save(Match match) {
         String sql = """
                 INSERT INTO matches (organizer_username, sport, match_date, match_time, city,
-                                    required_participants, field_id, status, participants)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                                    required_participants, field_id, status, participants, booking_id)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON DUPLICATE KEY UPDATE
                     sport = VALUES(sport),
                     match_date = VALUES(match_date),
@@ -32,7 +32,8 @@ public class MatchDAODBMS implements MatchDAO {
                     required_participants = VALUES(required_participants),
                     field_id = VALUES(field_id),
                     status = VALUES(status),
-                    participants = VALUES(participants)
+                    participants = VALUES(participants),
+                    booking_id = VALUES(booking_id)
                 """;
 
         try (PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -51,13 +52,17 @@ public class MatchDAODBMS implements MatchDAO {
 
             stmt.setInt(8, match.getStatus().getCode());
 
-            // Serialize participants list to JSON
             String participantsJson = serializeParticipantsToJson(match.getParticipants());
             stmt.setString(9, participantsJson);
 
+            if (match.getBookingId() != null) {
+                stmt.setInt(10, match.getBookingId());
+            } else {
+                stmt.setNull(10, Types.INTEGER);
+            }
+
             stmt.executeUpdate();
 
-            // Se è un nuovo match, recupera l'ID generato
             if (match.getMatchId() == null) {
                 try (ResultSet rs = stmt.getGeneratedKeys()) {
                     if (rs.next()) {
@@ -74,7 +79,7 @@ public class MatchDAODBMS implements MatchDAO {
     public Match findById(int matchId) {
         String sql = """
                 SELECT match_id, organizer_username, sport, match_date, match_time,
-                       city, required_participants, field_id, status, participants
+                       city, required_participants, field_id, status, participants, booking_id
                 FROM matches
                 WHERE match_id = ?
                 """;
@@ -95,7 +100,7 @@ public class MatchDAODBMS implements MatchDAO {
     @Override
     public List<Match> findByOrganizer(String organizerUsername) {
         String sql = "SELECT match_id, organizer_username, sport, match_date, match_time, " +
-                "city, required_participants, field_id, status, participants FROM matches " +
+                "city, required_participants, field_id, status, participants, booking_id FROM matches " +
                 "WHERE organizer_username = ? ORDER BY match_date DESC, match_time DESC";
         List<Match> matches = new ArrayList<>();
 
@@ -115,7 +120,7 @@ public class MatchDAODBMS implements MatchDAO {
     @Override
     public List<Match> findAllAvailable() {
         String sql = "SELECT match_id, organizer_username, sport, match_date, match_time, " +
-                "city, required_participants, field_id, status, participants FROM matches " +
+                "city, required_participants, field_id, status, participants, booking_id FROM matches " +
                 "WHERE status = ? AND match_date >= CURDATE() ORDER BY match_date, match_time";
         List<Match> matches = new ArrayList<>();
 
@@ -164,10 +169,14 @@ public class MatchDAODBMS implements MatchDAO {
 
         match.setStatus(MatchStatus.fromCode(rs.getInt("status")));
 
-        // Deserialize participants from JSON
         String participantsJson = rs.getString("participants");
         List<String> participants = deserializeParticipantsFromJson(participantsJson);
         match.setParticipants(participants);
+
+        int bookingId = rs.getInt("booking_id");
+        if (!rs.wasNull()) {
+            match.setBookingId(bookingId);
+        }
 
         return match;
     }

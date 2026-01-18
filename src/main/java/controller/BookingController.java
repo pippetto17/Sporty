@@ -71,15 +71,11 @@ public class BookingController {
         }
     }
 
-    public void rejectBooking(int bookingId, String reason) throws ValidationException {
+    public void rejectBooking(int bookingId) throws ValidationException {
         validateFieldManager();
         model.domain.Booking booking = bookingDAO.findById(bookingId);
         if (booking != null) {
             booking.setStatus(model.domain.BookingStatus.REJECTED);
-            // Save rejection reason if domain supports it
-            if (reason != null && !reason.isBlank()) {
-                booking.setRejectionReason(reason);
-            }
             bookingDAO.save(booking);
         }
     }

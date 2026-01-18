@@ -16,7 +16,7 @@ import java.util.List;
  */
 public class BookingDAODBMS implements BookingDAO {
 
-    private static final String BOOKINGS_COLUMNS = "booking_id, field_id, requester_username, booking_date, start_time, end_time, type, status, total_price, requested_at, confirmed_at, rejection_reason";
+    private static final String BOOKINGS_COLUMNS = "booking_id, field_id, requester_username, booking_date, start_time, end_time, type, status, total_price, requested_at, confirmed_at";
     // Common prefix for selecting all booking columns from the bookings table
     private static final String SELECT_BOOKINGS = "SELECT " + BOOKINGS_COLUMNS + " FROM bookings";
 
@@ -24,12 +24,11 @@ public class BookingDAODBMS implements BookingDAO {
     public void save(Booking booking) {
         String sql = """
                 INSERT INTO bookings (field_id, requester_username, booking_date, start_time, end_time,
-                                    type, status, total_price, requested_at, confirmed_at, rejection_reason)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                                    type, status, total_price, requested_at, confirmed_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON DUPLICATE KEY UPDATE
                     status = VALUES(status),
-                    confirmed_at = VALUES(confirmed_at),
-                    rejection_reason = VALUES(rejection_reason)
+                    confirmed_at = VALUES(confirmed_at)
                 """;
 
         try (Connection conn = ConnectionFactory.getConnection();
@@ -46,7 +45,6 @@ public class BookingDAODBMS implements BookingDAO {
             stmt.setTimestamp(9, Timestamp.valueOf(booking.getRequestedAt()));
             stmt.setTimestamp(10,
                     booking.getConfirmedAt() != null ? Timestamp.valueOf(booking.getConfirmedAt()) : null);
-            stmt.setString(11, booking.getRejectionReason());
 
             stmt.executeUpdate();
 
@@ -113,7 +111,7 @@ public class BookingDAODBMS implements BookingDAO {
     public List<Booking> findPendingByManagerId(String managerId) {
         String sql = """
                 SELECT b.booking_id, b.field_id, b.requester_username, b.booking_date, b.start_time, b.end_time,
-                       b.type, b.status, b.total_price, b.requested_at, b.confirmed_at, b.rejection_reason
+                       b.type, b.status, b.total_price, b.requested_at, b.confirmed_at
                 FROM bookings b
                 JOIN fields f ON b.field_id = f.field_id
                 WHERE f.manager_id = ? AND b.status = 0
@@ -217,7 +215,6 @@ public class BookingDAODBMS implements BookingDAO {
             booking.setConfirmedAt(confirmedAt.toLocalDateTime());
         }
 
-        booking.setRejectionReason(rs.getString("rejection_reason"));
 
         return booking;
     }

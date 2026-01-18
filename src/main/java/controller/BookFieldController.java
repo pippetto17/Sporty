@@ -19,6 +19,7 @@ public class BookFieldController {
     private MatchBean currentMatchBean;
     private List<FieldBean> availableFields;
     private FieldBean selectedField;
+    private boolean standaloneMode;
 
     public BookFieldController(ApplicationController applicationController) {
         this.applicationController = applicationController;
@@ -31,6 +32,14 @@ public class BookFieldController {
 
     public void setMatchBean(MatchBean matchBean) {
         this.currentMatchBean = matchBean;
+    }
+
+    public void setStandaloneMode(boolean standalone) {
+        this.standaloneMode = standalone;
+    }
+
+    public boolean isStandaloneMode() {
+        return standaloneMode;
     }
 
     public MatchBean getCurrentMatchBean() {
@@ -65,6 +74,14 @@ public class BookFieldController {
         return availableFields;
     }
 
+    public List<FieldBean> searchFieldsForDirectBooking(model.domain.Sport sport, String city) {
+        List<model.domain.Field> fields = fieldDAO.findAvailableFields(sport, city, null, null);
+        this.availableFields = fields.stream()
+                .map(model.converter.FieldConverter::toBean)
+                .toList();
+        return availableFields;
+    }
+
     // sortFields removed as unused and relying on deleted type
 
     public List<FieldBean> filterByPriceRange(double minPrice, double maxPrice) {
@@ -87,11 +104,14 @@ public class BookFieldController {
         if (selectedField == null)
             throw new ValidationException(Constants.ERROR_NO_FIELD_SELECTED);
 
-        if (currentMatchBean.getPricePerPerson() == null) {
-            currentMatchBean.setPricePerPerson(selectedField.getPricePerPerson());
+        if (standaloneMode) {
+            applicationController.navigateToPaymentForBooking(selectedField, currentMatchBean);
+        } else {
+            if (currentMatchBean.getPricePerPerson() == null) {
+                currentMatchBean.setPricePerPerson(selectedField.getPricePerPerson());
+            }
+            applicationController.navigateToPayment(currentMatchBean);
         }
-
-        applicationController.navigateToPayment(currentMatchBean);
     }
 
     public void navigateBack() {

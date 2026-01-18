@@ -119,8 +119,12 @@ public class CLIHomeView implements HomeView {
                 homeController.organizeMatch();
             }
             case "3" -> {
+                System.out.println("\n--- BOOK FIELD ---");
+                homeController.bookFieldStandalone();
+            }
+            case "4" -> {
                 applicationController.logout();
-                return false; // Ferma il loop
+                return false;
             }
             default -> System.out.println(Constants.ERROR_INVALID_OPTION);
         }

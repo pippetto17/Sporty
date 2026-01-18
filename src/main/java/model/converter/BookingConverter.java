@@ -34,7 +34,6 @@ public class BookingConverter {
         bean.setTotalPrice(booking.getTotalPrice());
         bean.setRequestedAt(booking.getRequestedAt());
         bean.setConfirmedAt(booking.getConfirmedAt());
-        bean.setRejectionReason(booking.getRejectionReason());
 
         return bean;
     }
@@ -85,7 +84,6 @@ public class BookingConverter {
         booking.setTotalPrice(bean.getTotalPrice());
         booking.setRequestedAt(bean.getRequestedAt());
         booking.setConfirmedAt(bean.getConfirmedAt());
-        booking.setRejectionReason(bean.getRejectionReason());
 
         return booking;
     }

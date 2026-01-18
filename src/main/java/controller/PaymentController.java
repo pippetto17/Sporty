@@ -19,6 +19,8 @@ public class PaymentController {
     private final ApplicationController applicationController;
     private final model.dao.MatchDAO matchDAO;
     private MatchBean matchBean;
+    private model.bean.FieldBean fieldBean;
+    private boolean bookingMode;
 
     public PaymentController(ApplicationController applicationController) {
         this.applicationController = applicationController;
@@ -31,6 +33,21 @@ public class PaymentController {
 
     public void setMatchBean(MatchBean matchBean) {
         this.matchBean = matchBean;
+        this.bookingMode = false;
+    }
+
+    public void setBookingMode(model.bean.FieldBean fieldBean, MatchBean contextBean) {
+        this.fieldBean = fieldBean;
+        this.matchBean = contextBean;
+        this.bookingMode = true;
+    }
+
+    public boolean isBookingMode() {
+        return bookingMode;
+    }
+
+    public model.bean.FieldBean getFieldBean() {
+        return fieldBean;
     }
 
     public MatchBean getMatchBean() {
@@ -38,31 +55,60 @@ public class PaymentController {
     }
 
     public boolean processPayment(PaymentBean paymentBean) throws ValidationException {
-        // Simple mock payment logic (KISS)
-        boolean success = paymentBean != null &&
-                paymentBean.getCardNumber() != null &&
-                !paymentBean.getCardNumber().isEmpty();
+        if (paymentBean == null || paymentBean.getCardNumber() == null || paymentBean.getCardNumber().isEmpty())
+            return false;
 
-        if (success) {
-            try {
-                if (matchBean == null)
-                    throw new ValidationException("MatchBean cannot be null");
-                matchBean.setStatus(model.domain.MatchStatus.CONFIRMED);
-
-                model.domain.Match match = model.converter.MatchConverter.toEntity(matchBean);
-                matchDAO.save(match);
-
-                if (match.getMatchId() != null) {
-                    matchBean.setMatchId(match.getMatchId());
-                }
-
-                applicationController.navigateToRecap(matchBean);
-            } catch (Exception e) {
-                logger.log(Level.SEVERE, Constants.ERROR_MATCH_CONFIRM, e);
-                return false;
+        try {
+            if (bookingMode) {
+                return processBookingPayment();
+            } else {
+                return processMatchPayment();
             }
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, bookingMode ? "Error confirming booking" : Constants.ERROR_MATCH_CONFIRM, e);
+            return false;
         }
-        return success;
+    }
+
+    private boolean processMatchPayment() throws ValidationException {
+        if (matchBean == null)
+            throw new ValidationException("MatchBean cannot be null");
+
+        matchBean.setStatus(model.domain.MatchStatus.CONFIRMED);
+        model.domain.Match match = model.converter.MatchConverter.toEntity(matchBean);
+        matchDAO.save(match);
+
+        if (match.getMatchId() != null) {
+            matchBean.setMatchId(match.getMatchId());
+        }
+
+        applicationController.navigateToRecap(matchBean);
+        return true;
+    }
+
+    private boolean processBookingPayment() throws ValidationException {
+        if (fieldBean == null || matchBean == null)
+            throw new ValidationException("Field and context required for booking");
+
+        model.dao.BookingDAO bookingDAO = model.dao.DAOFactory.getBookingDAO(
+                applicationController.getPersistenceType());
+
+        model.domain.Booking booking = new model.domain.Booking();
+        booking.setFieldId(fieldBean.getFieldId());
+        booking.setRequesterUsername(matchBean.getOrganizerUsername());
+        booking.setBookingDate(matchBean.getMatchDate());
+        booking.setStartTime(matchBean.getMatchTime());
+        booking.setEndTime(matchBean.getMatchTime().plusHours(2));
+        booking.setType(model.domain.BookingType.PRIVATE);
+        booking.setTotalPrice(fieldBean.getPricePerHour() * 2);
+        booking.setStatus(model.domain.BookingStatus.CONFIRMED);
+
+        bookingDAO.save(booking);
+
+        // Torna alla home: Payment -> BookField -> Home
+        applicationController.back(); // chiude Payment
+        applicationController.back(); // chiude BookField, torna a Home
+        return true;
     }
 
     public void back() {

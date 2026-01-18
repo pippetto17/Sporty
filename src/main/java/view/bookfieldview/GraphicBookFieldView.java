@@ -65,13 +65,16 @@ public class GraphicBookFieldView implements BookFieldView {
                     getClass().getResource("/css/style.css").toExternalForm(),
                     getClass().getResource("/css/controls-dark.css").toExternalForm());
 
-            stage.setTitle("Sporty - Select Field");
+            stage.setTitle("Sporty - " + (controller.isStandaloneMode() ? "Book Field" : "Select Field"));
             stage.setScene(scene);
             stage.show();
 
-            // Post-show initialization
-            displayMatchInfo();
-            searchFields();
+            if (controller.isStandaloneMode()) {
+                showStandaloneSearchForm();
+            } else {
+                displayMatchInfo();
+                searchFields();
+            }
 
         } catch (Exception e) {
             logger.severe("View load failed: " + e.getMessage());
@@ -92,6 +95,91 @@ public class GraphicBookFieldView implements BookFieldView {
                 match.getRequiredParticipants());
 
         matchInfoLabel.setText("Match: " + info);
+    }
+
+    private void showStandaloneSearchForm() {
+        matchInfoLabel.setText("Select booking parameters:");
+
+        javafx.scene.control.Dialog<ButtonType> dialog = new javafx.scene.control.Dialog<>();
+        dialog.setTitle("Book Field - Search Parameters");
+        dialog.setHeaderText("Enter search criteria");
+
+        javafx.scene.control.ComboBox<model.domain.Sport> sportCombo = new javafx.scene.control.ComboBox<>();
+        sportCombo.getItems().addAll(model.domain.Sport.values());
+        sportCombo.setPromptText("Select Sport");
+
+        javafx.scene.control.TextField cityField = new javafx.scene.control.TextField();
+        cityField.setPromptText("City (e.g., Milan)");
+
+        javafx.scene.control.DatePicker datePicker = new javafx.scene.control.DatePicker();
+        datePicker.setPromptText("Select Date");
+        datePicker.setValue(java.time.LocalDate.now());
+
+        javafx.scene.control.ComboBox<String> timeCombo = new javafx.scene.control.ComboBox<>();
+        for (int h = 8; h <= 22; h++) {
+            timeCombo.getItems().add(String.format("%02d:00", h));
+        }
+        timeCombo.setPromptText("Select Time");
+
+        javafx.scene.layout.GridPane grid = new javafx.scene.layout.GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.add(new Label("Sport:"), 0, 0);
+        grid.add(sportCombo, 1, 0);
+        grid.add(new Label("City:"), 0, 1);
+        grid.add(cityField, 1, 1);
+        grid.add(new Label("Date:"), 0, 2);
+        grid.add(datePicker, 1, 2);
+        grid.add(new Label("Time:"), 0, 3);
+        grid.add(timeCombo, 1, 3);
+
+        dialog.getDialogPane().setContent(grid);
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+        ViewUtils.applyStylesheets(dialog.getDialogPane());
+
+        dialog.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK && sportCombo.getValue() != null &&
+                !cityField.getText().trim().isEmpty() && datePicker.getValue() != null &&
+                timeCombo.getValue() != null) {
+
+                MatchBean contextBean = controller.getCurrentMatchBean();
+                contextBean.setSport(sportCombo.getValue());
+                contextBean.setCity(cityField.getText().trim());
+                contextBean.setMatchDate(datePicker.getValue());
+                contextBean.setMatchTime(java.time.LocalTime.parse(timeCombo.getValue()));
+
+                matchInfoLabel.setText(String.format("Booking: %s - %s - %s %s",
+                    contextBean.getSport().getDisplayName(),
+                    contextBean.getCity(),
+                    contextBean.getMatchDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
+                    contextBean.getMatchTime().format(DateTimeFormatter.ofPattern("HH:mm"))));
+
+                searchFieldsStandalone(contextBean.getSport(), contextBean.getCity());
+            } else {
+                controller.navigateBack();
+            }
+        });
+    }
+
+    private void searchFieldsStandalone(model.domain.Sport sport, String city) {
+        if (resultsLabel != null) {
+            resultsLabel.setText("Searching available fields...");
+        }
+        if (fieldsContainer != null) {
+            fieldsContainer.getChildren().clear();
+        }
+
+        CompletableFuture.supplyAsync(() -> controller.searchFieldsForDirectBooking(sport, city))
+                .thenAcceptAsync(this::handleSearchResults, Platform::runLater)
+                .exceptionally(ex -> {
+                    Platform.runLater(() -> {
+                        if (resultsLabel != null) {
+                            resultsLabel.setText("Error loading fields");
+                        }
+                        showAlert(ERROR_TITLE, "Search failed: " + ex.getMessage(), Alert.AlertType.ERROR);
+                    });
+                    return null;
+                });
     }
 
     // --- LOGICA DI RICERCA (Async Clean) ---

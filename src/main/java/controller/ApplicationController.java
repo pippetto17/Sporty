@@ -133,9 +133,28 @@ public class ApplicationController {
         pushView(view);
     }
 
+    public void navigateToBookFieldStandalone(User user) {
+        var controller = new BookFieldController(this);
+        controller.setStandaloneMode(true);
+        MatchBean contextBean = new MatchBean();
+        contextBean.setOrganizerUsername(user.getUsername());
+        controller.setMatchBean(contextBean);
+        view.bookfieldview.BookFieldView view = viewFactory.createBookFieldView(controller);
+        view.setApplicationController(this);
+        pushView(view);
+    }
+
     public void navigateToPayment(MatchBean matchBean) {
         PaymentController paymentController = new PaymentController(this);
         paymentController.setMatchBean(matchBean);
+        view.paymentview.PaymentView paymentView = viewFactory.createPaymentView(paymentController);
+        paymentView.setApplicationController(this);
+        pushView(paymentView);
+    }
+
+    public void navigateToPaymentForBooking(model.bean.FieldBean fieldBean, MatchBean contextBean) {
+        PaymentController paymentController = new PaymentController(this);
+        paymentController.setBookingMode(fieldBean, contextBean);
         view.paymentview.PaymentView paymentView = viewFactory.createPaymentView(paymentController);
         paymentView.setApplicationController(this);
         pushView(paymentView);
