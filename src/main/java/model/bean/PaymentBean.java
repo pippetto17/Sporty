@@ -9,15 +9,6 @@ public class PaymentBean {
     private int sharesToPay;
     private String matchId; // Optional connection to match
 
-    /**
-     * Default no-arg constructor required for JavaBeans specification.
-     * This constructor is needed for serialization/deserialization frameworks
-     * and JavaFX property binding.
-     */
-    public PaymentBean() {
-        // Empty constructor required by JavaBeans specification for reflection-based instantiation
-    }
-
     public String getCardNumber() {
         return cardNumber;
     }

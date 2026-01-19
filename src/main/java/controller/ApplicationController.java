@@ -12,8 +12,9 @@ import view.factory.ViewFactory;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Scanner;
-import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import exception.ValidationException;
 
 public class ApplicationController {
 
@@ -23,69 +24,57 @@ public class ApplicationController {
     private ViewFactory viewFactory;
     private DAOFactory.PersistenceType persistenceType;
 
-    // Default constructor implicit — runtime initialization happens in start()
-
     public void start() {
-        // 1. Wizard di configurazione (Console)
         setupConfiguration();
-
-        // 2. Scelta Interfaccia
         setupInterface();
-
-        // 3. Avvio applicazione
         navigateToLogin();
     }
 
     // --- CONFIGURATION WIZARD ---
 
+    @SuppressWarnings("resource")
     private void setupConfiguration() {
-        Scanner scanner = new Scanner(System.in);
+        var scanner = new Scanner(System.in);
         System.out.println("=== SPORTY CONFIGURATION ===");
-
-        // Scelta Versione
         System.out.println("Select version:\n1. DEMO (No persistence)\n2. FULL (Persistence)");
         System.out.print("> ");
+
         boolean isDemo = scanner.nextLine().trim().equals("1");
 
         if (isDemo) {
             this.persistenceType = DAOFactory.PersistenceType.MEMORY;
             logger.info(() -> "App started in DEMO mode");
-        } else {
-            // Scelta Storage (Solo per FULL)
-            System.out.println("Select storage:\n1. FileSystem\n2. Database (DBMS)");
-            System.out.print("> ");
-            boolean isDbms = scanner.nextLine().trim().equals("2");
-
-            this.persistenceType = isDbms
-                    ? DAOFactory.PersistenceType.DBMS
-                    : DAOFactory.PersistenceType.FILESYSTEM;
-
-            // Use lambda supplier to avoid unnecessary string concatenation when logger level is higher
-            logger.info(() -> String.format("App started with persistence: %s", persistenceType));
+            return;
         }
+
+        System.out.println("Select storage:\n1. FileSystem\n2. Database (DBMS)");
+        System.out.print("> ");
+        boolean isDbms = scanner.nextLine().trim().equals("2");
+
+        this.persistenceType = isDbms ? DAOFactory.PersistenceType.DBMS : DAOFactory.PersistenceType.FILESYSTEM;
+        logger.info(() -> String.format("App started with persistence: %s", persistenceType));
     }
 
+    @SuppressWarnings("resource")
     private void setupInterface() {
-        Scanner scanner = new Scanner(System.in);
+        var scanner = new Scanner(System.in);
         System.out.println("Select Interface:\n1. Graphic (JavaFX)\n2. CLI (Console)");
         System.out.print("> ");
 
         String choice = scanner.nextLine().trim();
-        // Default a CLI se la scelta non è 1
         this.viewFactory = choice.equals("1") ? new GraphicViewFactory() : new CLIViewFactory();
     }
 
     // --- NAVIGATION ROUTING ---
 
     public void navigateToLogin() {
-        LoginController controller = new LoginController(persistenceType);
-        view.loginview.LoginView view = viewFactory.createLoginView(controller);
+        var controller = new LoginController(persistenceType);
+        var view = viewFactory.createLoginView(controller);
         view.setApplicationController(this);
         pushView(view);
     }
 
-    public void navigateToHome(User user) {
-        // Routing intelligente basato sul ruolo
+    public void navigateToHome(User user) throws ValidationException {
         if (user.getRole() == Role.FIELD_MANAGER.getCode()) {
             navigateToFieldManagerDashboard(user);
         } else {
@@ -94,33 +83,23 @@ public class ApplicationController {
     }
 
     private void navigateToPlayerHome(User user) {
-        try {
-            var matchDAO = DAOFactory.getMatchDAO(persistenceType);
-            var controller = new HomeController(user, this, matchDAO);
-            view.homeview.HomeView view = viewFactory.createHomeView(controller);
-
-            view.setApplicationController(this);
-
-            pushView(view);
-        } catch (Exception e) {
-            logError("Home navigation failed", e);
-        }
+        var matchDAO = DAOFactory.getMatchDAO(persistenceType);
+        var controller = new HomeController(user, this, matchDAO);
+        var view = viewFactory.createHomeView(controller);
+        view.setApplicationController(this);
+        pushView(view);
     }
 
-    public void navigateToFieldManagerDashboard(User manager) {
-        try {
-            var controller = new FieldManagerController(manager, persistenceType);
-            view.fieldmanagerview.FieldManagerView view = viewFactory.createFieldManagerView(controller);
-            view.setApplicationController(this);
-            pushView(view);
-        } catch (Exception e) {
-            logError("Dashboard navigation failed", e);
-        }
+    public void navigateToFieldManagerDashboard(User manager) throws ValidationException {
+        var controller = new FieldManagerController(manager, persistenceType);
+        var view = viewFactory.createFieldManagerView(controller);
+        view.setApplicationController(this);
+        pushView(view);
     }
 
     public void navigateToOrganizeMatch(User organizer) {
         var controller = new OrganizeMatchController(organizer, this);
-        view.organizematchview.OrganizeMatchView view = viewFactory.createOrganizeMatchView(controller);
+        var view = viewFactory.createOrganizeMatchView(controller);
         view.setApplicationController(this);
         pushView(view);
     }
@@ -128,7 +107,7 @@ public class ApplicationController {
     public void navigateToBookField(MatchBean match) {
         var controller = new BookFieldController(this);
         controller.setMatchBean(match);
-        view.bookfieldview.BookFieldView view = viewFactory.createBookFieldView(controller);
+        var view = viewFactory.createBookFieldView(controller);
         view.setApplicationController(this);
         pushView(view);
     }
@@ -136,72 +115,74 @@ public class ApplicationController {
     public void navigateToBookFieldStandalone(User user) {
         var controller = new BookFieldController(this);
         controller.setStandaloneMode(true);
-        MatchBean contextBean = new MatchBean();
+
+        var contextBean = new MatchBean();
         contextBean.setOrganizerUsername(user.getUsername());
         controller.setMatchBean(contextBean);
-        view.bookfieldview.BookFieldView view = viewFactory.createBookFieldView(controller);
+
+        var view = viewFactory.createBookFieldView(controller);
         view.setApplicationController(this);
         pushView(view);
     }
 
     public void navigateToPayment(MatchBean matchBean) {
-        PaymentController paymentController = new PaymentController(this);
-        paymentController.setMatchBean(matchBean);
-        view.paymentview.PaymentView paymentView = viewFactory.createPaymentView(paymentController);
-        paymentView.setApplicationController(this);
-        pushView(paymentView);
+        var controller = new PaymentController(this);
+        controller.setMatchBean(matchBean);
+        var view = viewFactory.createPaymentView(controller);
+        view.setApplicationController(this);
+        controller.setView(view);
+        pushView(view);
+        controller.start();
     }
 
     public void navigateToPaymentForBooking(model.bean.FieldBean fieldBean, MatchBean contextBean) {
-        PaymentController paymentController = new PaymentController(this);
-        paymentController.setBookingMode(fieldBean, contextBean);
-        view.paymentview.PaymentView paymentView = viewFactory.createPaymentView(paymentController);
-        paymentView.setApplicationController(this);
-        pushView(paymentView);
+        var controller = new PaymentController(this);
+        controller.setBookingMode(fieldBean, contextBean);
+        var view = viewFactory.createPaymentView(controller);
+        view.setApplicationController(this);
+        controller.setView(view);
+        pushView(view);
+        controller.start();
     }
 
     public void navigateToPaymentForJoin(MatchBean matchBean, User user) {
-        PaymentController paymentController = new PaymentController(this);
-        paymentController.setJoinMode(matchBean, user);
-        view.paymentview.PaymentView paymentView = viewFactory.createPaymentView(paymentController);
-        paymentView.setApplicationController(this);
-        pushView(paymentView);
+        var controller = new PaymentController(this);
+        controller.setJoinMode(matchBean, user);
+        var view = viewFactory.createPaymentView(controller);
+        view.setApplicationController(this);
+        controller.setView(view);
+        pushView(view);
+        controller.start();
     }
 
     public void navigateToJoinMatch(MatchBean matchBean, User user) {
-        JoinMatchController controller = new JoinMatchController(user, this);
+        var controller = new JoinMatchController(user, this);
         controller.setMatch(matchBean);
-        view.joinmatchview.JoinMatchView view = viewFactory.createJoinMatchView(controller);
+        var view = viewFactory.createJoinMatchView(controller);
         view.setApplicationController(this);
+        controller.setView(view);
         pushView(view);
+        controller.start();
     }
 
-    // Metodi specifici per Field Manager
     public void navigateToAddField(FieldManagerController controller) {
-        // Crea la view per l'aggiunta del campo e la mostra.
-        // L'interfaccia AddFieldView non dichiara setApplicationController, quindi
-        // non la invochiamo qui per evitare errori di compilazione.
-        view.addfieldview.AddFieldView view = viewFactory.createAddFieldView(controller);
+        var view = viewFactory.createAddFieldView(controller);
         pushView(view);
     }
 
     public void navigateToMyFields(FieldManagerController controller) {
-        view.myfieldsview.MyFieldsView view = viewFactory.createMyFieldsView(controller);
+        var view = viewFactory.createMyFieldsView(controller);
         view.setApplicationController(this);
         pushView(view);
     }
 
-    // --- STACK MANAGEMENT HELPERS ---
+    // --- STACK MANAGEMENT ---
 
     private void pushView(View view) {
-        // Chiude la view precedente se esiste
         if (!viewStack.isEmpty()) {
             viewStack.peek().close();
         }
-
-        // Manteniamo la responsabilità di impostare application controller sulle singole view
-        // (se necessario) e non qui, perché l'interfaccia View non lo dichiara.
-        viewStack.push(view); // 'push' è equivalente a 'addFirst' in ArrayDeque
+        viewStack.push(view);
         view.display();
     }
 
@@ -211,13 +192,8 @@ public class ApplicationController {
             return;
         }
 
-        View current = viewStack.pop();
-        current.close();
-
-        View previous = viewStack.peek();
-        if (previous != null) {
-            previous.display();
-        }
+        viewStack.pop().close();
+        viewStack.peek().display();
     }
 
     public View getCurrentView() {
@@ -225,34 +201,24 @@ public class ApplicationController {
     }
 
     public void logout() {
-        // Svuota lo stack fino all'ultimo elemento (o tutto)
         while (viewStack.size() > 1) {
             viewStack.pop().close();
         }
-        // Chiudi anche l'ultima view rimasta
         if (!viewStack.isEmpty()) {
             viewStack.pop().close();
         }
-        // Ricomincia
         navigateToLogin();
     }
 
-    // --- UTILS ---
-
-    private void logError(String message, Exception e) {
-        // Use the throwable overload so the exception is logged with its stack trace
-        logger.log(Level.SEVERE, message, e);
-    }
+    // --- GETTERS ---
 
     public DAOFactory.PersistenceType getPersistenceType() {
         return persistenceType;
     }
 
     public String getConfigurationInfo() {
-        if (persistenceType == DAOFactory.PersistenceType.MEMORY) {
-            return "Running DEMO version (data will not be persisted)";
-        } else {
-            return "Running FULL version with " + persistenceType + " persistence";
-        }
+        return persistenceType == DAOFactory.PersistenceType.MEMORY
+                ? "Running DEMO version (data will not be persisted)"
+                : "Running FULL version with " + persistenceType + " persistence";
     }
 }

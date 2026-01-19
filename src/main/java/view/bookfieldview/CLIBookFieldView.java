@@ -69,7 +69,8 @@ public class CLIBookFieldView implements BookFieldView {
         model.domain.Sport[] sports = model.domain.Sport.values();
         for (int i = 0; i < sports.length; i++) {
             System.out.print((i + 1) + "=" + sports[i].getDisplayName());
-            if (i < sports.length - 1) System.out.print(", ");
+            if (i < sports.length - 1)
+                System.out.print(", ");
         }
         System.out.print("): ");
 
@@ -113,7 +114,11 @@ public class CLIBookFieldView implements BookFieldView {
         }
 
         System.out.println("\nSearching for available fields...");
-        return bookFieldController.searchFieldsForDirectBooking(sports[sportChoice - 1], city);
+        return bookFieldController.searchFieldsForDirectBooking(
+                sports[sportChoice - 1],
+                city,
+                bookFieldController.getCurrentMatchBean().getMatchDate(),
+                bookFieldController.getCurrentMatchBean().getMatchTime());
     }
 
     @Override

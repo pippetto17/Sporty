@@ -20,7 +20,7 @@ class OrganizeMatchTest {
     private model.dao.MatchDAO matchDAO;
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         fieldDAO = DAOFactory.getFieldDAO(DAOFactory.PersistenceType.MEMORY);
         matchDAO = DAOFactory.getMatchDAO(DAOFactory.PersistenceType.MEMORY);
 

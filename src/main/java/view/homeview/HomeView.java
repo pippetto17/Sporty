@@ -17,14 +17,9 @@ public interface HomeView extends View {
 
     void refreshMatches();
 
-    List<MatchBean> getMatches();
-
-    default MatchBean findMatchById(int matchId) {
-        return getMatches().stream()
-                .filter(m -> m.getMatchId() == matchId)
-                .findFirst()
-                .orElse(null);
-    }
-
     void showMatchDetails(int matchId);
+
+    void displayError(String message);
+
+    void displaySuccess(String message);
 }

@@ -48,7 +48,7 @@ public class GraphicHomeView implements HomeView {
     @FXML
     private Label matchesTitle;
     @FXML
-    private FlowPane matchesContainer;
+    private GridPane matchesContainer;
     @FXML
     private ScrollPane mainScrollPane;
 
@@ -93,12 +93,13 @@ public class GraphicHomeView implements HomeView {
                 initialize();
                 stage.show();
             } catch (IOException e) {
-                showError(model.utils.Constants.ERROR_LOAD_HOME_VIEW_IT + e.getMessage());
+                displayError(model.utils.Constants.ERROR_LOAD_HOME_VIEW_IT + e.getMessage());
             }
         });
     }
 
     private void initialize() {
+        homeController.setHomeView(this);
         displayWelcome();
 
         // Toggle Switch (se organizzatore)
@@ -239,17 +240,19 @@ public class GraphicHomeView implements HomeView {
     }
 
     // --- CARDS ---
+    // --- CARDS ---
+    // --- CARDS ---
     private VBox createGridMatchCard(model.bean.MatchBean match) {
         VBox card = new VBox(0);
         card.getStyleClass().add("match-card");
 
         // 1. HEADER
         StackPane imageHeader = new StackPane();
-        String sportClass = getSportStyleClass(match.getSport()); // Ottieni classe dinamica
+        String sportClass = homeController.getSportStyleClass(match.getSport());
         imageHeader.getStyleClass().addAll("card-image-area", sportClass);
 
         // Icona specifica (Immagine)
-        String imagePath = getSportImagePath(match.getSport());
+        String imagePath = homeController.getSportImagePath(match.getSport());
         javafx.scene.image.ImageView sportIcon = new javafx.scene.image.ImageView();
         try {
             javafx.scene.image.Image img = new javafx.scene.image.Image(
@@ -259,23 +262,23 @@ public class GraphicHomeView implements HomeView {
             sportIcon.setFitHeight(80);
             sportIcon.setPreserveRatio(true);
             sportIcon.setSmooth(true);
-            // Effect similar to previous: dropshadow
             sportIcon.setEffect(new javafx.scene.effect.DropShadow(10, javafx.scene.paint.Color.rgb(0, 0, 0, 0.3)));
         } catch (Exception e) {
-            // Fallback to text if image missing (rare)
-            // We can just leave empty or put a placeholder label, but for now log it
             java.util.logging.Logger.getLogger(getClass().getName())
                     .log(java.util.logging.Level.WARNING, () -> String.format("Sport image not found: %s", imagePath));
         }
+        imageHeader.getChildren().add(sportIcon);
 
-        Label priceBadge = new Label(
-                match.getPricePerPerson() != null ? String.format("€%.0f", match.getPricePerPerson())
-                        : model.utils.Constants.MATCH_DETAIL_FREE);
-        priceBadge.getStyleClass().add(model.utils.Constants.CSS_CARD_PRICE_BADGE);
-        StackPane.setAlignment(priceBadge, Pos.TOP_RIGHT);
-        StackPane.setMargin(priceBadge, new Insets(10));
-
-        imageHeader.getChildren().addAll(sportIcon, priceBadge);
+        // PRICE BADGE - Show ONLY if viewing as Player
+        if (homeController.shouldShowPriceBadge()) {
+            Label priceBadge = new Label(
+                    match.getPricePerPerson() != null ? String.format("€%.0f", match.getPricePerPerson())
+                            : model.utils.Constants.MATCH_DETAIL_FREE);
+            priceBadge.getStyleClass().add(model.utils.Constants.CSS_CARD_PRICE_BADGE);
+            StackPane.setAlignment(priceBadge, Pos.TOP_RIGHT);
+            StackPane.setMargin(priceBadge, new Insets(10));
+            imageHeader.getChildren().add(priceBadge);
+        }
 
         // 2. CONTENT
         VBox content = new VBox(5);
@@ -290,12 +293,10 @@ public class GraphicHomeView implements HomeView {
                 + model.utils.Constants.ICON_CLOCK + match.getMatchTime());
         dateLabel.getStyleClass().add(model.utils.Constants.CSS_CARD_SUBTITLE);
 
-        int current = match.getParticipants() != null ? match.getParticipants().size() : 0;
+        int current = homeController.getCurrentParticipants(match);
         int max = match.getRequiredParticipants();
-        ProgressBar capacityBar = new ProgressBar((double) current / max);
-        capacityBar.getStyleClass().addAll(model.utils.Constants.CSS_CARD_PROGRESS_BAR, sportClass + "-bar"); // Barra
-        // progressiva
-        // coordinata
+        ProgressBar capacityBar = new ProgressBar(homeController.getCapacityBarProgress(match));
+        capacityBar.getStyleClass().addAll(model.utils.Constants.CSS_CARD_PROGRESS_BAR, sportClass + "-bar");
         capacityBar.setPrefWidth(Double.MAX_VALUE);
 
         Label playersLabel = new Label(current + "/" + max + " joined");
@@ -305,14 +306,13 @@ public class GraphicHomeView implements HomeView {
 
         content.getChildren().addAll(locationTitle, dateLabel, new Region(), playersBox, capacityBar);
 
-        // Aggiungi pulsante Join se l'utente sta visualizzando come player
-        if (homeController.isViewingAsPlayer() && !match.isFull()) {
+        // Add join button if appropriate
+        if (homeController.shouldShowJoinButton(match)) {
             Button joinButton = new Button(model.utils.Constants.BTN_JOIN_MATCH);
-            joinButton.getStyleClass().addAll(model.utils.Constants.CSS_SUCCESS, model.utils.Constants.CSS_SMALL); // AtlantaFX
-            // classes
+            joinButton.getStyleClass().addAll(model.utils.Constants.CSS_SUCCESS, model.utils.Constants.CSS_SMALL);
             joinButton.setOnAction(e -> {
                 e.consume();
-                homeController.joinMatch(match.getMatchId());
+                handleJoinMatch(match.getMatchId());
             });
             content.getChildren().add(joinButton);
         }
@@ -325,38 +325,12 @@ public class GraphicHomeView implements HomeView {
         return card;
     }
 
-    // Helper per determinare lo stile CSS in base all'enum Sport
-    private String getSportStyleClass(model.domain.Sport sport) {
-        if (sport == null)
-            return "sport-default";
-        String name = sport.name().toUpperCase();
-
-        if (name.contains("FOOTBALL"))
-            return "sport-soccer";
-        if (name.contains("BASKET"))
-            return "sport-basket";
-        if (name.contains("TENNIS") || name.contains("PADEL"))
-            return "sport-tennis";
-
-        return "sport-default";
-    }
-
-    // Helper per determinare il percorso immagine in base all'enum Sport
-    private String getSportImagePath(model.domain.Sport sport) {
-        if (sport == null)
-            return model.utils.Constants.IMAGE_MEDAL_PATH;
-        String name = sport.name().toUpperCase();
-
-        if (name.contains("FOOTBALL"))
-            return model.utils.Constants.IMAGE_FOOTBALL_PATH;
-        if (name.contains("BASKET"))
-            return model.utils.Constants.IMAGE_BASKETBALL_PATH;
-        if (name.contains("TENNIS"))
-            return model.utils.Constants.IMAGE_TENNIS_PATH;
-        if (name.contains("PADEL"))
-            return model.utils.Constants.IMAGE_PADEL_PATH;
-
-        return model.utils.Constants.IMAGE_MEDAL_PATH;
+    private void handleJoinMatch(int matchId) {
+        try {
+            homeController.joinMatch(matchId);
+        } catch (exception.ValidationException e) {
+            displayError(e.getMessage());
+        }
     }
 
     private void updateCityAutocomplete(String input) {
@@ -416,23 +390,29 @@ public class GraphicHomeView implements HomeView {
             Label empty = new Label(model.utils.Constants.LABEL_NO_MATCHES_FOUND);
             empty.getStyleClass().addAll(model.utils.Constants.CSS_TEXT_MUTED, model.utils.Constants.CSS_TITLE_4);
             empty.setPadding(new Insets(20));
-            matchesContainer.getChildren().add(empty);
+            matchesContainer.add(empty, 0, 0);
             return;
         }
-        for (model.bean.MatchBean match : matches)
-            matchesContainer.getChildren().add(createGridMatchCard(match));
+
+        // Add matches to grid with 3 columns per row
+        int column = 0;
+        int row = 0;
+        for (model.bean.MatchBean match : matches) {
+            VBox card = createGridMatchCard(match);
+            matchesContainer.add(card, column, row);
+            column++;
+            if (column >= 3) {
+                column = 0;
+                row++;
+            }
+        }
     }
 
     private void updateViewMode() {
-        if (homeController.isViewingAsPlayer()) {
-            organizerActionsBox.setVisible(false);
-            organizerActionsBox.setManaged(false);
-            matchesTitle.setText(model.utils.Constants.LABEL_EXPLORE_MATCHES);
-        } else {
-            organizerActionsBox.setVisible(true);
-            organizerActionsBox.setManaged(true);
-            matchesTitle.setText(model.utils.Constants.LABEL_YOUR_MATCHES);
-        }
+        boolean showOrganizerActions = homeController.shouldShowOrganizerActions();
+        organizerActionsBox.setVisible(showOrganizerActions);
+        organizerActionsBox.setManaged(showOrganizerActions);
+        matchesTitle.setText(homeController.getMatchesTitle());
     }
 
     @Override
@@ -441,21 +421,88 @@ public class GraphicHomeView implements HomeView {
     }
 
     @Override
-    public List<model.bean.MatchBean> getMatches() {
-        return homeController.getMatches();
-    }
-
-    @Override
     public void showMatchDetails(int matchId) {
-        // Implementation delegated to controller or other view
+        // Find match from current matches list
+        model.bean.MatchBean match = homeController.getMatches().stream()
+                .filter(m -> m.getMatchId() == matchId)
+                .findFirst()
+                .orElse(null);
+
+        if (match == null) {
+            displayError("Match not found!");
+            return;
+        }
+
+        Alert alert = new Alert(Alert.AlertType.NONE);
+        alert.setTitle("Match Details");
+        alert.setHeaderText(match.getSport().getDisplayName() + " - " + match.getCity());
+
+        // Custom Content
+        VBox content = new VBox(10);
+        content.setPadding(new Insets(10));
+
+        // Common Info
+        content.getChildren().add(new Label("Date: " + match.getMatchDate()));
+        content.getChildren().add(new Label("Time: " + match.getMatchTime()));
+        content.getChildren().add(new Label("Field: " + (match.getFieldId() != null ? match.getFieldId() : "TBD")));
+
+        // Role Specific Info
+        double pricePerHead = (match.getPricePerPerson() != null) ? match.getPricePerPerson() : 0.0;
+        int totalPlayers = match.getRequiredParticipants();
+
+        if (homeController.isViewingAsPlayer()) {
+            // PLAYER VIEW
+            double totalPrice = pricePerHead * totalPlayers;
+            int joined = (match.getParticipants() != null) ? match.getParticipants().size() : 0;
+
+            content.getChildren().add(new Label(String.format("Price to Pay: €%.2f", pricePerHead)));
+            content.getChildren().add(new Label(String.format("Total Match Cost: €%.2f", totalPrice)));
+            content.getChildren().add(new Label(String.format("Players Joined: %d/%d", joined, totalPlayers)));
+
+            ButtonType joinBtn = new ButtonType("Join Match", ButtonBar.ButtonData.OK_DONE);
+            alert.getButtonTypes().setAll(joinBtn, ButtonType.CLOSE);
+
+            // Set action later
+            alert.setResultConverter(btn -> {
+                if (btn == joinBtn) {
+                    handleJoinMatch(matchId);
+                }
+                return null;
+            });
+
+        } else {
+            // ORGANIZER VIEW
+            double totalPrice = pricePerHead * totalPlayers;
+
+            content.getChildren().add(new Label(String.format("Total Match Cost: €%.2f", totalPrice)));
+            content.getChildren().add(new Label(String.format("My Cost: €%.2f", pricePerHead))); // Assuming 1 share
+
+            ButtonType inviteBtn = new ButtonType("Invite Player", ButtonBar.ButtonData.OTHER);
+            ButtonType cancelBtn = new ButtonType("Cancel Match", ButtonBar.ButtonData.FINISH);
+
+            alert.getButtonTypes().setAll(inviteBtn, cancelBtn, ButtonType.CLOSE);
+
+            // Hacky way to handle custom buttons action without closing immediately or
+            // handling result
+            alert.setResultConverter(btn -> {
+                if (btn == cancelBtn) {
+                    // Call logic to cancel
+                    displayError("Cancel feature coming soon!");
+                } else if (btn == inviteBtn) {
+                    displayError("Invite feature coming soon!");
+                }
+                return null;
+            });
+        }
+
+        alert.getDialogPane().setContent(content);
+        view.ViewUtils.applyStylesheets(alert.getDialogPane());
+        alert.showAndWait();
     }
 
     @Override
     public void displayMenu() {
-        // Intentionally empty: menu interactions are handled directly in the graphic UI
-        // (toolbar/buttons)
-        // This method exists to satisfy the View interface used by other
-        // implementations (e.g., CLI).
+        // Intentionally empty``
     }
 
     @FXML
@@ -479,11 +526,23 @@ public class GraphicHomeView implements HomeView {
         applicationController.logout();
     }
 
-    private void showError(String msg) {
+    @Override
+    public void displayError(String msg) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Error");
         alert.setHeaderText(null);
         alert.setContentText(msg);
+        view.ViewUtils.applyStylesheets(alert.getDialogPane());
+        alert.showAndWait();
+    }
+
+    @Override
+    public void displaySuccess(String msg) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Success");
+        alert.setHeaderText(null);
+        alert.setContentText(msg);
+        view.ViewUtils.applyStylesheets(alert.getDialogPane());
         alert.showAndWait();
     }
 

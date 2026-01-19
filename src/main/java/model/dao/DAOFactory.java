@@ -15,34 +15,44 @@ public class DAOFactory {
         MEMORY
     }
 
-    public static UserDAO getUserDAO(PersistenceType type) throws SQLException {
+    public static UserDAO getUserDAO(PersistenceType type) {
         return switch (type) {
             case DBMS -> {
-                Connection connection = ConnectionFactory.getConnection();
-                yield new UserDAODBMS(connection);
+                try {
+                    Connection connection = ConnectionFactory.getConnection();
+                    yield new UserDAODBMS(connection);
+                } catch (SQLException e) {
+                    throw new exception.DataAccessException("Error creating UserDAO: " + e.getMessage(), e);
+                }
             }
             case FILESYSTEM -> new UserDAOFileSystem();
             case MEMORY -> new UserDAOMemory();
         };
     }
 
-    public static MatchDAO getMatchDAO(PersistenceType type) throws SQLException {
+    public static MatchDAO getMatchDAO(PersistenceType type) {
         return switch (type) {
             case DBMS, FILESYSTEM -> {
-                // Filesystem usa DBMS per i match (come da specifica)
-                Connection connection = ConnectionFactory.getConnection();
-                yield new MatchDAODBMS(connection);
+                try {
+                    Connection connection = ConnectionFactory.getConnection();
+                    yield new MatchDAODBMS(connection);
+                } catch (SQLException e) {
+                    throw new exception.DataAccessException("Error creating MatchDAO: " + e.getMessage(), e);
+                }
             }
             case MEMORY -> new MatchDAOMemory();
         };
     }
 
-    public static FieldDAO getFieldDAO(PersistenceType type) throws SQLException {
+    public static FieldDAO getFieldDAO(PersistenceType type) {
         return switch (type) {
             case DBMS, FILESYSTEM -> {
-                // Filesystem usa DBMS per i field (come da specifica)
-                Connection connection = ConnectionFactory.getConnection();
-                yield new FieldDAODBMS(connection);
+                try {
+                    Connection connection = ConnectionFactory.getConnection();
+                    yield new FieldDAODBMS(connection);
+                } catch (SQLException e) {
+                    throw new exception.DataAccessException("Error creating FieldDAO: " + e.getMessage(), e);
+                }
             }
             case MEMORY -> new FieldDAOMemory();
         };
@@ -50,14 +60,14 @@ public class DAOFactory {
 
     public static BookingDAO getBookingDAO(PersistenceType type) {
         return switch (type) {
-            case DBMS, FILESYSTEM -> new BookingDAODBMS(); // Filesystem usa DBMS per i bookings
+            case DBMS, FILESYSTEM -> new BookingDAODBMS();
             case MEMORY -> new BookingDAOMemory();
         };
     }
 
     public static TimeSlotDAO getTimeSlotDAO(PersistenceType type) {
         return switch (type) {
-            case DBMS, FILESYSTEM -> new TimeSlotDAODBMS(); // Filesystem usa DBMS per i time slots
+            case DBMS, FILESYSTEM -> new TimeSlotDAODBMS();
             case MEMORY -> new TimeSlotDAOMemory();
         };
     }

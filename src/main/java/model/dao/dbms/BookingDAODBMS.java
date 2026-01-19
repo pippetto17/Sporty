@@ -238,7 +238,6 @@ public class BookingDAODBMS implements BookingDAO {
             booking.setConfirmedAt(confirmedAt.toLocalDateTime());
         }
 
-
         return booking;
     }
 }

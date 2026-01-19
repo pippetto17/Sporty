@@ -218,15 +218,11 @@ public class GraphicOrganizeMatchView implements OrganizeMatchView {
     private void updateParticipantsInfo() {
         Sport selected = sportComboBox.getValue();
         if (selected != null) {
-            int totalPlayers = selected.getRequiredPlayers();
-            int maxAdditional = selected.getAdditionalParticipantsNeeded();
+            // Get info text from controller
+            participantsInfoLabel.setText(organizeMatchController.getParticipantsInfoText(selected));
 
-            participantsInfoLabel.setText(String.format(
-                    "Need %d more players (Total: %d for %s)",
-                    maxAdditional, totalPlayers, selected.getDisplayName()));
-
-            // Update spinner range: da 1 a (requiredPlayers - 1)
-            // L'organizer è già il primo, quindi cerca da 1 a max-1 altri giocatori
+            // Get max additional participants from controller
+            int maxAdditional = organizeMatchController.getMaxAdditionalParticipants(selected);
             SpinnerValueFactory<Integer> valueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(1,
                     maxAdditional, maxAdditional);
             participantsSpinner.setValueFactory(valueFactory);

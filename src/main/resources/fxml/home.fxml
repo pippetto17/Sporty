@@ -73,12 +73,12 @@
                                 styleClass="flat, accent"/>
                     </HBox>
 
-                    <!-- GRID VIEW (FlowPane) -->
-                    <FlowPane fx:id="matchesContainer"
-                              hgap="25" vgap="25" prefWrapLength="900" 
+                    <!-- GRID VIEW (GridPane) -->
+                    <GridPane fx:id="matchesContainer"
+                              hgap="25" vgap="25" 
                               alignment="TOP_LEFT">
                         <!-- Le Match Cards verticali vengono aggiunte qui -->
-                    </FlowPane>
+                    </GridPane>
                 </VBox>
             </VBox>
         </ScrollPane>

@@ -1,7 +1,6 @@
 package view.paymentview;
 
 import controller.ApplicationController;
-import controller.PaymentController;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -13,22 +12,21 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import model.bean.FieldBean;
 import model.bean.MatchBean;
 import model.bean.PaymentBean;
 import view.ViewUtils;
 
 import java.io.IOException;
 import java.util.logging.Logger;
+import java.util.stream.IntStream;
 
-/**
- * Implementazione grafica della view di pagamento utilizzando JavaFX.
- * Gestisce l'input dei dati di pagamento e l'interazione con l'utente.
- */
 public class GraphicPaymentView implements PaymentView {
     private static final Logger logger = Logger.getLogger(GraphicPaymentView.class.getName());
 
-    private final PaymentController paymentController;
     private Stage stage;
+    private PaymentBean collectedPaymentData;
+    private int maxAvailableShares;
 
     @FXML
     private Label matchInfoLabel;
@@ -49,13 +47,14 @@ public class GraphicPaymentView implements PaymentView {
     @FXML
     private Label errorLabel;
 
-    public GraphicPaymentView(PaymentController paymentController) {
-        this.paymentController = paymentController;
+    // Default constructor for FXML loader
+    public GraphicPaymentView() {
+        // No-arg constructor required by FXMLLoader
     }
 
     @Override
     public void setApplicationController(ApplicationController applicationController) {
-        // Non utilizzato in questa view
+    // Not needed in this view
     }
 
     @Override
@@ -74,128 +73,111 @@ public class GraphicPaymentView implements PaymentView {
 
                 stage.setScene(scene);
                 stage.show();
-
-                initialize();
             } catch (IOException e) {
                 logger.severe("Failed to load payment view: " + e.getMessage());
             }
         });
     }
 
-    @FXML
-    public void initialize() {
-        if (paymentController.isBookingMode()) {
-            initializeBookingMode();
-        } else {
-            initializeMatchMode();
-        }
-    }
-
-    private void initializeMatchMode() {
-        MatchBean match = paymentController.getMatchBean();
-        if (match != null) {
+    @Override
+    public void displayMatchInfo(MatchBean match, int availableShares) {
+        Platform.runLater(() -> {
             matchInfoLabel.setText(String.format("Payment for: %s - %s @ %s",
                     match.getSport(), match.getCity(), match.getMatchTime()));
 
-            Double price = match.getPricePerPerson();
-            if (price != null) {
-                Integer[] shares = new Integer[match.getRequiredParticipants()];
-                for (int i = 0; i < shares.length; i++) {
-                    shares[i] = i + 1;
-                }
-                sharesComboBox.setItems(FXCollections.observableArrayList(shares));
-                sharesComboBox.setValue(1);
-                sharesComboBox.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
-                    if (newVal != null)
-                        updateAmount();
-                });
-                updateAmount();
-            }
-        }
+            maxAvailableShares = availableShares;
+            sharesComboBox.setItems(FXCollections.observableArrayList(
+                    IntStream.rangeClosed(1, availableShares).boxed().toList()));
+            sharesComboBox.setValue(1);
+            sharesComboBox.getSelectionModel().selectedItemProperty()
+                    .addListener((obs, oldVal, newVal) -> updateAmount(match.getPricePerPerson()));
+            updateAmount(match.getPricePerPerson());
+        });
     }
 
-    private void initializeBookingMode() {
-        model.bean.FieldBean field = paymentController.getFieldBean();
-        MatchBean context = paymentController.getMatchBean();
-
-        if (field != null && context != null) {
+    @Override
+    public void displayBookingInfo(FieldBean field, MatchBean context) {
+        Platform.runLater(() -> {
             matchInfoLabel.setText(String.format("Booking: %s - %s on %s @ %s",
-                    field.getName(), field.getCity(),
-                    context.getMatchDate(), context.getMatchTime()));
+                    field.getName(), field.getCity(), context.getMatchDate(), context.getMatchTime()));
 
             sharesComboBox.setVisible(false);
-            double totalPrice = field.getPricePerHour() * 2;
-            amountLabel.setText(String.format("Total Amount: €%.2f (2h slot)", totalPrice));
-        }
+            amountLabel.setText(String.format("Total Amount: €%.2f (2h slot)", field.getPricePerHour() * 2));
+            maxAvailableShares = 0; // No shares for booking mode
+        });
     }
 
-    private void updateAmount() {
-        Double price = paymentController.getMatchBean().getPricePerPerson();
-        Integer shares = sharesComboBox.getValue();
-        if (price != null && shares != null) {
-            double total = price * shares;
-            amountLabel.setText(String.format("Total: € %.2f", total));
+    @Override
+    public void showSuccess(String message) {
+        Platform.runLater(() -> {
+            errorLabel.setStyle("-fx-text-fill: green;");
+            errorLabel.setText(message);
+        });
+    }
+
+    @Override
+    public PaymentBean collectPaymentData(int maxShares) {
+        if (cardNumberField.getText().trim().isEmpty() ||
+                expiryField.getText().trim().isEmpty() ||
+                cvvField.getText().trim().isEmpty() ||
+                cardHolderField.getText().trim().isEmpty()) {
+            return null;
         }
+
+        PaymentBean paymentBean = new PaymentBean();
+        paymentBean.setCardNumber(cardNumberField.getText().trim());
+        paymentBean.setExpiryDate(expiryField.getText().trim());
+        paymentBean.setCvv(cvvField.getText().trim());
+        paymentBean.setCardHolder(cardHolderField.getText().trim());
+        paymentBean.setSharesToPay(sharesComboBox.getValue() != null ? sharesComboBox.getValue() : 1);
+
+        // The amount will be set by the controller based on the shares and price
+        // This view only collects the payment details and shares
+        return paymentBean;
+    }
+
+    private void updateAmount(double pricePerPerson) {
+        double total = pricePerPerson * sharesComboBox.getValue();
+        amountLabel.setText(String.format("Total: € %.2f", total));
     }
 
     @FXML
     private void handlePay() {
         errorLabel.setText("");
+        errorLabel.setStyle(""); // Reset style
 
-        PaymentBean paymentBean = new PaymentBean();
-        paymentBean.setCardNumber(cardNumberField.getText());
-        paymentBean.setExpiryDate(expiryField.getText());
-        paymentBean.setCvv(cvvField.getText());
-        paymentBean.setCardHolder(cardHolderField.getText());
-        paymentBean.setSharesToPay(sharesComboBox.getValue());
-
-        // Calculate amount
-        Double price = paymentController.getMatchBean().getPricePerPerson();
-        if (price != null) {
-            paymentBean.setAmount(price * sharesComboBox.getValue());
+        PaymentBean data = collectPaymentData(maxAvailableShares);
+        if (data == null) {
+            showError("Please fill all payment fields.");
+            return;
         }
 
-        payButton.setDisable(true);
-        payButton.setText("Processing...");
-
-        // Run in background to avoid freezing UI if notification sleeps
-        new Thread(() -> {
-            try {
-                boolean success = paymentController.processPayment(paymentBean);
-
-                Platform.runLater(() -> {
-                    payButton.setDisable(false);
-                    payButton.setText("Pay Now");
-
-                    if (!success) {
-                        showError("Payment declined. Please check details.");
-                    }
-                });
-            } catch (exception.ValidationException e) {
-                Platform.runLater(() -> {
-                    payButton.setDisable(false);
-                    payButton.setText("Pay Now");
-                    showError(e.getMessage());
-                });
-            }
-        }).start();
+        collectedPaymentData = data;
+        stage.close();
     }
 
     @FXML
     private void handleBack() {
+        collectedPaymentData = null; // Indicate cancellation
         stage.close();
-        paymentController.back();
     }
 
     @Override
     public void showError(String message) {
-        Platform.runLater(() -> errorLabel.setText(message));
+        Platform.runLater(() -> {
+            errorLabel.setStyle("-fx-text-fill: red;");
+            errorLabel.setText(message);
+        });
     }
 
     @Override
     public void close() {
         if (stage != null) {
-            Platform.runLater(() -> stage.close());
+            Platform.runLater(stage::close);
         }
+    }
+
+    public PaymentBean getCollectedPaymentData() {
+        return collectedPaymentData;
     }
 }

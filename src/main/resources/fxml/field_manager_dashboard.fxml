@@ -20,6 +20,7 @@
             <Label fx:id="managerNameLabel" text="Manager: " styleClass="subtitle"/>
         </VBox>
         <javafx.scene.image.ImageView fx:id="managerImageView" fitHeight="60" fitWidth="60" preserveRatio="true" smooth="true"/>
+        <Button text="🔔" fx:id="notificationButton" onAction="#handleShowNotifications" styleClass="button-outlined"/>
         <Button text="Logout" onAction="#handleLogout" styleClass="danger-button"/>
     </HBox>
 

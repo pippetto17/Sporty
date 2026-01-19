@@ -9,7 +9,7 @@ public class FieldConverter {
         // Private constructor to prevent instantiation
     }
 
-    public static Field toField(FieldBean fieldBean) {
+    public static Field toEntity(FieldBean fieldBean) {
         if (fieldBean == null) {
             return null;
         }
@@ -29,7 +29,7 @@ public class FieldConverter {
         return field;
     }
 
-    public static FieldBean toFieldBean(Field field) {
+    public static FieldBean toBean(Field field) {
         if (field == null) {
             return null;
         }
@@ -47,25 +47,5 @@ public class FieldConverter {
         fieldBean.setAutoApprove(field.getAutoApprove());
 
         return fieldBean;
-    }
-
-    public static FieldBean toFieldBeanWithPricePerPerson(Field field, int participants) {
-        FieldBean fieldBean = toFieldBean(field);
-        if (fieldBean != null && field.getPricePerHour() != null) {
-            // Calculate price per person for 2 hours booking
-            double pricePerPerson = model.utils.Utils.calculatePricePerPerson(
-                    field.getPricePerHour(), 2.0, participants);
-            fieldBean.setPricePerPerson(pricePerPerson);
-        }
-        return fieldBean;
-    }
-
-    // Alias methods for consistency
-    public static Field toEntity(FieldBean bean) {
-        return toField(bean);
-    }
-
-    public static FieldBean toBean(Field entity) {
-        return toFieldBean(entity);
     }
 }

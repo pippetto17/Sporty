@@ -3,6 +3,7 @@ package controller;
 import exception.ValidationException;
 import model.bean.BookingBean;
 import model.dao.DAOFactory;
+import model.domain.Booking;
 import model.domain.BookingType;
 import model.domain.User;
 
@@ -10,11 +11,6 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
-/**
- * Controller for booking operations.
- * Handles booking requests, approvals, and cancellations.
- */
-@SuppressWarnings("unused")
 public class BookingController {
     private final User currentUser;
     private final model.dao.BookingDAO bookingDAO;
@@ -36,7 +32,7 @@ public class BookingController {
 
     private BookingBean createBooking(String fieldId, LocalDate date, LocalTime startTime, LocalTime endTime,
             BookingType type) {
-        model.domain.Booking booking = new model.domain.Booking();
+        var booking = new Booking();
         booking.setFieldId(fieldId);
         booking.setRequesterUsername(currentUser.getUsername());
         booking.setBookingDate(date);
@@ -64,28 +60,27 @@ public class BookingController {
 
     public void approveBooking(int bookingId) throws ValidationException {
         validateFieldManager();
-        model.domain.Booking booking = bookingDAO.findById(bookingId);
-        if (booking != null) {
-            booking.setStatus(model.domain.BookingStatus.CONFIRMED);
-            bookingDAO.save(booking);
-        }
+        var booking = findBookingOrThrow(bookingId);
+        booking.setStatus(model.domain.BookingStatus.CONFIRMED);
+        bookingDAO.save(booking);
     }
 
     public void rejectBooking(int bookingId) throws ValidationException {
         validateFieldManager();
-        model.domain.Booking booking = bookingDAO.findById(bookingId);
-        if (booking != null) {
-            booking.setStatus(model.domain.BookingStatus.REJECTED);
-            bookingDAO.save(booking);
-        }
+        var booking = findBookingOrThrow(bookingId);
+        booking.setStatus(model.domain.BookingStatus.REJECTED);
+        bookingDAO.save(booking);
     }
 
-    public void cancelMyBooking(int bookingId) {
-        model.domain.Booking booking = bookingDAO.findById(bookingId);
-        if (booking != null && booking.getRequesterUsername().equals(currentUser.getUsername())) {
-            booking.setStatus(model.domain.BookingStatus.CANCELLED);
-            bookingDAO.save(booking);
+    public void cancelMyBooking(int bookingId) throws ValidationException {
+        var booking = findBookingOrThrow(bookingId);
+
+        if (!booking.getRequesterUsername().equals(currentUser.getUsername())) {
+            throw new ValidationException("You can only cancel your own bookings");
         }
+
+        booking.setStatus(model.domain.BookingStatus.CANCELLED);
+        bookingDAO.save(booking);
     }
 
     public List<BookingBean> getFieldBookings(String fieldId) {
@@ -102,5 +97,13 @@ public class BookingController {
         if (!currentUser.isFieldManager()) {
             throw new ValidationException("Only field managers can perform this operation");
         }
+    }
+
+    private Booking findBookingOrThrow(int bookingId) throws ValidationException {
+        var booking = bookingDAO.findById(bookingId);
+        if (booking == null) {
+            throw new ValidationException("Booking not found with ID: " + bookingId);
+        }
+        return booking;
     }
 }

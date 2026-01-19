@@ -44,9 +44,8 @@ public class CLIViewFactory implements ViewFactory {
 
     @Override
     public PaymentView createPaymentView(PaymentController paymentController) {
-        return new CLIPaymentView(paymentController);
+        return new CLIPaymentView();
     }
-
 
     @Override
     public FieldManagerView createFieldManagerView(FieldManagerController controller) {
@@ -65,6 +64,6 @@ public class CLIViewFactory implements ViewFactory {
 
     @Override
     public JoinMatchView createJoinMatchView(JoinMatchController controller) {
-        return new CLIJoinMatchView(controller);
+        return new CLIJoinMatchView();
     }
 }

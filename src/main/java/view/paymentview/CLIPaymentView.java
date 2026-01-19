@@ -1,23 +1,22 @@
 package view.paymentview;
 
 import controller.ApplicationController;
-import controller.PaymentController;
+import model.bean.FieldBean;
+import model.bean.MatchBean;
+import model.bean.PaymentBean;
 
-/**
- * Implementazione CLI della view di pagamento.
- * Attualmente non completamente implementata - placeholder per future
- * estensioni.
- */
+import java.util.Scanner;
+
 public class CLIPaymentView implements PaymentView {
-    private final PaymentController paymentController;
+    private final Scanner scanner;
 
-    public CLIPaymentView(PaymentController paymentController) {
-        this.paymentController = paymentController;
+    public CLIPaymentView() {
+        this.scanner = new Scanner(System.in);
     }
 
     @Override
     public void setApplicationController(ApplicationController applicationController) {
-        // CLI view does not require application controller reference
+    // No action needed for CLI view
     }
 
     @Override
@@ -27,13 +26,74 @@ public class CLIPaymentView implements PaymentView {
 
     @Override
     public void display() {
-        System.out.println("=== PAGAMENTO (CLI NON IMPLEMENTATA) ===");
-        System.out.println("La funzionalità di pagamento è disponibile solo nell'interfaccia grafica.");
-        paymentController.back();
+        System.out.println("\n=== PAGAMENTO ===");
+    }
+
+    @Override
+    public void displayMatchInfo(MatchBean match, int availableShares) {
+        System.out.printf("Pagamento per: %s - %s @ %s%n",
+                match.getSport(), match.getCity(), match.getMatchTime());
+        System.out.printf("Prezzo per persona: €%.2f%n", match.getPricePerPerson());
+        System.out.printf("Quote disponibili: 1-%d%n", availableShares);
+    }
+
+    @Override
+    public void displayBookingInfo(FieldBean field, MatchBean context) {
+        System.out.printf("Prenotazione: %s - %s il %s @ %s%n",
+                field.getName(), field.getCity(), context.getMatchDate(), context.getMatchTime());
+        System.out.printf("Totale: €%.2f (2h)%n", field.getPricePerHour() * 2);
+    }
+
+    @Override
+    public void showSuccess(String message) {
+        System.out.println("✓ " + message);
+    }
+
+    @Override
+    public PaymentBean collectPaymentData(int maxShares) {
+        PaymentBean paymentBean = new PaymentBean();
+
+        if (maxShares > 0) {
+            System.out.print("Numero di quote da acquistare (1-" + maxShares + "): ");
+            try {
+                int shares = Integer.parseInt(scanner.nextLine().trim());
+                if (shares < 1 || shares > maxShares) {
+                    return null;
+                }
+                paymentBean.setSharesToPay(shares);
+            } catch (NumberFormatException e) {
+                return null;
+            }
+        } else {
+            paymentBean.setSharesToPay(1);
+        }
+
+        System.out.print("Numero carta: ");
+        String cardNumber = scanner.nextLine().trim();
+
+        System.out.print("Scadenza (MM/YY): ");
+        String expiry = scanner.nextLine().trim();
+
+        System.out.print("CVV: ");
+        String cvv = scanner.nextLine().trim();
+
+        System.out.print("Intestatario: ");
+        String cardHolder = scanner.nextLine().trim();
+
+        if (cardNumber.isEmpty() || expiry.isEmpty() || cvv.isEmpty() || cardHolder.isEmpty()) {
+            return null;
+        }
+
+        paymentBean.setCardNumber(cardNumber);
+        paymentBean.setExpiryDate(expiry);
+        paymentBean.setCvv(cvv);
+        paymentBean.setCardHolder(cardHolder);
+
+        return paymentBean;
     }
 
     @Override
     public void close() {
-        // CLI views do not require explicit cleanup
+        // Nothing to close for CLI
     }
 }

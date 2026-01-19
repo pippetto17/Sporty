@@ -9,7 +9,7 @@ public class MatchConverter {
         // Private constructor to prevent instantiation
     }
 
-    public static Match toMatch(MatchBean matchBean) {
+    public static Match toEntity(MatchBean matchBean) {
         if (matchBean == null) {
             return null;
         }
@@ -25,6 +25,7 @@ public class MatchConverter {
         match.setFieldId(matchBean.getFieldId());
         match.setPricePerPerson(matchBean.getPricePerPerson());
         match.setStatus(matchBean.getStatus());
+        match.setBookingId(matchBean.getBookingId());
 
         // Convert participants
         if (matchBean.getParticipants() != null) {
@@ -34,7 +35,7 @@ public class MatchConverter {
         return match;
     }
 
-    public static MatchBean toMatchBean(Match match) {
+    public static MatchBean toBean(Match match) {
         if (match == null) {
             return null;
         }
@@ -50,6 +51,7 @@ public class MatchConverter {
         matchBean.setFieldId(match.getFieldId());
         matchBean.setPricePerPerson(match.getPricePerPerson());
         matchBean.setStatus(match.getStatus());
+        matchBean.setBookingId(match.getBookingId());
 
         // Convert participants
         if (match.getParticipants() != null) {
@@ -57,14 +59,5 @@ public class MatchConverter {
         }
 
         return matchBean;
-    }
-
-    // Alias methods for consistency
-    public static Match toEntity(MatchBean bean) {
-        return toMatch(bean);
-    }
-
-    public static MatchBean toBean(Match entity) {
-        return toMatchBean(entity);
     }
 }

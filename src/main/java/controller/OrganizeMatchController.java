@@ -5,10 +5,9 @@ import exception.ValidationException;
 import model.bean.MatchBean;
 import model.domain.Sport;
 import model.domain.User;
-import model.utils.Constants;
+
 import model.utils.Utils;
 
-import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Arrays;
@@ -36,11 +35,7 @@ public class OrganizeMatchController {
     public OrganizeMatchController(User organizer, ApplicationController applicationController) {
         this.organizer = organizer;
         this.applicationController = applicationController;
-        try {
-            this.matchDAO = model.dao.DAOFactory.getMatchDAO(applicationController.getPersistenceType());
-        } catch (SQLException e) {
-            throw new DataAccessException(Constants.ERROR_DAO_INIT + e.getMessage(), e);
-        }
+        this.matchDAO = model.dao.DAOFactory.getMatchDAO(applicationController.getPersistenceType());
     }
 
     public void startNewMatch() {
@@ -158,5 +153,48 @@ public class OrganizeMatchController {
 
     public void navigateBack() {
         applicationController.back();
+    }
+
+    // --- Parsing Methods ---
+
+    public LocalDate parseDate(String dateStr) {
+        if (dateStr == null)
+            return null;
+        try {
+            java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            return LocalDate.parse(dateStr.trim(), formatter);
+        } catch (java.time.format.DateTimeParseException e) {
+            return null;
+        }
+    }
+
+    public LocalTime parseTime(String timeStr) {
+        if (timeStr == null)
+            return null;
+        try {
+            java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("HH:mm");
+            return LocalTime.parse(timeStr.trim(), formatter);
+        } catch (java.time.format.DateTimeParseException e) {
+            return null;
+        }
+    }
+
+    // --- UI Helper Methods ---
+
+    public String getParticipantsInfoText(Sport sport) {
+        if (sport == null) {
+            return model.utils.Constants.ERROR_SELECT_SPORT_FIRST;
+        }
+        int totalPlayers = sport.getRequiredPlayers();
+        int maxAdditional = sport.getAdditionalParticipantsNeeded();
+        return String.format("Need %d more players (Total: %d for %s)",
+                maxAdditional, totalPlayers, sport.getDisplayName());
+    }
+
+    public int getMaxAdditionalParticipants(Sport sport) {
+        if (sport == null) {
+            return 1; // Default fallback
+        }
+        return sport.getAdditionalParticipantsNeeded();
     }
 }

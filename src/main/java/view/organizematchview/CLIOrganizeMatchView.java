@@ -170,7 +170,7 @@ public class CLIOrganizeMatchView implements OrganizeMatchView {
         System.out.print("Enter match date (format: dd/MM/yyyy, e.g., 15/01/2026): ");
 
         String dateInput = scanner.nextLine().trim();
-        LocalDate date = parseDate(dateInput);
+        LocalDate date = organizeMatchController.parseDate(dateInput);
         if (date == null)
             return null;
 
@@ -187,7 +187,7 @@ public class CLIOrganizeMatchView implements OrganizeMatchView {
         System.out.print("Enter match time (format: HH:mm, e.g., 18:30): ");
 
         String timeInput = scanner.nextLine().trim();
-        return parseTime(timeInput);
+        return organizeMatchController.parseTime(timeInput);
     }
 
     private String enterCity() {
@@ -243,11 +243,13 @@ public class CLIOrganizeMatchView implements OrganizeMatchView {
         System.out.println(Constants.SEPARATOR);
         System.out.println();
         System.out.println("Match Details:");
-        System.out.println("  Sport:        " + (matchBean.getSport() != null ? matchBean.getSport().getDisplayName() : "N/A"));
+        System.out.println(
+                "  Sport:        " + (matchBean.getSport() != null ? matchBean.getSport().getDisplayName() : "N/A"));
         System.out.println("  Date:         " + (matchBean.getMatchDate() != null ? matchBean.getMatchDate() : "N/A"));
         System.out.println("  Time:         " + (matchBean.getMatchTime() != null ? matchBean.getMatchTime() : "N/A"));
         System.out.println("  Location:     " + (matchBean.getCity() != null ? matchBean.getCity() : "N/A"));
-        System.out.println("  Organizer:    " + (matchBean.getOrganizerUsername() != null ? matchBean.getOrganizerUsername() : "N/A"));
+        System.out.println("  Organizer:    "
+                + (matchBean.getOrganizerUsername() != null ? matchBean.getOrganizerUsername() : "N/A"));
         System.out.println("  Players:      0/" + matchBean.getRequiredParticipants());
 
         if (matchBean.getFieldId() != null) {
@@ -288,13 +290,4 @@ public class CLIOrganizeMatchView implements OrganizeMatchView {
         }
     }
 
-    @Override
-    public java.time.LocalDate parseDate(String s) {
-        return OrganizeMatchView.super.parseDate(s);
-    }
-
-    @Override
-    public java.time.LocalTime parseTime(String s) {
-        return OrganizeMatchView.super.parseTime(s);
-    }
 }

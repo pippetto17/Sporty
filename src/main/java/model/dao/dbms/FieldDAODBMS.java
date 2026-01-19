@@ -94,15 +94,34 @@ public class FieldDAODBMS implements FieldDAO {
 
     @Override
     public List<Field> findAvailableFields(Sport sport, String city, LocalDate date, LocalTime time) {
-        // Returns all fields matching sport and city
-        // Note: Availability checking against actual bookings will be implemented in
-        // future version
-        String sql = "SELECT field_id, name, sport, address, city, price_per_hour, availability, indoor, manager_id, structure_name, auto_approve FROM fields WHERE sport = ? AND city = ? ORDER BY price_per_hour";
+        String sql = """
+                SELECT f.field_id, f.name, f.sport, f.address, f.city, f.price_per_hour,
+                       f.availability, f.indoor, f.manager_id, f.structure_name, f.auto_approve
+                FROM fields f
+                WHERE f.sport = ? AND f.city = ?
+                AND f.field_id NOT IN (
+                    SELECT b.field_id
+                    FROM bookings b
+                    WHERE b.booking_date = ?
+                    AND b.start_time < ?  -- Existing booking starts before requested end
+                    AND b.end_time > ?    -- Existing booking ends after requested start
+                    AND b.status NOT IN (2, 3) -- Exclude REJECTED (2) and CANCELLED (3)
+                )
+                ORDER BY f.price_per_hour
+                """;
         List<Field> fields = new ArrayList<>();
 
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, sport.getCode());
             stmt.setString(2, city);
+            stmt.setDate(3, Date.valueOf(date));
+
+            // Calculate end time based on sport duration
+            LocalTime endTime = time.plusMinutes(sport.getDuration());
+
+            stmt.setTime(4, Time.valueOf(endTime)); // Requested End Time
+            stmt.setTime(5, Time.valueOf(time)); // Requested Start Time
+
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {

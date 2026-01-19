@@ -22,7 +22,7 @@ class BookFieldTest {
     private BookingDAO bookingDAO;
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         fieldDAO = DAOFactory.getFieldDAO(DAOFactory.PersistenceType.MEMORY);
         bookingDAO = DAOFactory.getBookingDAO(DAOFactory.PersistenceType.MEMORY);
 

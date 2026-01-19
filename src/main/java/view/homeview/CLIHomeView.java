@@ -71,30 +71,15 @@ public class CLIHomeView implements HomeView {
                 model.bean.MatchBean match = matches.get(i);
                 String matchStr = String.format("%d. %s %s - %s - %s at %s (%d players)",
                         i + 1,
-                        getSportEmoji(match.getSport()),
+                        homeController.getSportEmoji(match.getSport()),
                         match.getSport().getDisplayName(),
                         match.getCity(),
                         match.getMatchDate(),
                         match.getMatchTime(),
-                        match.getParticipants() != null ? match.getParticipants().size() : 0);
+                        homeController.getCurrentParticipants(match));
                 System.out.println(matchStr);
             }
         }
-    }
-
-    private String getSportEmoji(model.domain.Sport sport) {
-        if (sport == null)
-            return Constants.ICON_EXTRAS_MEDAL;
-        String name = sport.name().toUpperCase();
-        if (name.contains("FOOTBALL"))
-            return Constants.ICON_FOOTBALL;
-        if (name.contains("BASKET"))
-            return Constants.ICON_BASKETBALL;
-        if (name.contains("TENNIS"))
-            return Constants.ICON_TENNIS;
-        if (name.contains("PADEL"))
-            return Constants.ICON_PADEL;
-        return Constants.ICON_EXTRAS_MEDAL;
     }
 
     @Override
@@ -126,7 +111,7 @@ public class CLIHomeView implements HomeView {
                         int matchNum = Integer.parseInt(scanner.nextLine().trim());
                         if (matchNum > 0 && matchNum <= matches.size()) {
                             model.bean.MatchBean selectedMatch = matches.get(matchNum - 1);
-                            homeController.joinMatch(selectedMatch.getMatchId());
+                            attemptJoinMatch(selectedMatch);
                         }
                     } catch (NumberFormatException e) {
                         System.out.println("Invalid input");
@@ -166,22 +151,16 @@ public class CLIHomeView implements HomeView {
     }
 
     @Override
-    public void refreshMatches() {
-        displayMatches(homeController.getMatches());
-    }
-
-    @Override
-    public java.util.List<model.bean.MatchBean> getMatches() {
-        return homeController.getMatches();
-    }
-
-    @Override
     public void showMatchDetails(int matchId) {
         try {
-            model.bean.MatchBean match = findMatchById(matchId);
+            // Find match from controller
+            model.bean.MatchBean match = homeController.getMatches().stream()
+                    .filter(m -> m.getMatchId() == matchId)
+                    .findFirst()
+                    .orElse(null);
 
             if (match == null) {
-                System.out.println("Match not found");
+                displayError("Match not found");
                 return;
             }
 
@@ -192,7 +171,7 @@ public class CLIHomeView implements HomeView {
             System.out.println("Date: " + match.getMatchDate() + " at " + match.getMatchTime());
             System.out.println("City: " + match.getCity());
             System.out.println("Organizer: " + match.getOrganizerUsername());
-            System.out.println("Players: " + (match.getParticipants() != null ? match.getParticipants().size() : 0)
+            System.out.println("Players: " + homeController.getCurrentParticipants(match)
                     + "/" + match.getRequiredParticipants());
             System.out.println("Price: €"
                     + (match.getPricePerPerson() != null ? String.format("%.2f", match.getPricePerPerson()) : "Free"));
@@ -203,7 +182,30 @@ public class CLIHomeView implements HomeView {
             scanner.nextLine();
 
         } catch (Exception e) {
-            System.out.println("Error showing match details: " + e.getMessage());
+            displayError("Error showing match details: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public void displayError(String message) {
+        System.out.println("\n[ERROR] " + message);
+    }
+
+    @Override
+    public void displaySuccess(String message) {
+        System.out.println("\n[SUCCESS] " + message);
+    }
+
+    @Override
+    public void refreshMatches() {
+        displayMatches(homeController.getMatches());
+    }
+
+    private void attemptJoinMatch(model.bean.MatchBean selectedMatch) {
+        try {
+            homeController.joinMatch(selectedMatch.getMatchId());
+        } catch (exception.ValidationException e) {
+            System.out.println("Error joining match: " + e.getMessage());
         }
     }
 }

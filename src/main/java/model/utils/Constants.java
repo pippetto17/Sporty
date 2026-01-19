@@ -251,4 +251,9 @@ public final class Constants {
 
     // Small UI fragments
     public static final String LABEL_JOINED_SUFFIX = " joined";
+
+    public static final String PADEL = "PADEL";
+    public static final String FOOTBALL = "FOOTBALL";
+    public static final String BASKET = "BASKET";
+    public static final String TENNIS = "TENNIS";
 }

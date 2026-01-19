@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 <BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
-            styleClass="root-container" prefWidth="600" prefHeight="500">
+            styleClass="root-container" prefWidth="600" prefHeight="750">
 
     <top>
         <VBox spacing="10" styleClass="header-container">
@@ -26,85 +26,65 @@
     </top>
 
     <center>
-        <VBox spacing="15" alignment="CENTER_LEFT">
-            <padding>
-                <Insets top="20" right="40" bottom="20" left="40"/>
-            </padding>
-            
-            <Label fx:id="matchInfoLabel" text="Match Info" styleClass="info-label"/>
-            
-            <HBox spacing="10" alignment="CENTER_LEFT">
-                <Label text="Number of shares to pay:"/>
-                <ComboBox fx:id="sharesComboBox" prefWidth="80"/>
-            </HBox>
-            
-            <Label fx:id="amountLabel" text="Total: € 0.00" style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
-            
-            <Separator />
-            
-            <Label text="Card Details" styleClass="section-header"/>
-            
-            <GridPane hgap="10" vgap="10">
-                 <Label text="Card Number" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
-                 <TextField fx:id="cardNumberField" promptText="0000 0000 0000 0000" GridPane.columnIndex="1" GridPane.rowIndex="0" GridPane.columnSpan="2"/>
-                 
-                 <Label text="Card Holder" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
-                 <TextField fx:id="cardHolderField" promptText="NAME SURNAME" GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.columnSpan="2"/>
-        <VBox spacing="20" alignment="TOP_CENTER">
-            <padding>
-                <Insets top="30" right="40" bottom="30" left="40"/>
-            </padding>
-            
-            <VBox spacing="10" styleClass="card, elevated-1">
-                <padding>
-                    <Insets top="20" right="20" bottom="20" left="20"/>
-                </padding>
-                
-                <Label fx:id="matchInfoLabel" text="Match Info" styleClass="title-4"/>
-                
-                <HBox spacing="15" alignment="CENTER_LEFT">
-                    <Label text="Shares to pay:" styleClass="text-bold"/>
-                    <ComboBox fx:id="sharesComboBox" prefWidth="100"/>
-                </HBox>
-                
-                <Separator/>
-                
-                <HBox alignment="CENTER_RIGHT">
-                     <Label fx:id="amountLabel" text="Total: € 0.00" styleClass="title-2, accent"/>
-                </HBox>
-            </VBox>
-            
-            <VBox spacing="15">
-                <Label text="Card Details" styleClass="title-4"/>
-                
-                <VBox spacing="5">
-                    <Label text="Card Number" styleClass="text-caption"/>
-                    <TextField fx:id="cardNumberField" promptText="0000 0000 0000 0000" styleClass="text-field"/>
-                </VBox>
-                
-                <VBox spacing="5">
-                    <Label text="Card Holder" styleClass="text-caption"/>
-                    <TextField fx:id="cardHolderField" promptText="NAME SURNAME" styleClass="text-field"/>
-                </VBox>
-                
-                <HBox spacing="15">
-                    <VBox spacing="5" HBox.hgrow="ALWAYS">
-                        <Label text="Expiry Date" styleClass="text-caption"/>
-                        <TextField fx:id="expiryField" promptText="MM/YY"/>
+        <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;">
+            <content>
+                <VBox spacing="20" alignment="TOP_CENTER">
+                    <padding>
+                        <Insets top="30" right="40" bottom="30" left="40"/>
+                    </padding>
+                    
+                    <VBox spacing="10" styleClass="card, elevated-1">
+                        <padding>
+                            <Insets top="20" right="20" bottom="20" left="20"/>
+                        </padding>
+                        
+                        <Label fx:id="matchInfoLabel" text="Match Info" styleClass="title-4"/>
+                        
+                        <HBox spacing="15" alignment="CENTER_LEFT">
+                            <Label text="Shares to pay:" styleClass="text-bold"/>
+                            <ComboBox fx:id="sharesComboBox" prefWidth="100"/>
+                        </HBox>
+                        
+                        <Separator/>
+                        
+                        <HBox alignment="CENTER_RIGHT">
+                            <Label fx:id="amountLabel" text="Total: € 0.00" styleClass="title-2, accent"/>
+                        </HBox>
                     </VBox>
-                    <VBox spacing="5" HBox.hgrow="ALWAYS">
-                        <Label text="CVV" styleClass="text-caption"/>
-                        <TextField fx:id="cvvField" promptText="123"/>
+                    
+                    <VBox spacing="15">
+                        <Label text="Card Details" styleClass="title-4"/>
+                        
+                        <VBox spacing="5">
+                            <Label text="Card Number" styleClass="text-caption"/>
+                            <TextField fx:id="cardNumberField" promptText="0000 0000 0000 0000" styleClass="text-field"/>
+                        </VBox>
+                        
+                        <VBox spacing="5">
+                            <Label text="Card Holder" styleClass="text-caption"/>
+                            <TextField fx:id="cardHolderField" promptText="NAME SURNAME" styleClass="text-field"/>
+                        </VBox>
+                        
+                        <HBox spacing="15">
+                            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                                <Label text="Expiry Date" styleClass="text-caption"/>
+                                <TextField fx:id="expiryField" promptText="MM/YY"/>
+                            </VBox>
+                            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                                <Label text="CVV" styleClass="text-caption"/>
+                                <TextField fx:id="cvvField" promptText="123"/>
+                            </VBox>
+                        </HBox>
                     </VBox>
-                </HBox>
-            </VBox>
-            
-            <Label fx:id="errorLabel" text="" styleClass="danger"/>
-        </VBox>
+                    
+                    <Label fx:id="errorLabel" text="" styleClass="danger"/>
+                </VBox>
+            </content>
+        </ScrollPane>
     </center>
     
     <bottom>
-        <HBox alignment="CENTER" style="-fx-padding: 20; -fx-border-color: -color-border-subtle; -fx-border-width: 1 0 0 0;">
+        <HBox alignment="CENTER" style="-fx-padding: 20; -fx-border-color: #e0e0e0; -fx-border-width: 1 0 0 0;">
             <Button fx:id="payButton" text="Pay Now" onAction="#handlePay" styleClass="success, large" prefWidth="250"/>
         </HBox>
     </bottom>

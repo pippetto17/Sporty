@@ -81,7 +81,11 @@ public class CLILoginView implements LoginView {
             System.out.println("Role: " + model.domain.Role.fromCode(user.getRole()));
 
             running = false;
-            applicationController.navigateToHome(user);
+            try {
+                applicationController.navigateToHome(user);
+            } catch (exception.ValidationException e) {
+                displayLoginError(e.getMessage());
+            }
         } else {
             displayLoginError(Constants.ERROR_INVALID_CREDENTIALS);
         }

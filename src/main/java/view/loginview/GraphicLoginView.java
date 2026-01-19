@@ -143,7 +143,11 @@ public class GraphicLoginView extends Application implements LoginView {
             // Navigate to home
             Platform.runLater(() -> {
                 primaryStage.close();
-                applicationController.navigateToHome(user);
+                try {
+                    applicationController.navigateToHome(user);
+                } catch (exception.ValidationException e) {
+                    displayLoginError(e.getMessage());
+                }
             });
         } else {
             displayLoginError(Constants.ERROR_INVALID_CREDENTIALS);
@@ -190,13 +194,16 @@ public class GraphicLoginView extends Application implements LoginView {
             String surname = surnameField.getText().trim();
             String selectedRole = roleComboBox.getValue();
 
-            if (username.isEmpty() || password.isEmpty() || name.isEmpty() ||
-                    surname.isEmpty() || selectedRole == null) {
-                showRegisterError(Constants.ERROR_ALL_FIELDS_REQUIRED);
+            // Validate inputs through controller
+            String validationError = loginController.validateRegistrationInputs(
+                    username, password, name, surname, selectedRole);
+            if (validationError != null) {
+                showRegisterError(validationError);
                 return;
             }
 
-            int roleCode = LoginController.getRoleCodeFromString(selectedRole);
+            // Get role code from controller (no longer static)
+            int roleCode = loginController.getRoleCodeFromString(selectedRole);
 
             UserBean userBean = new UserBean(username, password);
 

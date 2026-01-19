@@ -67,7 +67,8 @@ public class TimeSlotDAODBMS implements TimeSlotDAO {
 
     @Override
     public List<TimeSlot> findByFieldId(String fieldId) {
-        String sql = "SELECT " + TIME_SLOTS_COLUMNS + " FROM time_slots WHERE field_id = ? ORDER BY day_of_week, start_time";
+        String sql = "SELECT " + TIME_SLOTS_COLUMNS
+                + " FROM time_slots WHERE field_id = ? ORDER BY day_of_week, start_time";
 
         try (Connection conn = ConnectionFactory.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -102,14 +103,14 @@ public class TimeSlotDAODBMS implements TimeSlotDAO {
     public List<TimeSlot> findAvailableSlotsForDate(String fieldId, LocalDate date) {
         String sql = """
                 SELECT %s FROM time_slots
-                WHERE field_id = ? 
-                AND day_of_week = ? 
+                WHERE field_id = ?
+                AND day_of_week = ?
                 AND status = 'AVAILABLE'
                 AND (booking_date IS NULL OR booking_date = ?)
                 AND slot_id NOT IN (
-                    SELECT slot_id FROM time_slots 
-                    WHERE field_id = ? 
-                    AND booking_date = ? 
+                    SELECT slot_id FROM time_slots
+                    WHERE field_id = ?
+                    AND booking_date = ?
                     AND status = 'BOOKED'
                 )
                 ORDER BY start_time
@@ -170,7 +171,7 @@ public class TimeSlotDAODBMS implements TimeSlotDAO {
     public List<TimeSlot> findConflictingForDate(String fieldId, LocalDate date, LocalTime start, LocalTime end) {
         String sql = """
                 SELECT %s FROM time_slots
-                WHERE field_id = ? 
+                WHERE field_id = ?
                 AND booking_date = ?
                 AND start_time < ? AND end_time > ?
                 """.formatted(TIME_SLOTS_COLUMNS);

@@ -10,9 +10,11 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import model.bean.BookingBean;
 import model.domain.User;
+import model.notification.FieldManagerNotificationObserver;
 import model.utils.Constants;
 import view.ViewUtils;
 
@@ -128,31 +130,136 @@ public class GraphicFieldManagerView implements FieldManagerView {
         Platform.runLater(this::checkAndShowNotifications);
     }
 
+    @FXML
+    private Button notificationButton;
+
     private void checkAndShowNotifications() {
         if (notificationService == null)
             return;
 
         List<String> unread = notificationService.getUnreadNotifications(manager.getUsername());
         if (!unread.isEmpty()) {
-            showNotificationsPopup(unread);
+            notificationButton.setStyle("-fx-text-fill: -color-danger-fg; -fx-border-color: -color-danger-emphasis;");
+            notificationButton.setText("🔔 (" + unread.size() + ")");
+        } else {
+            notificationButton.setStyle("");
+            notificationButton.setText("🔔");
         }
     }
 
-    private void showNotificationsPopup(List<String> notifications) {
-        StringBuilder content = new StringBuilder();
-        content.append("Hai ").append(notifications.size()).append(" nuove notifiche:\n\n");
+    @FXML
+    private void handleShowNotifications() {
+        Dialog<Void> dialog = new Dialog<>();
+        dialog.setTitle("Notification Center");
+        dialog.setHeaderText("Notifications & Requests");
 
-        for (String notification : notifications) {
-            content.append("🔔 ").append(notification).append("\n\n");
+        TabPane tabPane = new TabPane();
+        tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
+
+        tabPane.getTabs().addAll(createRequestsTab(), createAlertsTab());
+
+        dialog.getDialogPane().setContent(tabPane);
+        dialog.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
+        ViewUtils.applyStylesheets(dialog.getDialogPane());
+
+        dialog.showAndWait();
+    }
+
+    private Tab createAlertsTab() {
+        Tab alertsTab = new Tab("Alerts");
+        VBox alertsBox = new VBox(10);
+        alertsBox.setPadding(new javafx.geometry.Insets(10));
+
+        List<String> unread = notificationService.getUnreadNotifications(manager.getUsername());
+        populateAlertsBox(alertsBox, unread);
+
+        alertsTab.setContent(new ScrollPane(alertsBox));
+        return alertsTab;
+    }
+
+    private void populateAlertsBox(VBox alertsBox, List<String> unread) {
+        if (unread.isEmpty()) {
+            alertsBox.getChildren().add(new Label("No new notifications."));
+            return;
         }
 
-        Alert alert = createStyledAlert(Alert.AlertType.INFORMATION,
-                "Notifiche",
-                content.toString());
-        alert.setHeaderText("Nuove notifiche!");
-        alert.showAndWait();
-
+        for (String note : unread) {
+            Label l = new Label("🔔 " + note);
+            l.setWrapText(true);
+            alertsBox.getChildren().add(l);
+        }
         notificationService.markAllAsRead(manager.getUsername());
+        checkAndShowNotifications();
+    }
+
+    private Tab createRequestsTab() {
+        Tab requestsTab = new Tab("Pending Requests");
+        VBox requestsBox = new VBox(10);
+        requestsBox.setPadding(new javafx.geometry.Insets(10));
+
+        List<BookingBean> pendingRequests = controller.getPendingRequests();
+        populateRequestsBox(requestsBox, pendingRequests);
+
+        requestsTab.setContent(new ScrollPane(requestsBox));
+        return requestsTab;
+    }
+
+    private void populateRequestsBox(VBox requestsBox, List<BookingBean> pendingRequests) {
+        if (pendingRequests.isEmpty()) {
+            requestsBox.getChildren().add(new Label("No pending requests."));
+            return;
+        }
+
+        for (BookingBean b : pendingRequests) {
+            requestsBox.getChildren().add(createBookingRequestRow(b, requestsBox));
+        }
+    }
+
+    private HBox createBookingRequestRow(BookingBean b, VBox requestsBox) {
+        HBox row = new HBox(10);
+        row.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+
+        VBox info = new VBox(2);
+        Label title = new Label(b.getFieldName() + " - " + b.getBookingDate());
+        title.setStyle("-fx-font-weight: bold");
+        Label subtitle = new Label(b.getStartTime() + " (" + b.getRequesterUsername() + ")");
+        info.getChildren().addAll(title, subtitle);
+
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, javafx.scene.layout.Priority.ALWAYS);
+
+        Button approveBtn = new Button("✓");
+        approveBtn.getStyleClass().add("success-button");
+        approveBtn.setOnAction(e -> handleApproveFromDialog(b, row, requestsBox));
+
+        Button rejectBtn = new Button("✗");
+        rejectBtn.getStyleClass().add("danger-button");
+        rejectBtn.setOnAction(e -> handleRejectFromDialog(b, row, requestsBox));
+
+        row.getChildren().addAll(info, spacer, approveBtn, rejectBtn);
+        return row;
+    }
+
+    private void handleApproveFromDialog(BookingBean b, HBox row, VBox requestsBox) {
+        try {
+            controller.approveBooking(b.getBookingId());
+            requestsBox.getChildren().remove(row);
+            loadData();
+            showMessage("Request approved!", false);
+        } catch (Exception ex) {
+            showMessage("Error approving: " + ex.getMessage(), true);
+        }
+    }
+
+    private void handleRejectFromDialog(BookingBean b, HBox row, VBox requestsBox) {
+        try {
+            controller.rejectBooking(b.getBookingId());
+            requestsBox.getChildren().remove(row);
+            loadData();
+            showMessage("Request rejected", false);
+        } catch (Exception ex) {
+            showMessage("Error rejecting: " + ex.getMessage(), true);
+        }
     }
 
     private void setupTable() {

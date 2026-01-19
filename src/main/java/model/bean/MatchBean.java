@@ -19,22 +19,22 @@ public class MatchBean {
     private String fieldId;
     private Double pricePerPerson;
     private MatchStatus status;
+    private Integer bookingId;
     private List<String> participants;
 
     public MatchBean() {
         this.participants = new ArrayList<>();
     }
 
-    public MatchBean(Sport sport, LocalDate matchDate, LocalTime matchTime, String city, int requiredParticipants) {
-        this.sport = sport;
-        this.matchDate = matchDate;
-        this.matchTime = matchTime;
-        this.city = city;
-        this.requiredParticipants = requiredParticipants;
-        this.participants = new ArrayList<>();
+    // Getters and Setters
+    public Integer getBookingId() {
+        return bookingId;
     }
 
-    // Getters and Setters
+    public void setBookingId(Integer bookingId) {
+        this.bookingId = bookingId;
+    }
+
     public Integer getMatchId() {
         return matchId;
     }
@@ -123,7 +123,4 @@ public class MatchBean {
         this.participants = participants;
     }
 
-    public boolean isFull() {
-        return participants != null && participants.size() >= requiredParticipants;
-    }
 }

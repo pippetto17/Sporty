@@ -44,9 +44,8 @@ public class GraphicViewFactory implements ViewFactory {
 
     @Override
     public PaymentView createPaymentView(PaymentController paymentController) {
-        return new GraphicPaymentView(paymentController);
+        return new GraphicPaymentView();
     }
-
 
     @Override
     public view.fieldmanagerview.FieldManagerView createFieldManagerView(controller.FieldManagerController controller) {
@@ -65,6 +64,6 @@ public class GraphicViewFactory implements ViewFactory {
 
     @Override
     public JoinMatchView createJoinMatchView(JoinMatchController controller) {
-        return new GraphicJoinMatchView(controller);
+        return new GraphicJoinMatchView();
     }
 }

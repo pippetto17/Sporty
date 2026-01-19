@@ -17,16 +17,6 @@ public class FieldBean {
     private String structureName; // Name of the sports structure/facility
     private boolean autoApprove; // Auto-approve booking requests without manager intervention
 
-    /**
-     * Default no-arg constructor required for JavaBeans specification.
-     * This constructor is needed for serialization/deserialization frameworks
-     * (e.g., Jackson, JAXB) and for JavaFX property binding.
-     */
-    public FieldBean() {
-        // Empty constructor required by JavaBeans specification for reflection-based
-        // instantiation
-    }
-
     // Getters and Setters
     public String getFieldId() {
         return fieldId;
@@ -77,7 +67,13 @@ public class FieldBean {
     }
 
     public Double getPricePerPerson() {
-        return pricePerPerson;
+        if (pricePerPerson != null) {
+            return pricePerPerson;
+        }
+        if (pricePerHour != null && sport != null && sport.getRequiredPlayers() > 0) {
+            return pricePerHour / sport.getRequiredPlayers();
+        }
+        return 0.0;
     }
 
     public void setPricePerPerson(Double pricePerPerson) {

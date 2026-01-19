@@ -195,7 +195,10 @@ public class GraphicBookFieldView implements BookFieldView {
             fieldsContainer.getChildren().clear();
         }
 
-        CompletableFuture.supplyAsync(() -> controller.searchFieldsForDirectBooking(sport, city))
+        CompletableFuture.supplyAsync(() -> {
+            MatchBean mb = controller.getCurrentMatchBean();
+            return controller.searchFieldsForDirectBooking(sport, city, mb.getMatchDate(), mb.getMatchTime());
+        })
                 .thenAcceptAsync(this::handleSearchResults, Platform::runLater)
                 .exceptionally(ex -> {
                     Platform.runLater(() -> {
@@ -313,15 +316,14 @@ public class GraphicBookFieldView implements BookFieldView {
         fieldsContainer.getChildren().stream()
                 .filter(VBox.class::isInstance)
                 .forEach(n -> {
-                    n.getStyleClass().remove(Constants.CSS_ACCENT); // Remove accent border/glow
-                    n.setStyle(""); // Reset inline styles
+                    n.getStyleClass().remove(Constants.CSS_ACCENT);
+                    n.setStyle("");
                 });
 
         // Seleziona nuovo
-        card.getStyleClass().add(Constants.CSS_ACCENT); // Highlights border in AtlantaFX
-         // Add subtle background change to indicate selection
-         card.setStyle(
-                 "-fx-border-color: -color-accent-emphasis; -fx-border-width: 2px; -fx-background-color: -color-bg-subtle;");
+        card.getStyleClass().add(Constants.CSS_ACCENT);
+        card.setStyle(
+                "-fx-border-color: -color-accent-emphasis; -fx-border-width: 2px; -fx-background-color: -color-bg-subtle;");
 
         this.selectedField = field;
         controller.setSelectedField(field);
@@ -337,8 +339,8 @@ public class GraphicBookFieldView implements BookFieldView {
             return;
 
         Alert confirm = createStyledAlert(Alert.AlertType.CONFIRMATION, "Confirm Booking",
-                "Book " + selectedField.getName() + "?\n\nTotal per person: €"
-                        + String.format("%.2f", selectedField.getPricePerPerson()));
+                "Book " + selectedField.getName() + "?\n\nTotal per person: "
+                        + String.format("€%.2f", selectedField.getPricePerPerson()));
 
         confirm.showAndWait().ifPresent(response -> {
             if (response == ButtonType.OK) {
@@ -368,7 +370,6 @@ public class GraphicBookFieldView implements BookFieldView {
         controller.navigateBack();
     }
 
-    // Unico metodo helper per tutti i messaggi
     private void showAlert(String title, String content, Alert.AlertType type) {
         Platform.runLater(() -> {
             Alert alert = createStyledAlert(type, title, content);
@@ -376,8 +377,6 @@ public class GraphicBookFieldView implements BookFieldView {
         });
     }
 
-    // Metodi dell'interfaccia non usati dalla GUI rimossi o lasciati vuoti se
-    // obbligatori
     @Override
     public void setApplicationController(controller.ApplicationController app) {
         // Not needed for this view as it uses BookFieldController
@@ -426,4 +425,3 @@ public class GraphicBookFieldView implements BookFieldView {
         showAlert("Success", message, Alert.AlertType.INFORMATION);
     }
 }
-
