@@ -69,8 +69,9 @@ public class CLIHomeView implements HomeView {
         } else {
             for (int i = 0; i < matches.size(); i++) {
                 model.bean.MatchBean match = matches.get(i);
-                String matchStr = String.format("%d. %s - %s - %s at %s (%d players)",
+                String matchStr = String.format("%d. %s %s - %s - %s at %s (%d players)",
                         i + 1,
+                        getSportEmoji(match.getSport()),
                         match.getSport().getDisplayName(),
                         match.getCity(),
                         match.getMatchDate(),
@@ -79,6 +80,21 @@ public class CLIHomeView implements HomeView {
                 System.out.println(matchStr);
             }
         }
+    }
+
+    private String getSportEmoji(model.domain.Sport sport) {
+        if (sport == null)
+            return Constants.ICON_EXTRAS_MEDAL;
+        String name = sport.name().toUpperCase();
+        if (name.contains("FOOTBALL"))
+            return Constants.ICON_FOOTBALL;
+        if (name.contains("BASKET"))
+            return Constants.ICON_BASKETBALL;
+        if (name.contains("TENNIS"))
+            return Constants.ICON_TENNIS;
+        if (name.contains("PADEL"))
+            return Constants.ICON_PADEL;
+        return Constants.ICON_EXTRAS_MEDAL;
     }
 
     @Override

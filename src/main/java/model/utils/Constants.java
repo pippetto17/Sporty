@@ -210,6 +210,12 @@ public final class Constants {
     public static final String ICON_CALENDAR = "📅 ";
     public static final String ICON_CLOCK = "🕒 ";
     public static final String ICON_PLAYERS = "👥";
+    public static final String ICON_FOOTBALL = "⚽";
+    public static final String ICON_BASKETBALL = "🏀";
+    public static final String ICON_TENNIS = "🎾";
+    public static final String ICON_PADEL = "🎾"; // Using tennis ball for now, or find a racket if possible, but tennis
+                                                  // ball is standard
+    public static final String ICON_EXTRAS_MEDAL = "🏅";
 
     // Bullet
     public static final String BULLET = " • ";
@@ -237,6 +243,11 @@ public final class Constants {
     // -Dsporty.image.player=... and -Dsporty.image.organizer=...
     public static final String IMAGE_PLAYER_PATH = "/image/player.png";
     public static final String IMAGE_ORGANIZER_PATH = "/image/organizer.jpg";
+    public static final String IMAGE_FOOTBALL_PATH = "/image/football.png";
+    public static final String IMAGE_BASKETBALL_PATH = "/image/basketball.png";
+    public static final String IMAGE_TENNIS_PATH = "/image/tennis.png";
+    public static final String IMAGE_PADEL_PATH = "/image/padel.png";
+    public static final String IMAGE_MEDAL_PATH = "/image/medal.png";
 
     // Small UI fragments
     public static final String LABEL_JOINED_SUFFIX = " joined";

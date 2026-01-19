@@ -230,7 +230,8 @@ public class GraphicHomeView implements HomeView {
 
         // 4. SEARCH BUTTON
         Button searchBtn = new Button(model.utils.Constants.BTN_SEARCH);
-        searchBtn.getStyleClass().addAll(model.utils.Constants.CSS_SEARCH_ACTION_BUTTON, model.utils.Constants.CSS_SUCCESS);
+        searchBtn.getStyleClass().addAll(model.utils.Constants.CSS_SEARCH_ACTION_BUTTON,
+                model.utils.Constants.CSS_SUCCESS);
         searchBtn.setOnAction(e -> applyFilters());
 
         capsule.getChildren().addAll(cityBox, sep1, sportBox, sep2, dateBox, searchBtn);
@@ -247,13 +248,29 @@ public class GraphicHomeView implements HomeView {
         String sportClass = getSportStyleClass(match.getSport()); // Ottieni classe dinamica
         imageHeader.getStyleClass().addAll("card-image-area", sportClass);
 
-        // Icona specifica
-        Label sportIcon = new Label(getSportIcon(match.getSport()));
-        sportIcon.setStyle(
-                "-fx-font-size: 52px; -fx-text-fill: rgba(255,255,255,0.9); -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 5, 0, 0, 1);");
+        // Icona specifica (Immagine)
+        String imagePath = getSportImagePath(match.getSport());
+        javafx.scene.image.ImageView sportIcon = new javafx.scene.image.ImageView();
+        try {
+            javafx.scene.image.Image img = new javafx.scene.image.Image(
+                    Objects.requireNonNull(getClass().getResourceAsStream(imagePath)));
+            sportIcon.setImage(img);
+            sportIcon.setFitWidth(80);
+            sportIcon.setFitHeight(80);
+            sportIcon.setPreserveRatio(true);
+            sportIcon.setSmooth(true);
+            // Effect similar to previous: dropshadow
+            sportIcon.setEffect(new javafx.scene.effect.DropShadow(10, javafx.scene.paint.Color.rgb(0, 0, 0, 0.3)));
+        } catch (Exception e) {
+            // Fallback to text if image missing (rare)
+            // We can just leave empty or put a placeholder label, but for now log it
+            java.util.logging.Logger.getLogger(getClass().getName())
+                    .log(java.util.logging.Level.WARNING, () -> String.format("Sport image not found: %s", imagePath));
+        }
 
         Label priceBadge = new Label(
-                match.getPricePerPerson() != null ? String.format("€%.0f", match.getPricePerPerson()) : model.utils.Constants.MATCH_DETAIL_FREE);
+                match.getPricePerPerson() != null ? String.format("€%.0f", match.getPricePerPerson())
+                        : model.utils.Constants.MATCH_DETAIL_FREE);
         priceBadge.getStyleClass().add(model.utils.Constants.CSS_CARD_PRICE_BADGE);
         StackPane.setAlignment(priceBadge, Pos.TOP_RIGHT);
         StackPane.setMargin(priceBadge, new Insets(10));
@@ -264,17 +281,21 @@ public class GraphicHomeView implements HomeView {
         VBox content = new VBox(5);
         content.getStyleClass().add(model.utils.Constants.CSS_CARD_CONTENT);
 
-        Label locationTitle = new Label(match.getCity() + model.utils.Constants.BULLET + match.getSport().getDisplayName());
+        Label locationTitle = new Label(
+                match.getCity() + model.utils.Constants.BULLET + match.getSport().getDisplayName());
         locationTitle.getStyleClass().add(model.utils.Constants.CSS_CARD_TITLE);
         locationTitle.setWrapText(true);
 
-        Label dateLabel = new Label(model.utils.Constants.ICON_CALENDAR + match.getMatchDate() + "  " + model.utils.Constants.ICON_CLOCK + match.getMatchTime());
+        Label dateLabel = new Label(model.utils.Constants.ICON_CALENDAR + match.getMatchDate() + "  "
+                + model.utils.Constants.ICON_CLOCK + match.getMatchTime());
         dateLabel.getStyleClass().add(model.utils.Constants.CSS_CARD_SUBTITLE);
 
         int current = match.getParticipants() != null ? match.getParticipants().size() : 0;
         int max = match.getRequiredParticipants();
         ProgressBar capacityBar = new ProgressBar((double) current / max);
-        capacityBar.getStyleClass().addAll(model.utils.Constants.CSS_CARD_PROGRESS_BAR, sportClass + "-bar"); // Barra progressiva coordinata
+        capacityBar.getStyleClass().addAll(model.utils.Constants.CSS_CARD_PROGRESS_BAR, sportClass + "-bar"); // Barra
+        // progressiva
+        // coordinata
         capacityBar.setPrefWidth(Double.MAX_VALUE);
 
         Label playersLabel = new Label(current + "/" + max + " joined");
@@ -287,7 +308,8 @@ public class GraphicHomeView implements HomeView {
         // Aggiungi pulsante Join se l'utente sta visualizzando come player
         if (homeController.isViewingAsPlayer() && !match.isFull()) {
             Button joinButton = new Button(model.utils.Constants.BTN_JOIN_MATCH);
-            joinButton.getStyleClass().addAll(model.utils.Constants.CSS_SUCCESS, model.utils.Constants.CSS_SMALL); // AtlantaFX classes
+            joinButton.getStyleClass().addAll(model.utils.Constants.CSS_SUCCESS, model.utils.Constants.CSS_SMALL); // AtlantaFX
+            // classes
             joinButton.setOnAction(e -> {
                 e.consume();
                 homeController.joinMatch(match.getMatchId());
@@ -319,20 +341,22 @@ public class GraphicHomeView implements HomeView {
         return "sport-default";
     }
 
-    // Helper per determinare l'icona in base all'enum Sport
-    private String getSportIcon(model.domain.Sport sport) {
+    // Helper per determinare il percorso immagine in base all'enum Sport
+    private String getSportImagePath(model.domain.Sport sport) {
         if (sport == null)
-            return "🏅";
+            return model.utils.Constants.IMAGE_MEDAL_PATH;
         String name = sport.name().toUpperCase();
 
         if (name.contains("FOOTBALL"))
-            return "⚽";
+            return model.utils.Constants.IMAGE_FOOTBALL_PATH;
         if (name.contains("BASKET"))
-            return "🏀";
-        if (name.contains("TENNIS") || name.contains("PADEL"))
-            return "🎾";
+            return model.utils.Constants.IMAGE_BASKETBALL_PATH;
+        if (name.contains("TENNIS"))
+            return model.utils.Constants.IMAGE_TENNIS_PATH;
+        if (name.contains("PADEL"))
+            return model.utils.Constants.IMAGE_PADEL_PATH;
 
-        return "🏅";
+        return model.utils.Constants.IMAGE_MEDAL_PATH;
     }
 
     private void updateCityAutocomplete(String input) {
@@ -363,24 +387,26 @@ public class GraphicHomeView implements HomeView {
 
         // Load User Image
         try {
-            // Allow overriding the image paths via system properties so the URI is configurable
+            // Allow overriding the image paths via system properties so the URI is
+            // configurable
             String playerPath = System.getProperty("sporty.image.player", model.utils.Constants.IMAGE_PLAYER_PATH);
-            String organizerPath = System.getProperty("sporty.image.organizer", model.utils.Constants.IMAGE_ORGANIZER_PATH);
+            String organizerPath = System.getProperty("sporty.image.organizer",
+                    model.utils.Constants.IMAGE_ORGANIZER_PATH);
             String imagePath = homeController.getUserRole() == model.domain.Role.ORGANIZER ? organizerPath : playerPath;
 
             javafx.scene.image.Image img = new javafx.scene.image.Image(
                     java.util.Objects.requireNonNull(getClass().getResourceAsStream(imagePath)),
                     120, 120, true, true); // Load at higher res for sharpness
-             userImageView.setImage(img);
+            userImageView.setImage(img);
 
-             // Circular Clip
-             javafx.scene.shape.Circle clip = new javafx.scene.shape.Circle(30, 30, 30);
-             userImageView.setClip(clip);
-         } catch (Exception e) {
-             // Fallback
-             java.util.logging.Logger.getLogger(getClass().getName()).log(java.util.logging.Level.WARNING,
-                     String.format("User image not found: %s", e.getMessage()));
-         }
+            // Circular Clip
+            javafx.scene.shape.Circle clip = new javafx.scene.shape.Circle(30, 30, 30);
+            userImageView.setClip(clip);
+        } catch (Exception e) {
+            // Fallback
+            java.util.logging.Logger.getLogger(getClass().getName()).log(java.util.logging.Level.WARNING,
+                    String.format("User image not found: %s", e.getMessage()));
+        }
     }
 
     @Override
@@ -426,8 +452,10 @@ public class GraphicHomeView implements HomeView {
 
     @Override
     public void displayMenu() {
-        // Intentionally empty: menu interactions are handled directly in the graphic UI (toolbar/buttons)
-        // This method exists to satisfy the View interface used by other implementations (e.g., CLI).
+        // Intentionally empty: menu interactions are handled directly in the graphic UI
+        // (toolbar/buttons)
+        // This method exists to satisfy the View interface used by other
+        // implementations (e.g., CLI).
     }
 
     @FXML
