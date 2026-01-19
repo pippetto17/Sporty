@@ -10,6 +10,17 @@ public final class Constants {
         throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
     }
 
+    // CLI/UI helpers
+    // Separator used by CLI views to draw simple lines
+    public static final String SEPARATOR = "----------------------------------------";
+    // Prefix used when reporting how many items were found
+    public static final String FOUND_PREFIX = "Found ";
+
+    // Roles used across the app (display strings)
+    public static final String ROLE_PLAYER = "Player";
+    public static final String ROLE_ORGANIZER = "Organizer";
+    public static final String ROLE_FIELD_MANAGER = "Field Manager";
+
     // Error messages - Login/Registration
     public static final String ERROR_USERNAME_EMPTY = "Username cannot be empty";
     public static final String ERROR_PASSWORD_EMPTY = "Password cannot be empty";
