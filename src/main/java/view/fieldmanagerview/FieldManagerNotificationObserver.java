@@ -1,9 +1,9 @@
 package view.fieldmanagerview;
 
-import model.notification.NotificationEvent;
-import model.notification.NotificationObserver;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
+import model.notification.NotificationEvent;
+import model.notification.NotificationObserver;
 
 public class FieldManagerNotificationObserver implements NotificationObserver {
 

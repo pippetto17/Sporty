@@ -42,6 +42,8 @@ public class GraphicBookFieldView implements BookFieldView {
     private VBox fieldsContainer;
     @FXML
     private Button confirmButton;
+    @FXML
+    private javafx.scene.control.ComboBox<String> sortComboBox;
 
     private FieldBean selectedField;
 
@@ -62,8 +64,7 @@ public class GraphicBookFieldView implements BookFieldView {
 
             Scene scene = new Scene(loader.load(), 800, 700);
             scene.getStylesheets().addAll(
-                    getClass().getResource("/css/style.css").toExternalForm(),
-                    getClass().getResource("/css/controls-dark.css").toExternalForm());
+                    getClass().getResource("/css/style.css").toExternalForm());
 
             stage.setTitle("Sporty - " + (controller.isStandaloneMode() ? "Book Field" : "Select Field"));
             stage.setScene(scene);
@@ -76,10 +77,34 @@ public class GraphicBookFieldView implements BookFieldView {
                 searchFields();
             }
 
+            // Initialize Sort ComboBox
+            sortComboBox.getItems().addAll(
+                    "Distance (Coming Soon)",
+                    "Price: Low to High",
+                    "Price: High to Low");
+            sortComboBox.setOnAction(e -> handleSort());
+
         } catch (Exception e) {
             logger.severe("View load failed: " + e.getMessage());
             showAlert("Critical Error", "Could not load view: " + e.getMessage(), Alert.AlertType.ERROR);
         }
+    }
+
+    private void handleSort() {
+        String selected = sortComboBox.getValue();
+        if (selected == null)
+            return;
+
+        switch (selected) {
+            case "Price: Low to High" -> controller.sortFieldsByPrice(true);
+            case "Price: High to Low" -> controller.sortFieldsByPrice(false);
+            case "Distance (Coming Soon)" ->
+                showAlert("Info", "Distance sorting is coming soon!", Alert.AlertType.INFORMATION);
+            default -> {
+                /* Do nothing for unknown values */ }
+        }
+        // Refresh view with sorted list
+        handleSearchResults(controller.getAvailableFields());
     }
 
     private void displayMatchInfo() {
@@ -139,8 +164,8 @@ public class GraphicBookFieldView implements BookFieldView {
 
         dialog.showAndWait().ifPresent(response -> {
             if (response == ButtonType.OK && sportCombo.getValue() != null &&
-                !cityField.getText().trim().isEmpty() && datePicker.getValue() != null &&
-                timeCombo.getValue() != null) {
+                    !cityField.getText().trim().isEmpty() && datePicker.getValue() != null &&
+                    timeCombo.getValue() != null) {
 
                 MatchBean contextBean = controller.getCurrentMatchBean();
                 contextBean.setSport(sportCombo.getValue());
@@ -149,10 +174,10 @@ public class GraphicBookFieldView implements BookFieldView {
                 contextBean.setMatchTime(java.time.LocalTime.parse(timeCombo.getValue()));
 
                 matchInfoLabel.setText(String.format("Booking: %s - %s - %s %s",
-                    contextBean.getSport().getDisplayName(),
-                    contextBean.getCity(),
-                    contextBean.getMatchDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
-                    contextBean.getMatchTime().format(DateTimeFormatter.ofPattern("HH:mm"))));
+                        contextBean.getSport().getDisplayName(),
+                        contextBean.getCity(),
+                        contextBean.getMatchDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
+                        contextBean.getMatchTime().format(DateTimeFormatter.ofPattern("HH:mm"))));
 
                 searchFieldsStandalone(contextBean.getSport(), contextBean.getCity());
             } else {
@@ -213,19 +238,19 @@ public class GraphicBookFieldView implements BookFieldView {
 
     private VBox createFieldCard(FieldBean field) {
         VBox card = new VBox(10);
-        card.getStyleClass().add("field-card"); // CSS gestisce padding e background
-        card.setPadding(new Insets(15));
+        card.getStyleClass().addAll("card", "elevated-1");
+        card.setPadding(new Insets(20));
 
         // 1. Header (Nome + Badge Indoor/Outdoor)
         HBox header = new HBox(10);
         header.setAlignment(Pos.CENTER_LEFT);
         header.getChildren().addAll(
-                createLabel(field.getName(), "field-name"),
+                createLabel(field.getName(), "title-4"),
                 createBadge(field.isIndoor()));
 
         // 2. Info Body
-        Label sportLabel = createLabel("⚽ " + field.getSport().getDisplayName(), "field-detail");
-        Label addressLabel = createLabel("📍 " + field.getAddress() + ", " + field.getCity(), "field-detail");
+        Label sportLabel = createLabel("⚽ " + field.getSport().getDisplayName(), "text-bold");
+        Label addressLabel = createLabel("📍 " + field.getAddress() + ", " + field.getCity(), "text-small");
 
         // 3. Footer (Prezzo + Bottone)
         HBox footer = createCardFooter(field, card);
@@ -243,10 +268,10 @@ public class GraphicBookFieldView implements BookFieldView {
 
         VBox prices = new VBox(2);
         Label perHour = new Label(String.format("€%.2f/hour", field.getPricePerHour()));
-        perHour.setStyle("-fx-text-fill: #6c757d; -fx-font-size: 11px;");
+        perHour.getStyleClass().add("text-caption");
 
         Label perPerson = new Label(String.format("€%.2f per person", field.getPricePerPerson()));
-        perPerson.getStyleClass().add("field-price");
+        perPerson.getStyleClass().addAll("text-bold", "accent");
 
         prices.getChildren().addAll(perHour, perPerson);
 
@@ -254,7 +279,7 @@ public class GraphicBookFieldView implements BookFieldView {
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
         Button selectBtn = new Button("Select");
-        selectBtn.getStyleClass().add("primary-button");
+        selectBtn.getStyleClass().add("button-outlined");
         selectBtn.setOnAction(e -> selectField(field, card));
 
         footer.getChildren().addAll(prices, spacer, selectBtn);
@@ -270,11 +295,13 @@ public class GraphicBookFieldView implements BookFieldView {
     }
 
     private Label createBadge(boolean isIndoor) {
-        Label l = new Label(isIndoor ? "🏠 Indoor" : "🌤️ Outdoor");
-        // Piccolo inline style per badge dinamico, accettabile qui
-        String color = isIndoor ? "#17a2b8" : "#ffc107";
-        l.setStyle("-fx-background-color: " + color
-                + "; -fx-text-fill: white; -fx-padding: 3 8; -fx-background-radius: 3; -fx-font-size: 10px;");
+        Label l = new Label(isIndoor ? "In" : "Out");
+        l.getStyleClass().addAll("text-small", "pill");
+        if (isIndoor) {
+            l.getStyleClass().add("success"); // Greenish
+        } else {
+            l.getStyleClass().add("warning"); // Orangeish
+        }
         return l;
     }
 
@@ -284,9 +311,17 @@ public class GraphicBookFieldView implements BookFieldView {
         // Deseleziona visivamente tutti
         fieldsContainer.getChildren().stream()
                 .filter(VBox.class::isInstance)
-                .forEach(n -> n.getStyleClass().remove("selected"));
+                .forEach(n -> {
+                    n.getStyleClass().remove("accent"); // Remove accent border/glow
+                    n.setStyle(""); // Reset inline styles
+                });
 
-        card.getStyleClass().add("selected");
+        // Seleziona nuovo
+        card.getStyleClass().add("accent"); // Highlights border in AtlantaFX
+        // Add subtle background change to indicate selection
+        card.setStyle(
+                "-fx-border-color: -color-accent-emphasis; -fx-border-width: 2px; -fx-background-color: -color-bg-subtle;");
+
         this.selectedField = field;
         controller.setSelectedField(field);
 

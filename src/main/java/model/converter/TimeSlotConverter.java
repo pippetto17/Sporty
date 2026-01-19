@@ -25,6 +25,7 @@ public class TimeSlotConverter {
         bean.setSlotId(slot.getSlotId());
         bean.setFieldId(slot.getFieldId());
         bean.setDayOfWeek(slot.getDayOfWeek());
+        bean.setBookingDate(slot.getBookingDate());
         bean.setStartTime(slot.getStartTime());
         bean.setEndTime(slot.getEndTime());
         bean.setStatus(slot.getStatus().getDisplayName());
@@ -46,6 +47,7 @@ public class TimeSlotConverter {
         slot.setSlotId(bean.getSlotId());
         slot.setFieldId(bean.getFieldId());
         slot.setDayOfWeek(bean.getDayOfWeek());
+        slot.setBookingDate(bean.getBookingDate());
         slot.setStartTime(bean.getStartTime());
         slot.setEndTime(bean.getEndTime());
 

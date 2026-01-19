@@ -1,20 +1,23 @@
 package model.domain;
 
 import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalTime;
 
 /**
- * Domain class representing a recurring time slot in a field's weekly schedule.
- * Used by Field Managers to define when their fields are available.
+ * Domain class representing a time slot in a field's schedule.
+ * - bookingDate == null: recurring weekly availability template
+ * - bookingDate != null: specific booking for that date
  */
 public class TimeSlot {
     private Integer slotId;
     private String fieldId;
     private DayOfWeek dayOfWeek;
+    private LocalDate bookingDate;
     private LocalTime startTime;
     private LocalTime endTime;
     private SlotStatus status;
-    private Integer bookingId; // null if available
+    private Integer bookingId;
 
     public TimeSlot() {
         this.status = SlotStatus.AVAILABLE;
@@ -54,6 +57,14 @@ public class TimeSlot {
         this.dayOfWeek = dayOfWeek;
     }
 
+    public LocalDate getBookingDate() {
+        return bookingDate;
+    }
+
+    public void setBookingDate(LocalDate bookingDate) {
+        this.bookingDate = bookingDate;
+    }
+
     public LocalTime getStartTime() {
         return startTime;
     }
@@ -84,7 +95,11 @@ public class TimeSlot {
 
     public void setBookingId(Integer bookingId) {
         this.bookingId = bookingId;
-        this.status = (bookingId != null) ? SlotStatus.BOOKED : SlotStatus.AVAILABLE;
+        if (bookingId != null && bookingDate != null) {
+            this.status = SlotStatus.BOOKED;
+        } else if (bookingDate == null) {
+            this.status = SlotStatus.AVAILABLE;
+        }
     }
 
     /**

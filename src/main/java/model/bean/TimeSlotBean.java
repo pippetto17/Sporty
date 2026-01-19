@@ -1,6 +1,7 @@
 package model.bean;
 
 import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalTime;
 
 /**
@@ -11,6 +12,7 @@ public class TimeSlotBean {
     private String fieldId;
     private String fieldName; // Enriched data for display
     private DayOfWeek dayOfWeek;
+    private LocalDate bookingDate;
     private LocalTime startTime;
     private LocalTime endTime;
     private String status; // Display name of SlotStatus
@@ -48,6 +50,14 @@ public class TimeSlotBean {
 
     public void setDayOfWeek(DayOfWeek dayOfWeek) {
         this.dayOfWeek = dayOfWeek;
+    }
+
+    public LocalDate getBookingDate() {
+        return bookingDate;
+    }
+
+    public void setBookingDate(LocalDate bookingDate) {
+        this.bookingDate = bookingDate;
     }
 
     public LocalTime getStartTime() {

@@ -430,5 +430,59 @@
     "message": "player2 ha prenotato il campo \u0027Campo Sud\u0027 per il 2026-01-27 alle 14:00",
     "timestamp": "2026-01-19T00:41:02.946105",
     "read": false
+  },
+  {
+    "recipient": "manager4",
+    "sender": "organizer4",
+    "type": "MATCH_CREATED",
+    "title": "Nuova partita organizzata!",
+    "message": "organizer4 ha organizzato una partita di FOOTBALL_11 al campo \u0027Campo Ovest\u0027 per il 2026-01-29 alle 17:00",
+    "timestamp": "2026-01-19T00:56:18.819505",
+    "read": false
+  },
+  {
+    "recipient": "manager1",
+    "sender": "organizer1",
+    "type": "MATCH_CREATED",
+    "title": "Nuova partita organizzata!",
+    "message": "organizer1 ha organizzato una partita di FOOTBALL_5 al campo \u0027Campo Nord\u0027 per il 2026-01-25 alle 18:00",
+    "timestamp": "2026-01-19T00:56:18.980838",
+    "read": false
+  },
+  {
+    "recipient": "manager3",
+    "sender": "organizer3",
+    "type": "MATCH_CREATED",
+    "title": "Nuova partita organizzata!",
+    "message": "organizer3 ha organizzato una partita di BASKETBALL al campo \u0027Campo Est\u0027 per il 2026-01-28 alle 19:00",
+    "timestamp": "2026-01-19T00:56:19.014736",
+    "read": true
+  },
+  {
+    "recipient": "manager5",
+    "sender": "player5",
+    "type": "BOOKING_CREATED",
+    "title": "Nuova prenotazione!",
+    "message": "player5 ha prenotato il campo \u0027Campo Test\u0027 per il 2026-01-30 alle 16:00",
+    "timestamp": "2026-01-19T00:56:19.064918",
+    "read": false
+  },
+  {
+    "recipient": "manager1",
+    "sender": "player1",
+    "type": "BOOKING_CREATED",
+    "title": "Nuova prenotazione!",
+    "message": "player1 ha prenotato il campo \u0027Campo Centrale\u0027 per il 2026-01-26 alle 20:00",
+    "timestamp": "2026-01-19T00:56:19.570547",
+    "read": false
+  },
+  {
+    "recipient": "manager2",
+    "sender": "player2",
+    "type": "BOOKING_CREATED",
+    "title": "Nuova prenotazione!",
+    "message": "player2 ha prenotato il campo \u0027Campo Sud\u0027 per il 2026-01-27 alle 14:00",
+    "timestamp": "2026-01-19T00:56:19.574024",
+    "read": false
   }
 ]

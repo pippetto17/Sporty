@@ -14,7 +14,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
-import model.utils.Constants;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -28,12 +27,17 @@ public class GraphicHomeView implements HomeView {
     private Stage stage;
 
     private static final String CSS_ACTIVE = "active";
+    private static final String CSS_SEARCH_FIELD_CONTAINER = "search-field-container";
+    private static final String CSS_TEXT_CAPTION = "text-caption";
+    private static final String CSS_TEXT_MUTED = "text-muted";
 
     // FXML fields
     @FXML
     private Label welcomeLabel;
     @FXML
     private Label roleLabel;
+    @FXML
+    private javafx.scene.image.ImageView userImageView;
     @FXML
     private HBox roleSwitchContainer; // Container per il toggle
     @FXML
@@ -44,8 +48,6 @@ public class GraphicHomeView implements HomeView {
     private Label matchesTitle;
     @FXML
     private FlowPane matchesContainer;
-    @FXML
-    private Label statusLabel;
     @FXML
     private ScrollPane mainScrollPane;
 
@@ -82,8 +84,7 @@ public class GraphicHomeView implements HomeView {
                 Scene scene = new Scene(root, 1000, 750);
                 scene.getStylesheets()
                         .add(Objects.requireNonNull(getClass().getResource("/css/style.css")).toExternalForm());
-                scene.getStylesheets()
-                        .add(Objects.requireNonNull(getClass().getResource("/css/controls-dark.css")).toExternalForm());
+                // controls-dark.css removed
 
                 stage.setScene(scene);
                 stage.setResizable(true);
@@ -107,7 +108,6 @@ public class GraphicHomeView implements HomeView {
         buildSearchCapsule();
         updateViewMode();
         displayMatches(homeController.getMatches());
-        updateStatus("Pronto");
     }
 
     // --- TOGGLE SWITCH ---
@@ -116,14 +116,16 @@ public class GraphicHomeView implements HomeView {
 
         HBox toggleBox = new HBox(0);
         toggleBox.getStyleClass().add("toggle-container");
+        toggleBox.setAlignment(Pos.CENTER); // Center content vertically/horizontally
+        toggleBox.setMaxHeight(Region.USE_PREF_SIZE); // Prevent stretching to header height
 
         Button btnPlayer = new Button("Player");
         btnPlayer.getStyleClass().add("toggle-button");
-        btnPlayer.setPrefWidth(90);
+        btnPlayer.setPrefWidth(120);
 
         Button btnOrg = new Button("Organizer");
         btnOrg.getStyleClass().add("toggle-button");
-        btnOrg.setPrefWidth(90);
+        btnOrg.setPrefWidth(120);
 
         // Stato Iniziale
         if (homeController.isViewingAsPlayer()) {
@@ -162,22 +164,23 @@ public class GraphicHomeView implements HomeView {
         filterContainer.getChildren().clear();
 
         HBox capsule = new HBox(0);
-        capsule.getStyleClass().add("search-capsule");
+        capsule.getStyleClass().add("search-capsule"); // Kept custom for specific shape
         capsule.setAlignment(Pos.CENTER_LEFT);
 
-        // 1. CITTÀ
+        // 1. CITY
         VBox cityBox = new VBox(0);
         cityBox.getStyleClass().add("search-field-container");
+        cityBox.getStyleClass().add(CSS_SEARCH_FIELD_CONTAINER);
         cityBox.setAlignment(Pos.CENTER_LEFT);
-        Label cityLbl = new Label("Dove");
-        cityLbl.getStyleClass().add("search-label-small");
+        Label cityLbl = new Label("Where");
+        cityLbl.getStyleClass().addAll(CSS_TEXT_CAPTION, CSS_TEXT_MUTED);
 
         cityFilter = new ComboBox<>();
         cityFilter.setEditable(true);
-        cityFilter.setPromptText("Cerca destinazione");
+        cityFilter.setPromptText("Search destination");
         cityFilter.getStyleClass().add("integrated-combo");
-        cityFilter.setMaxWidth(Double.MAX_VALUE); // Full width
-        cityFilter.setPrefWidth(250); // Larghezza esplicita maggiore
+        cityFilter.setMaxWidth(Double.MAX_VALUE);
+        cityFilter.setPrefWidth(250);
         cityFilter.getItems().addAll(ALL_CITIES);
 
         cityFilter.getEditor().textProperty().addListener((obs, old, newVal) -> {
@@ -186,21 +189,21 @@ public class GraphicHomeView implements HomeView {
         });
 
         cityBox.getChildren().addAll(cityLbl, cityFilter);
-        HBox.setHgrow(cityBox, Priority.ALWAYS); // Occupa spazio extra
+        HBox.setHgrow(cityBox, Priority.ALWAYS);
 
-        // Separatore
+        // Separator
         Separator sep1 = new Separator(javafx.geometry.Orientation.VERTICAL);
-        sep1.getStyleClass().add("search-separator");
+        // Standard Separator
 
         // 2. SPORT
         VBox sportBox = new VBox(0);
-        sportBox.getStyleClass().add("search-field-container");
+        sportBox.getStyleClass().add(CSS_SEARCH_FIELD_CONTAINER);
         sportBox.setAlignment(Pos.CENTER_LEFT);
         Label sportLbl = new Label("Sport");
-        sportLbl.getStyleClass().add("search-label-small");
+        sportLbl.getStyleClass().addAll(CSS_TEXT_CAPTION, CSS_TEXT_MUTED);
 
         sportFilter = new ComboBox<>();
-        sportFilter.setPromptText("Qualsiasi");
+        sportFilter.setPromptText("Any");
         sportFilter.getStyleClass().add("integrated-combo");
         sportFilter.setPrefWidth(160);
         sportFilter.getItems().add(null);
@@ -208,27 +211,26 @@ public class GraphicHomeView implements HomeView {
 
         sportBox.getChildren().addAll(sportLbl, sportFilter);
 
-        // Separatore
+        // Separator
         Separator sep2 = new Separator(javafx.geometry.Orientation.VERTICAL);
-        sep2.getStyleClass().add("search-separator");
 
-        // 3. DATA
+        // 3. DATE
         VBox dateBox = new VBox(0);
-        dateBox.getStyleClass().add("search-field-container");
+        dateBox.getStyleClass().add(CSS_SEARCH_FIELD_CONTAINER);
         dateBox.setAlignment(Pos.CENTER_LEFT);
-        Label dateLbl = new Label("Quando");
-        dateLbl.getStyleClass().add("search-label-small");
+        Label dateLbl = new Label("When");
+        dateLbl.getStyleClass().addAll(CSS_TEXT_CAPTION, CSS_TEXT_MUTED);
 
         dateFilter = new DatePicker();
-        dateFilter.setPromptText("Aggiungi date");
+        dateFilter.setPromptText("Add dates");
         dateFilter.getStyleClass().add("integrated-date");
         dateFilter.setPrefWidth(160);
 
         dateBox.getChildren().addAll(dateLbl, dateFilter);
 
-        // 4. BOTTONE CERCA
-        Button searchBtn = new Button("Cerca");
-        searchBtn.getStyleClass().add("search-action-button");
+        // 4. SEARCH BUTTON
+        Button searchBtn = new Button("Search");
+        searchBtn.getStyleClass().addAll("search-action-button", "success");
         searchBtn.setOnAction(e -> applyFilters());
 
         capsule.getChildren().addAll(cityBox, sep1, sportBox, sep2, dateBox, searchBtn);
@@ -240,7 +242,7 @@ public class GraphicHomeView implements HomeView {
         VBox card = new VBox(0);
         card.getStyleClass().add("match-card");
 
-        // 1. IMMAGINE/HEADER (Dinamica in base allo sport)
+        // 1. HEADER
         StackPane imageHeader = new StackPane();
         String sportClass = getSportStyleClass(match.getSport()); // Ottieni classe dinamica
         imageHeader.getStyleClass().addAll("card-image-area", sportClass);
@@ -258,7 +260,7 @@ public class GraphicHomeView implements HomeView {
 
         imageHeader.getChildren().addAll(sportIcon, priceBadge);
 
-        // 2. CONTENUTO
+        // 2. CONTENT
         VBox content = new VBox(5);
         content.getStyleClass().add("card-content");
 
@@ -275,7 +277,7 @@ public class GraphicHomeView implements HomeView {
         capacityBar.getStyleClass().addAll("card-progress-bar", sportClass + "-bar"); // Barra progressiva coordinata
         capacityBar.setPrefWidth(Double.MAX_VALUE);
 
-        Label playersLabel = new Label(current + "/" + max + " iscritti");
+        Label playersLabel = new Label(current + "/" + max + " joined");
         playersLabel.getStyleClass().add("card-detail-text");
         HBox playersBox = new HBox(5, new Label("👥"), playersLabel);
         playersBox.setAlignment(Pos.CENTER_LEFT);
@@ -285,9 +287,7 @@ public class GraphicHomeView implements HomeView {
         // Aggiungi pulsante Join se l'utente sta visualizzando come player
         if (homeController.isViewingAsPlayer() && !match.isFull()) {
             Button joinButton = new Button("Join Match");
-            joinButton.getStyleClass().add("join-button");
-            joinButton.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; " +
-                              "-fx-font-weight: bold; -fx-cursor: hand; -fx-padding: 8 16;");
+            joinButton.getStyleClass().addAll("success", "small"); // AtlantaFX classes
             joinButton.setOnAction(e -> {
                 e.consume();
                 homeController.joinMatch(match.getMatchId());
@@ -305,37 +305,33 @@ public class GraphicHomeView implements HomeView {
 
     // Helper per determinare lo stile CSS in base all'enum Sport
     private String getSportStyleClass(model.domain.Sport sport) {
+        if (sport == null)
+            return "sport-default";
         String name = sport.name().toUpperCase();
-        if (name.contains("SOCCER") || name.contains("CALCIO"))
+
+        if (name.contains("FOOTBALL"))
             return "sport-soccer";
         if (name.contains("BASKET"))
             return "sport-basket";
-        if (name.contains("TENNIS"))
+        if (name.contains("TENNIS") || name.contains("PADEL"))
             return "sport-tennis";
-        if (name.contains("VOLLEY"))
-            return "sport-volley";
-        if (name.contains("RUGBY"))
-            return "sport-rugby";
+
         return "sport-default";
     }
 
     // Helper per determinare l'icona in base all'enum Sport
     private String getSportIcon(model.domain.Sport sport) {
+        if (sport == null)
+            return "🏅";
         String name = sport.name().toUpperCase();
-        if (name.contains("SOCCER") || name.contains("CALCIO"))
+
+        if (name.contains("FOOTBALL"))
             return "⚽";
         if (name.contains("BASKET"))
             return "🏀";
-        if (name.contains("TENNIS"))
+        if (name.contains("TENNIS") || name.contains("PADEL"))
             return "🎾";
-        if (name.contains("VOLLEY"))
-            return "🏐";
-        if (name.contains("RUGBY"))
-            return "🏉";
-        if (name.contains("GOLF"))
-            return "⛳";
-        if (name.contains("SWIM"))
-            return "🏊";
+
         return "🏅";
     }
 
@@ -361,16 +357,39 @@ public class GraphicHomeView implements HomeView {
 
     @Override
     public void displayWelcome() {
-        welcomeLabel.setText("Ciao, " + homeController.getCurrentUser().getUsername());
+        model.domain.User u = homeController.getCurrentUser();
+        welcomeLabel.setText("Hello, " + u.getName() + " " + u.getSurname());
         roleLabel.setText(homeController.getUserRole().getDisplayName());
+
+        // Load User Image
+        try {
+            String imagePath = "/image/player.png"; // Default
+            if (homeController.getUserRole() == model.domain.Role.ORGANIZER) {
+                imagePath = "/image/organizer.jpg";
+            }
+
+            javafx.scene.image.Image img = new javafx.scene.image.Image(
+                    java.util.Objects.requireNonNull(getClass().getResourceAsStream(imagePath)),
+                    120, 120, true, true); // Load at higher res for sharpness
+            userImageView.setImage(img);
+
+            // Circular Clip
+            javafx.scene.shape.Circle clip = new javafx.scene.shape.Circle(30, 30, 30);
+            userImageView.setClip(clip);
+        } catch (Exception e) {
+            // Fallback
+            java.util.logging.Logger.getLogger(getClass().getName()).log(java.util.logging.Level.WARNING,
+                    "User image not found: " + e.getMessage());
+        }
     }
 
     @Override
     public void displayMatches(List<model.bean.MatchBean> matches) {
         matchesContainer.getChildren().clear();
         if (matches == null || matches.isEmpty()) {
-            Label empty = new Label("Nessuna partita trovata.");
-            empty.setStyle("-fx-text-fill: #9ca3af; -fx-font-size: 16px; -fx-padding: 20;");
+            Label empty = new Label("No matches found.");
+            empty.getStyleClass().addAll("text-muted", "title-4");
+            empty.setPadding(new Insets(20));
             matchesContainer.getChildren().add(empty);
             return;
         }
@@ -382,11 +401,11 @@ public class GraphicHomeView implements HomeView {
         if (homeController.isViewingAsPlayer()) {
             organizerActionsBox.setVisible(false);
             organizerActionsBox.setManaged(false);
-            matchesTitle.setText("Esplora partite");
+            matchesTitle.setText("Explore Matches");
         } else {
             organizerActionsBox.setVisible(true);
             organizerActionsBox.setManaged(true);
-            matchesTitle.setText("Le tue partite");
+            matchesTitle.setText("Your Matches");
         }
     }
 
@@ -402,7 +421,8 @@ public class GraphicHomeView implements HomeView {
 
     @Override
     public void showMatchDetails(int matchId) {
-        /* ... */ }
+        // Implementation delegated to controller or other view
+    }
 
     @Override
     public void displayMenu() {
@@ -429,13 +449,13 @@ public class GraphicHomeView implements HomeView {
         applicationController.logout();
     }
 
-    private void updateStatus(String msg) {
-        if (statusLabel != null)
-            statusLabel.setText(msg);
-    }
-
     private void showError(String msg) {
-        /* Alert */ }
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText(null);
+        alert.setContentText(msg);
+        alert.showAndWait();
+    }
 
     @Override
     public void close() {

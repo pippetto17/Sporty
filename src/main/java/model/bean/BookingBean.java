@@ -128,7 +128,6 @@ public class BookingBean {
         this.confirmedAt = confirmedAt;
     }
 
-
     @Override
     public String toString() {
         return String.format("BookingBean[id=%d, field=%s, date=%s, %s-%s, status=%s]",

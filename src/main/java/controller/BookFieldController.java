@@ -82,6 +82,19 @@ public class BookFieldController {
         return availableFields;
     }
 
+    public void sortFieldsByPrice(boolean ascending) {
+        if (availableFields == null || availableFields.isEmpty())
+            return;
+
+        // Create mutable list to sort
+        java.util.List<FieldBean> sorted = new java.util.ArrayList<>(availableFields);
+        sorted.sort((f1, f2) -> {
+            int result = Double.compare(f1.getPricePerPerson(), f2.getPricePerPerson());
+            return ascending ? result : -result;
+        });
+        this.availableFields = sorted;
+    }
+
     // sortFields removed as unused and relying on deleted type
 
     public List<FieldBean> filterByPriceRange(double minPrice, double maxPrice) {

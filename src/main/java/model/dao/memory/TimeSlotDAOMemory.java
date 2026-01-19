@@ -5,6 +5,7 @@ import model.domain.SlotStatus;
 import model.domain.TimeSlot;
 
 import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.List;
@@ -37,6 +38,18 @@ public class TimeSlotDAOMemory implements TimeSlotDAO {
         return timeSlots.values().stream()
                 .filter(slot -> slot.getFieldId().equals(fieldId))
                 .filter(slot -> slot.getDayOfWeek() == day)
+                .filter(slot -> slot.getBookingDate() == null)
+                .filter(TimeSlot::isAvailable)
+                .toList();
+    }
+
+    @Override
+    public List<TimeSlot> findAvailableSlotsForDate(String fieldId, LocalDate date) {
+        DayOfWeek dayOfWeek = date.getDayOfWeek();
+        return timeSlots.values().stream()
+                .filter(slot -> slot.getFieldId().equals(fieldId))
+                .filter(slot -> slot.getDayOfWeek() == dayOfWeek)
+                .filter(slot -> slot.getBookingDate() == null || slot.getBookingDate().equals(date))
                 .filter(TimeSlot::isAvailable)
                 .toList();
     }
@@ -54,6 +67,16 @@ public class TimeSlotDAOMemory implements TimeSlotDAO {
         return timeSlots.values().stream()
                 .filter(slot -> slot.getFieldId().equals(fieldId))
                 .filter(slot -> slot.getDayOfWeek() == day)
+                .filter(slot -> slot.getBookingDate() == null)
+                .filter(slot -> slot.overlapsWith(start, end))
+                .toList();
+    }
+
+    @Override
+    public List<TimeSlot> findConflictingForDate(String fieldId, LocalDate date, LocalTime start, LocalTime end) {
+        return timeSlots.values().stream()
+                .filter(slot -> slot.getFieldId().equals(fieldId))
+                .filter(slot -> date.equals(slot.getBookingDate()))
                 .filter(slot -> slot.overlapsWith(start, end))
                 .toList();
     }

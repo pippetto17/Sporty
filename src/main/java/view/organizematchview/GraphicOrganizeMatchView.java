@@ -11,7 +11,6 @@ import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
-import model.bean.FieldBean;
 import model.bean.MatchBean;
 import model.domain.Sport;
 import model.utils.Constants;
@@ -36,7 +35,7 @@ public class GraphicOrganizeMatchView implements OrganizeMatchView {
     @FXML
     private DatePicker datePicker;
     @FXML
-    private TextField timeField;
+    private ComboBox<LocalTime> timeComboBox;
     @FXML
     private ComboBox<String> cityComboBox;
     @FXML
@@ -72,7 +71,6 @@ public class GraphicOrganizeMatchView implements OrganizeMatchView {
     @FXML
     private Button inviteButton;
 
-    private FieldBean selectedField;
     private boolean isUpdatingCityComboBox = false;
 
     public GraphicOrganizeMatchView(OrganizeMatchController organizeMatchController) {
@@ -95,9 +93,9 @@ public class GraphicOrganizeMatchView implements OrganizeMatchView {
                 loader.setController(this);
                 Parent root = loader.load();
 
-                Scene scene = new Scene(root, 650, 700);
+                Scene scene = new Scene(root, 700, 750);
                 scene.getStylesheets().add(getClass().getResource("/css/style.css").toExternalForm());
-                scene.getStylesheets().add(getClass().getResource("/css/controls-dark.css").toExternalForm());
+                // controls-dark.css removed
 
                 stage.setScene(scene);
                 stage.setResizable(true);
@@ -151,6 +149,25 @@ public class GraphicOrganizeMatchView implements OrganizeMatchView {
         // selection)
         SpinnerValueFactory<Integer> valueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 20, 1);
         participantsSpinner.setValueFactory(valueFactory);
+
+        // Initialize time combo box (every 30 minutes)
+        List<LocalTime> times = new java.util.ArrayList<>();
+        for (int h = 0; h < 24; h++) {
+            times.add(LocalTime.of(h, 0));
+            times.add(LocalTime.of(h, 30));
+        }
+        timeComboBox.getItems().addAll(times);
+        timeComboBox.setConverter(new StringConverter<LocalTime>() {
+            @Override
+            public String toString(LocalTime time) {
+                return time != null ? time.format(DateTimeFormatter.ofPattern("HH:mm")) : "";
+            }
+
+            @Override
+            public LocalTime fromString(String string) {
+                return LocalTime.parse(string);
+            }
+        });
 
         // Set date picker to today as minimum
         datePicker.setDayCellFactory(picker -> new DateCell() {
@@ -232,7 +249,7 @@ public class GraphicOrganizeMatchView implements OrganizeMatchView {
         // Get values
         Sport sport = sportComboBox.getValue();
         LocalDate date = datePicker.getValue();
-        LocalTime time = parseTime(timeField.getText());
+        LocalTime time = timeComboBox.getValue();
         String city = cityComboBox.getValue();
         int participants = participantsSpinner.getValue();
 
@@ -275,15 +292,11 @@ public class GraphicOrganizeMatchView implements OrganizeMatchView {
             showError(Constants.ERROR_PLEASE_SELECT_DATE);
             return false;
         }
-        if (timeField.getText() == null || timeField.getText().trim().isEmpty()) {
+        if (timeComboBox.getValue() == null) {
             showError(Constants.ERROR_PLEASE_ENTER_TIME);
             return false;
         }
-        LocalTime time = parseTime(timeField.getText());
-        if (time == null) {
-            showError(Constants.ERROR_INVALID_TIME_FORMAT);
-            return false;
-        }
+        // Removed manual text parsing check
         if (cityComboBox.getValue() == null || cityComboBox.getValue().trim().isEmpty()) {
             showError(Constants.ERROR_PLEASE_SELECT_CITY);
             return false;
@@ -306,7 +319,7 @@ public class GraphicOrganizeMatchView implements OrganizeMatchView {
     private void handleClear() {
         sportComboBox.setValue(null);
         datePicker.setValue(null);
-        timeField.clear();
+        timeComboBox.setValue(null);
         cityComboBox.setValue(null);
         cityComboBox.getEditor().clear();
         participantsSpinner.getValueFactory().setValue(1);
@@ -362,8 +375,8 @@ public class GraphicOrganizeMatchView implements OrganizeMatchView {
             sportComboBox.setManaged(false);
             datePicker.setVisible(false);
             datePicker.setManaged(false);
-            timeField.setVisible(false);
-            timeField.setManaged(false);
+            timeComboBox.setVisible(false);
+            timeComboBox.setManaged(false);
             cityComboBox.setVisible(false);
             cityComboBox.setManaged(false);
             participantsSpinner.setVisible(false);

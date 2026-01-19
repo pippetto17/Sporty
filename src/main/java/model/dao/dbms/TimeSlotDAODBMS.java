@@ -7,6 +7,7 @@ import model.domain.TimeSlot;
 
 import java.sql.*;
 import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,13 +17,13 @@ import java.util.List;
  */
 public class TimeSlotDAODBMS implements TimeSlotDAO {
 
-    private static final String TIME_SLOTS_COLUMNS = "slot_id, field_id, day_of_week, start_time, end_time, status, booking_id";
+    private static final String TIME_SLOTS_COLUMNS = "slot_id, field_id, day_of_week, booking_date, start_time, end_time, status, booking_id";
 
     @Override
     public void save(TimeSlot slot) {
         String sql = """
-                INSERT INTO time_slots (field_id, day_of_week, start_time, end_time, status, booking_id)
-                VALUES (?, ?, ?, ?, ?, ?)
+                INSERT INTO time_slots (field_id, day_of_week, booking_date, start_time, end_time, status, booking_id)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
                 ON DUPLICATE KEY UPDATE
                     status = VALUES(status),
                     booking_id = VALUES(booking_id)
@@ -33,14 +34,21 @@ public class TimeSlotDAODBMS implements TimeSlotDAO {
 
             stmt.setString(1, slot.getFieldId());
             stmt.setInt(2, slot.getDayOfWeek().getValue());
-            stmt.setTime(3, Time.valueOf(slot.getStartTime()));
-            stmt.setTime(4, Time.valueOf(slot.getEndTime()));
-            stmt.setString(5, slot.getStatus().name());
+
+            if (slot.getBookingDate() != null) {
+                stmt.setDate(3, Date.valueOf(slot.getBookingDate()));
+            } else {
+                stmt.setNull(3, Types.DATE);
+            }
+
+            stmt.setTime(4, Time.valueOf(slot.getStartTime()));
+            stmt.setTime(5, Time.valueOf(slot.getEndTime()));
+            stmt.setString(6, slot.getStatus().name());
 
             if (slot.getBookingId() != null) {
-                stmt.setInt(6, slot.getBookingId());
+                stmt.setInt(7, slot.getBookingId());
             } else {
-                stmt.setNull(6, Types.INTEGER);
+                stmt.setNull(7, Types.INTEGER);
             }
 
             stmt.executeUpdate();
@@ -75,7 +83,7 @@ public class TimeSlotDAODBMS implements TimeSlotDAO {
     public List<TimeSlot> findAvailableSlots(String fieldId, DayOfWeek day) {
         String sql = """
                 SELECT %s FROM time_slots
-                WHERE field_id = ? AND day_of_week = ? AND status = 'AVAILABLE'
+                WHERE field_id = ? AND day_of_week = ? AND status = 'AVAILABLE' AND booking_date IS NULL
                 ORDER BY start_time
                 """.formatted(TIME_SLOTS_COLUMNS);
 
@@ -87,6 +95,38 @@ public class TimeSlotDAODBMS implements TimeSlotDAO {
             return executeQuery(stmt);
         } catch (SQLException e) {
             throw new DataAccessException("Error finding available slots: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public List<TimeSlot> findAvailableSlotsForDate(String fieldId, LocalDate date) {
+        String sql = """
+                SELECT %s FROM time_slots
+                WHERE field_id = ? 
+                AND day_of_week = ? 
+                AND status = 'AVAILABLE'
+                AND (booking_date IS NULL OR booking_date = ?)
+                AND slot_id NOT IN (
+                    SELECT slot_id FROM time_slots 
+                    WHERE field_id = ? 
+                    AND booking_date = ? 
+                    AND status = 'BOOKED'
+                )
+                ORDER BY start_time
+                """.formatted(TIME_SLOTS_COLUMNS);
+
+        try (Connection conn = ConnectionFactory.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            DayOfWeek dayOfWeek = date.getDayOfWeek();
+            stmt.setString(1, fieldId);
+            stmt.setInt(2, dayOfWeek.getValue());
+            stmt.setDate(3, Date.valueOf(date));
+            stmt.setString(4, fieldId);
+            stmt.setDate(5, Date.valueOf(date));
+            return executeQuery(stmt);
+        } catch (SQLException e) {
+            throw new DataAccessException("Error finding available slots for date: " + e.getMessage(), e);
         }
     }
 
@@ -109,7 +149,7 @@ public class TimeSlotDAODBMS implements TimeSlotDAO {
     public List<TimeSlot> findConflicting(String fieldId, DayOfWeek day, LocalTime start, LocalTime end) {
         String sql = """
                 SELECT %s FROM time_slots
-                WHERE field_id = ? AND day_of_week = ?
+                WHERE field_id = ? AND day_of_week = ? AND booking_date IS NULL
                 AND start_time < ? AND end_time > ?
                 """.formatted(TIME_SLOTS_COLUMNS);
 
@@ -123,6 +163,28 @@ public class TimeSlotDAODBMS implements TimeSlotDAO {
             return executeQuery(stmt);
         } catch (SQLException e) {
             throw new DataAccessException("Error finding conflicting slots: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public List<TimeSlot> findConflictingForDate(String fieldId, LocalDate date, LocalTime start, LocalTime end) {
+        String sql = """
+                SELECT %s FROM time_slots
+                WHERE field_id = ? 
+                AND booking_date = ?
+                AND start_time < ? AND end_time > ?
+                """.formatted(TIME_SLOTS_COLUMNS);
+
+        try (Connection conn = ConnectionFactory.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, fieldId);
+            stmt.setDate(2, Date.valueOf(date));
+            stmt.setTime(3, Time.valueOf(end));
+            stmt.setTime(4, Time.valueOf(start));
+            return executeQuery(stmt);
+        } catch (SQLException e) {
+            throw new DataAccessException("Error finding conflicting slots for date: " + e.getMessage(), e);
         }
     }
 
@@ -171,6 +233,12 @@ public class TimeSlotDAODBMS implements TimeSlotDAO {
         slot.setSlotId(rs.getInt("slot_id"));
         slot.setFieldId(rs.getString("field_id"));
         slot.setDayOfWeek(DayOfWeek.of(rs.getInt("day_of_week")));
+
+        Date bookingDate = rs.getDate("booking_date");
+        if (!rs.wasNull()) {
+            slot.setBookingDate(bookingDate.toLocalDate());
+        }
+
         slot.setStartTime(rs.getTime("start_time").toLocalTime());
         slot.setEndTime(rs.getTime("end_time").toLocalTime());
         slot.setStatus(SlotStatus.valueOf(rs.getString("status")));

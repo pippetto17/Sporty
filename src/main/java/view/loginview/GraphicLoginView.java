@@ -113,6 +113,7 @@ public class GraphicLoginView extends Application implements LoginView {
 
     @Override
     public void start(Stage primaryStage) {
+        Application.setUserAgentStylesheet(new atlantafx.base.theme.PrimerDark().getUserAgentStylesheet());
         this.primaryStage = primaryStage;
         primaryStage.setTitle("Sporty - Login");
 
@@ -179,6 +180,7 @@ public class GraphicLoginView extends Application implements LoginView {
     @FXML
     private void handleRegisterSubmit() {
         registerMessageLabel.setText("");
+        registerMessageLabel.setVisible(false);
         registerMessageLabel.getStyleClass().removeAll(Constants.CSS_ERROR, Constants.CSS_SUCCESS);
 
         try {
@@ -245,15 +247,17 @@ public class GraphicLoginView extends Application implements LoginView {
 
     @Override
     public void displayLoginSuccess(String username) {
-        messageLabel.getStyleClass().removeAll("error");
-        messageLabel.getStyleClass().add("success");
+        messageLabel.setVisible(true);
+        messageLabel.getStyleClass().removeAll(Constants.CSS_ERROR);
+        messageLabel.getStyleClass().add(Constants.CSS_SUCCESS);
         messageLabel.setText("Welcome, " + username + "!");
     }
 
     @Override
     public void displayLoginError(String message) {
-        messageLabel.getStyleClass().removeAll("success");
-        messageLabel.getStyleClass().add("error");
+        messageLabel.setVisible(true);
+        messageLabel.getStyleClass().removeAll(Constants.CSS_SUCCESS);
+        messageLabel.getStyleClass().add(Constants.CSS_ERROR);
         messageLabel.setText(message);
     }
 
@@ -266,12 +270,14 @@ public class GraphicLoginView extends Application implements LoginView {
     }
 
     private void showRegisterError(String message) {
+        registerMessageLabel.setVisible(true);
         registerMessageLabel.getStyleClass().removeAll(Constants.CSS_SUCCESS);
         registerMessageLabel.getStyleClass().add(Constants.CSS_ERROR);
         registerMessageLabel.setText(message);
     }
 
     private void showRegisterSuccess(String message) {
+        registerMessageLabel.setVisible(true);
         registerMessageLabel.getStyleClass().removeAll(Constants.CSS_ERROR);
         registerMessageLabel.getStyleClass().add(Constants.CSS_SUCCESS);
         registerMessageLabel.setText(message);

@@ -69,7 +69,7 @@ public class GraphicPaymentView implements PaymentView {
                 loader.setController(this);
                 Parent root = loader.load();
 
-                Scene scene = new Scene(root, 600, 500);
+                Scene scene = new Scene(root, 600, 550);
                 ViewUtils.applyStylesheets(scene);
 
                 stage.setScene(scene);
@@ -106,7 +106,8 @@ public class GraphicPaymentView implements PaymentView {
                 sharesComboBox.setItems(FXCollections.observableArrayList(shares));
                 sharesComboBox.setValue(1);
                 sharesComboBox.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
-                    if (newVal != null) updateAmount();
+                    if (newVal != null)
+                        updateAmount();
                 });
                 updateAmount();
             }

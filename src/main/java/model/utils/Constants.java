@@ -160,7 +160,7 @@ public final class Constants {
     public static final String CSS_SECONDARY_BUTTON = "secondary-button";
     public static final String CSS_MATCH_INFO = "match-info";
     public static final String CSS_FIELD_DETAIL = "field-detail";
-    public static final String CSS_ERROR = "error";
+    public static final String CSS_ERROR = "danger";
     public static final String CSS_SUCCESS = "success";
     public static final String CSS_INFO = "info";
     public static final String CSS_FIELD_LABEL = "field-label";

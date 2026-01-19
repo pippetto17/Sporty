@@ -2,45 +2,40 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
-
 <BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
-            styleClass="root-container" prefWidth="1000" prefHeight="750">
+            prefWidth="1000" prefHeight="750">
 
     <top>
         <VBox spacing="0">
             <!-- Header Superiore (Logo + Toggle + Utente) -->
-            <HBox alignment="CENTER_LEFT" spacing="20" styleClass="header-container">
-                <padding>
-                    <Insets top="15" right="30" bottom="15" left="30"/>
-                </padding>
+            <HBox alignment="CENTER_LEFT" spacing="25" styleClass="header-container" style="-fx-border-color: -color-border-subtle; -fx-border-width: 0 0 1 0; -fx-padding: 25 40 25 40;">
                 
-                <Label text="SPORTY" styleClass="title-label">
-                    <font>
-                        <Font name="System Bold" size="24"/>
-                    </font>
-                </Label>
+                <Label text="SPORTY" styleClass="title-1, accent"/>
 
                 <!-- Container per il Toggle Switch (popolato da Java) -->
                 <HBox fx:id="roleSwitchContainer" alignment="CENTER_LEFT" spacing="10">
-                    <padding><Insets left="20"/></padding>
+                    <padding><Insets left="30"/></padding>
                 </HBox>
 
                 <Region HBox.hgrow="ALWAYS"/>
 
-                <HBox alignment="CENTER_RIGHT" spacing="15">
-                    <VBox alignment="CENTER_RIGHT" spacing="2">
-                        <Label fx:id="welcomeLabel" text="Welcome" styleClass="welcome-label"/>
-                        <Label fx:id="roleLabel" text="Player" styleClass="role-label"/>
+                <HBox alignment="CENTER_RIGHT" spacing="20">
+                    <VBox alignment="CENTER_RIGHT" spacing="4">
+                        <Label fx:id="welcomeLabel" text="Welcome" styleClass="text-bold"/>
+                        <Label fx:id="roleLabel" text="Player" styleClass="text-small, text-muted"/>
                     </VBox>
-                    <Button fx:id="logoutButton" text="Esci" onAction="#handleLogout"
-                            styleClass="logout-button"/>
+                    
+                    <ImageView fx:id="userImageView" fitHeight="60" fitWidth="60" pickOnBounds="true" preserveRatio="true" smooth="true"/>
+                    
+                    <Button fx:id="logoutButton" text="Logout" onAction="#handleLogout"
+                            styleClass="danger-button"/>
                 </HBox>
             </HBox>
 
             <!-- Hero Section (Barra di Ricerca) -->
-            <VBox fx:id="heroContainer" alignment="CENTER" styleClass="hero-section">
+            <VBox fx:id="heroContainer" alignment="CENTER" style="-fx-padding: 30 0 30 0;">
                 <!-- Il contenitore dei filtri verrà iniettato qui da Java -->
                 <VBox fx:id="filterContainer" alignment="CENTER" fillWidth="false" spacing="10">
                     <!-- Populated dynamically -->
@@ -50,21 +45,21 @@
     </top>
 
     <center>
-        <ScrollPane fx:id="mainScrollPane" fitToWidth="true" styleClass="custom-scroll" vbarPolicy="AS_NEEDED" hbarPolicy="NEVER">
-            <VBox fx:id="mainContentBox" spacing="20" styleClass="content-container">
+        <ScrollPane fx:id="mainScrollPane" fitToWidth="true" hbarPolicy="NEVER" style="-fx-background-color: transparent;">
+            <VBox fx:id="mainContentBox" spacing="20">
                 <padding>
                     <Insets top="10" right="40" bottom="40" left="40"/>
                 </padding>
 
                 <!-- Azioni Organizzatore (Visibile solo se Organizer) -->
-                <VBox fx:id="organizerActionsBox" spacing="15" styleClass="actions-container" visible="false" managed="false">
-                    <Label text="Gestione Rapida" styleClass="section-title"/>
+                <VBox fx:id="organizerActionsBox" spacing="15" visible="false" managed="false">
+                    <Label text="Quick Actions" styleClass="title-4"/>
                     <HBox spacing="15">
-                        <Button fx:id="organizeMatchButton" text="+ Crea Partita"
-                                onAction="#handleOrganizeMatch" styleClass="primary-action-button"
+                        <Button fx:id="organizeMatchButton" text="+ Create Match"
+                                onAction="#handleOrganizeMatch" styleClass="accent, large"
                                 prefWidth="200" prefHeight="50"/>
-                        <Button fx:id="bookFieldButton" text="Prenota Campo"
-                                onAction="#handleBookField" styleClass="secondary-action-button"
+                        <Button fx:id="bookFieldButton" text="Book Field"
+                                onAction="#handleBookField" styleClass="button-outlined, large"
                                 prefWidth="200" prefHeight="50"/>
                     </HBox>
                 </VBox>
@@ -72,14 +67,14 @@
                 <!-- Sezione Partite -->
                 <VBox spacing="20">
                     <HBox alignment="CENTER_LEFT">
-                        <Label fx:id="matchesTitle" text="Esplora partite" styleClass="section-title"/>
+                        <Label fx:id="matchesTitle" text="Explore Matches" styleClass="title-4"/>
                         <Region HBox.hgrow="ALWAYS"/>
-                        <Button fx:id="refreshButton" text="Aggiorna" onAction="#handleRefresh"
-                                styleClass="text-button"/>
+                        <Button fx:id="refreshButton" text="Refresh" onAction="#handleRefresh"
+                                styleClass="flat, accent"/>
                     </HBox>
 
                     <!-- GRID VIEW (FlowPane) -->
-                    <FlowPane fx:id="matchesContainer" styleClass="matches-grid" 
+                    <FlowPane fx:id="matchesContainer"
                               hgap="25" vgap="25" prefWrapLength="900" 
                               alignment="TOP_LEFT">
                         <!-- Le Match Cards verticali vengono aggiunte qui -->
@@ -89,12 +84,4 @@
         </ScrollPane>
     </center>
 
-    <bottom>
-        <HBox alignment="CENTER_RIGHT" styleClass="footer-container">
-            <padding>
-                <Insets top="5" right="20" bottom="5" left="20"/>
-            </padding>
-            <Label fx:id="statusLabel" text="Pronto" styleClass="status-label"/>
-        </HBox>
-    </bottom>
 </BorderPane>

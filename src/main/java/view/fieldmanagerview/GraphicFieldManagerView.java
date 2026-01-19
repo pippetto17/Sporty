@@ -103,9 +103,26 @@ public class GraphicFieldManagerView implements FieldManagerView {
     }
 
     @FXML
+    private javafx.scene.image.ImageView managerImageView;
+
+    @FXML
     @SuppressWarnings("unused")
     private void initialize() {
         managerNameLabel.setText("Manager: " + manager.getName() + " " + manager.getSurname());
+
+        // Load Manager Image
+        try {
+            javafx.scene.image.Image img = new javafx.scene.image.Image(
+                    java.util.Objects.requireNonNull(getClass().getResourceAsStream("/image/manager.jpeg")),
+                    120, 120, true, true);
+            managerImageView.setImage(img);
+
+            javafx.scene.shape.Circle clip = new javafx.scene.shape.Circle(30, 30, 30);
+            managerImageView.setClip(clip);
+        } catch (Exception e) {
+            logger.warning("Manager image not found: " + e.getMessage());
+        }
+
         setupTable();
         loadData();
         Platform.runLater(this::checkAndShowNotifications);
@@ -226,11 +243,18 @@ public class GraphicFieldManagerView implements FieldManagerView {
     }
 
     @FXML
-    @SuppressWarnings("unused") // Called by FXML
     private void handleViewBookings() {
         Alert alert = createStyledAlert(Alert.AlertType.INFORMATION, "Feature Coming Soon",
                 "This feature will be available in a future update.");
         alert.showAndWait();
+    }
+
+    @FXML
+    private void handleLogout() {
+        if (stage != null)
+            stage.close();
+        if (appController != null)
+            appController.logout();
     }
 
     /**

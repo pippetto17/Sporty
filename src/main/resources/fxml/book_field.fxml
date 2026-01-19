@@ -5,16 +5,16 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 <BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
-            styleClass="root-container" prefWidth="800" prefHeight="700">
+            prefWidth="800" prefHeight="700">
 
     <top>
-        <VBox spacing="10" styleClass="header-container">
+        <VBox spacing="10" style="-fx-border-color: -color-border-subtle; -fx-border-width: 0 0 1 0;">
             <padding>
                 <Insets top="20" right="30" bottom="15" left="30"/>
             </padding>
 
             <HBox alignment="CENTER_LEFT" spacing="15">
-                <Label text="🏟️ SELECT FIELD" styleClass="title-label">
+                <Label text="SELECT FIELD" styleClass="title-3, accent">
                     <font>
                         <Font name="System Bold" size="24"/>
                     </font>

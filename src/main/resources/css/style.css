@@ -1,60 +1,55 @@
 /* SPORTY - Modern Dark UI - Final Fixes */
 
-.root-container {
-    -fx-background-color: #0f1419;
-    /* Sfondo scuro globale */
-    -fx-font-family: 'Segoe UI', system-ui, sans-serif;
+.card {
+    -fx-background-color: -color-bg-overlay;
+    -fx-background-radius: 16px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.4), 20, 0, 0, 5);
+}
+
+
+
+.root {
+    /* Palette: Dark Blue & Emerald Green */
+    -color-bg-default: #0a192f;
+    -color-bg-overlay: #112240;
+    -color-bg-subtle: #112240;
+
+    -color-accent-emphasis: #10b981;
+    /* Emerald Green */
+    -color-accent-fg: #10b981;
+    -color-accent-subtle: rgba(16, 185, 129, 0.15);
+
+    -color-fg-default: #e6f1ff;
+    -color-fg-muted: #8892b0;
+
+    /* Roundness increased */
+    -fx-base-radius: 12px;
+    -fx-inner-radius: 10px;
+    -fx-body-radius: 12px;
 }
 
 /* ScrollPane Fix: rimuove sfondo bianco default */
-.scroll-pane,
-.scroll-pane .viewport {
-    -fx-background-color: #0f1419;
-    -fx-background: #0f1419;
-}
+
 
 /* --- SCROLLBAR PERSONALIZZATA --- */
-.custom-scroll .scroll-bar:vertical,
-.custom-scroll .scroll-bar:horizontal {
-    -fx-background-color: transparent;
-}
+/* --- SCROLLBAR PERSONALIZZATA (Removed for AtlantaFX Native) --- */
 
-.custom-scroll .scroll-bar:vertical .track,
-.custom-scroll .scroll-bar:horizontal .track {
-    -fx-background-color: #1a1f26;
-    -fx-border-radius: 4;
-}
-
-.custom-scroll .scroll-bar:vertical .thumb,
-.custom-scroll .scroll-bar:horizontal .thumb {
-    -fx-background-color: #374151;
-    -fx-background-radius: 4;
-}
-
-.custom-scroll .scroll-bar:vertical .thumb:hover,
-.custom-scroll .scroll-bar:horizontal .thumb:hover {
-    -fx-background-color: #4b5563;
-}
-
-.custom-scroll .corner {
-    -fx-background-color: transparent;
-}
 
 /* --- HEADER & TOGGLE --- */
 .header-container {
-    -fx-background-color: #0f1419;
-    -fx-border-color: #1f2937;
+    -fx-background-color: -color-bg-default;
+    -fx-border-color: -color-border-subtle;
     -fx-border-width: 0 0 1 0;
 }
 
 .title-label {
-    -fx-text-fill: #10b981;
+    -fx-text-fill: -color-accent-emphasis;
     -fx-font-weight: 800;
 }
 
 /* Toggle Switch Container */
 .toggle-container {
-    -fx-background-color: #1f2937;
+    -fx-background-color: -color-bg-overlay;
     -fx-background-radius: 20;
     -fx-padding: 3;
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 5, 0, 0, 1);
@@ -64,10 +59,10 @@
     -fx-background-color: transparent;
     -fx-text-fill: #9ca3af;
     -fx-background-radius: 18;
-    -fx-font-size: 12px;
+    -fx-font-size: 14px;
     -fx-font-weight: 700;
     -fx-cursor: hand;
-    -fx-padding: 6 12;
+    -fx-padding: 10 20;
 }
 
 .toggle-button:hover {
@@ -83,12 +78,12 @@
 .welcome-label {
     -fx-text-fill: #f3f4f6;
     -fx-font-weight: 600;
-    -fx-font-size: 14px;
+    -fx-font-size: 16px;
 }
 
 .role-label {
     -fx-text-fill: #9ca3af;
-    -fx-font-size: 11px;
+    -fx-font-size: 13px;
 }
 
 .logout-button {
@@ -98,7 +93,7 @@
     -fx-border-radius: 8;
     -fx-border-width: 1;
     -fx-cursor: hand;
-    -fx-font-size: 12px;
+    -fx-font-size: 14px;
 }
 
 .logout-button:hover {
@@ -254,7 +249,7 @@
 }
 
 .match-card {
-    -fx-background-color: #1f2937;
+    -fx-background-color: -color-bg-overlay;
     -fx-background-radius: 16;
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 10, 0, 0, 2);
     -fx-min-width: 260px;
@@ -377,4 +372,20 @@
     -fx-text-fill: #10b981;
     -fx-cursor: hand;
     -fx-underline: true;
+}
+
+/* Danger Button (Red) */
+.danger-button {
+    -fx-background-color: #ef4444;
+    -fx-text-fill: white;
+    -fx-background-radius: 12;
+    -fx-cursor: hand;
+    -fx-font-weight: 700;
+    -fx-padding: 8 16;
+    -fx-effect: dropshadow(gaussian, rgba(239, 68, 68, 0.4), 8, 0, 0, 2);
+}
+
+.danger-button:hover {
+    -fx-background-color: #dc2626;
+    -fx-effect: dropshadow(gaussian, rgba(220, 38, 38, 0.6), 12, 0, 0, 4);
 }

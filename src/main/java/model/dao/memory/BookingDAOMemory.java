@@ -1,8 +1,11 @@
 package model.dao.memory;
 
 import model.dao.BookingDAO;
+import model.dao.DAOFactory;
 import model.domain.Booking;
 import model.domain.BookingStatus;
+import model.domain.SlotStatus;
+import model.domain.TimeSlot;
 
 import java.util.HashMap;
 import java.util.List;
@@ -21,6 +24,24 @@ public class BookingDAOMemory implements BookingDAO {
             booking.setBookingId(nextId++);
         }
         bookings.put(booking.getBookingId(), booking);
+
+        // Create time slot entry for confirmed bookings
+        if (booking.getBookingId() != null && booking.getStatus() == BookingStatus.CONFIRMED) {
+            createTimeSlotForBooking(booking);
+        }
+    }
+
+    private void createTimeSlotForBooking(Booking booking) {
+        TimeSlot slot = new TimeSlot();
+        slot.setFieldId(booking.getFieldId());
+        slot.setDayOfWeek(booking.getBookingDate().getDayOfWeek());
+        slot.setBookingDate(booking.getBookingDate());
+        slot.setStartTime(booking.getStartTime());
+        slot.setEndTime(booking.getEndTime());
+        slot.setStatus(SlotStatus.BOOKED);
+        slot.setBookingId(booking.getBookingId());
+
+        DAOFactory.getTimeSlotDAO(DAOFactory.PersistenceType.MEMORY).save(slot);
     }
 
     @Override

@@ -6,17 +6,15 @@ import javafx.scene.control.DialogPane;
 
 public class ViewUtils {
 
-    private ViewUtils() {}
+    private ViewUtils() {
+    }
 
     public static void applyStylesheets(Scene scene) {
         var styleResource = ViewUtils.class.getResource("/css/style.css");
         if (styleResource != null) {
             scene.getStylesheets().add(styleResource.toExternalForm());
         }
-        var controlsResource = ViewUtils.class.getResource("/css/controls-dark.css");
-        if (controlsResource != null) {
-            scene.getStylesheets().add(controlsResource.toExternalForm());
-        }
+        // controls-dark.css removed in favor of AtlantaFX
     }
 
     public static void applyStylesheets(DialogPane dialogPane) {
@@ -25,10 +23,7 @@ public class ViewUtils {
         if (styleResource != null) {
             dialogPane.getStylesheets().add(styleResource.toExternalForm());
         }
-        var controlsResource = ViewUtils.class.getResource("/css/controls-dark.css");
-        if (controlsResource != null) {
-            dialogPane.getStylesheets().add(controlsResource.toExternalForm());
-        }
+
     }
 
     public static void showError(String title, String message) {
@@ -47,4 +42,3 @@ public class ViewUtils {
         alert.showAndWait();
     }
 }
-

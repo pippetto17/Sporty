@@ -55,8 +55,31 @@ public class BookingDAODBMS implements BookingDAO {
                     }
                 }
             }
+
+            // Create time slot entry for confirmed bookings
+            if (booking.getBookingId() != null && booking.getStatus() == BookingStatus.CONFIRMED) {
+                createTimeSlotForBooking(conn, booking);
+            }
         } catch (SQLException e) {
             throw new DataAccessException("Error saving booking: " + e.getMessage(), e);
+        }
+    }
+
+    private void createTimeSlotForBooking(Connection conn, Booking booking) throws SQLException {
+        String sql = """
+                INSERT INTO time_slots (field_id, day_of_week, booking_date, start_time, end_time, status, booking_id)
+                VALUES (?, ?, ?, ?, ?, 'BOOKED', ?)
+                ON DUPLICATE KEY UPDATE status = 'BOOKED', booking_id = VALUES(booking_id)
+                """;
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, booking.getFieldId());
+            stmt.setInt(2, booking.getBookingDate().getDayOfWeek().getValue());
+            stmt.setDate(3, Date.valueOf(booking.getBookingDate()));
+            stmt.setTime(4, Time.valueOf(booking.getStartTime()));
+            stmt.setTime(5, Time.valueOf(booking.getEndTime()));
+            stmt.setInt(6, booking.getBookingId());
+            stmt.executeUpdate();
         }
     }
 

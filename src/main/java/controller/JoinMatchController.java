@@ -1,10 +1,11 @@
 package controller;
+
 import exception.DataAccessException;
-import exception.ValidationException;
 import model.bean.MatchBean;
 import model.domain.Match;
 import model.domain.User;
 import model.utils.Constants;
+
 import java.sql.SQLException;
 public class JoinMatchController {
     private final User currentUser;

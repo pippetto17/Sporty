@@ -4,12 +4,13 @@ import model.domain.SlotStatus;
 import model.domain.TimeSlot;
 
 import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
 /**
  * DAO interface for TimeSlot entity.
- * Handles persistence of weekly recurring availability slots for fields.
+ * Handles both recurring weekly templates (bookingDate=null) and date-specific bookings.
  */
 public interface TimeSlotDAO {
 
@@ -19,14 +20,19 @@ public interface TimeSlotDAO {
     void save(TimeSlot slot);
 
     /**
-     * Find all time slots for a specific field.
+     * Find all time slots for a specific field (both templates and bookings).
      */
     List<TimeSlot> findByFieldId(String fieldId);
 
     /**
-     * Find all available slots for a specific field on a given day.
+     * Find recurring availability templates for a field on a given day.
      */
     List<TimeSlot> findAvailableSlots(String fieldId, DayOfWeek day);
+
+    /**
+     * Find available slots for a specific date (considering both templates and existing bookings).
+     */
+    List<TimeSlot> findAvailableSlotsForDate(String fieldId, LocalDate date);
 
     /**
      * Update slot status.
@@ -34,10 +40,14 @@ public interface TimeSlotDAO {
     void updateStatus(int slotId, SlotStatus status);
 
     /**
-     * Find slots that overlap with a given time range on a specific day.
-     * Used for conflict detection.
+     * Find slots that conflict with a time range on a specific date.
      */
     List<TimeSlot> findConflicting(String fieldId, DayOfWeek day, LocalTime start, LocalTime end);
+
+    /**
+     * Find slots that conflict with a time range on a specific date.
+     */
+    List<TimeSlot> findConflictingForDate(String fieldId, LocalDate date, LocalTime start, LocalTime end);
 
     /**
      * Delete a time slot.

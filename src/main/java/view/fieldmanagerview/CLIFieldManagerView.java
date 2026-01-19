@@ -72,7 +72,7 @@ public class CLIFieldManagerView implements FieldManagerView {
         System.out.println("\n1) List Pending Requests");
         System.out.println("2) Approve Booking");
         System.out.println("3) Reject Booking");
-        System.out.println("0) Back");
+        System.out.println("0) Logout");
         System.out.print("> ");
     }
 

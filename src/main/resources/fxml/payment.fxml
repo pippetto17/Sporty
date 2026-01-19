@@ -50,24 +50,62 @@
                  
                  <Label text="Card Holder" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
                  <TextField fx:id="cardHolderField" promptText="NAME SURNAME" GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.columnSpan="2"/>
-                 
-                 <Label text="Expiry Date" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
-                 <TextField fx:id="expiryField" promptText="MM/YY" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
-                 
-                 <Label text="CVV" GridPane.columnIndex="2" GridPane.rowIndex="2"/>
-                 <TextField fx:id="cvvField" promptText="123" GridPane.columnIndex="3" GridPane.rowIndex="2" prefWidth="60"/>
-            </GridPane>
+        <VBox spacing="20" alignment="TOP_CENTER">
+            <padding>
+                <Insets top="30" right="40" bottom="30" left="40"/>
+            </padding>
             
-            <Label fx:id="errorLabel" text="" style="-fx-text-fill: red;"/>
+            <VBox spacing="10" styleClass="card, elevated-1">
+                <padding>
+                    <Insets top="20" right="20" bottom="20" left="20"/>
+                </padding>
+                
+                <Label fx:id="matchInfoLabel" text="Match Info" styleClass="title-4"/>
+                
+                <HBox spacing="15" alignment="CENTER_LEFT">
+                    <Label text="Shares to pay:" styleClass="text-bold"/>
+                    <ComboBox fx:id="sharesComboBox" prefWidth="100"/>
+                </HBox>
+                
+                <Separator/>
+                
+                <HBox alignment="CENTER_RIGHT">
+                     <Label fx:id="amountLabel" text="Total: € 0.00" styleClass="title-2, accent"/>
+                </HBox>
+            </VBox>
+            
+            <VBox spacing="15">
+                <Label text="Card Details" styleClass="title-4"/>
+                
+                <VBox spacing="5">
+                    <Label text="Card Number" styleClass="text-caption"/>
+                    <TextField fx:id="cardNumberField" promptText="0000 0000 0000 0000" styleClass="text-field"/>
+                </VBox>
+                
+                <VBox spacing="5">
+                    <Label text="Card Holder" styleClass="text-caption"/>
+                    <TextField fx:id="cardHolderField" promptText="NAME SURNAME" styleClass="text-field"/>
+                </VBox>
+                
+                <HBox spacing="15">
+                    <VBox spacing="5" HBox.hgrow="ALWAYS">
+                        <Label text="Expiry Date" styleClass="text-caption"/>
+                        <TextField fx:id="expiryField" promptText="MM/YY"/>
+                    </VBox>
+                    <VBox spacing="5" HBox.hgrow="ALWAYS">
+                        <Label text="CVV" styleClass="text-caption"/>
+                        <TextField fx:id="cvvField" promptText="123"/>
+                    </VBox>
+                </HBox>
+            </VBox>
+            
+            <Label fx:id="errorLabel" text="" styleClass="danger"/>
         </VBox>
     </center>
     
     <bottom>
-        <HBox alignment="CENTER" styleClass="footer-container">
-            <padding>
-                 <Insets top="20" right="20" bottom="20" left="20"/>
-            </padding>
-            <Button fx:id="payButton" text="Pay Now" onAction="#handlePay" styleClass="primary-button" prefWidth="200" prefHeight="40"/>
+        <HBox alignment="CENTER" style="-fx-padding: 20; -fx-border-color: -color-border-subtle; -fx-border-width: 1 0 0 0;">
+            <Button fx:id="payButton" text="Pay Now" onAction="#handlePay" styleClass="success, large" prefWidth="250"/>
         </HBox>
     </bottom>
 
