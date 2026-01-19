@@ -1,6 +1,5 @@
 package testing;
 
-import exception.ValidationException;
 import model.dao.BookingDAO;
 import model.dao.DAOFactory;
 import model.domain.BookingStatus;
@@ -53,7 +52,7 @@ class BookFieldTest {
 
     @Test
     @DisplayName("Ricerca campi disponibili per città e sport")
-    void testSearchAvailableFields() throws ValidationException {
+    void testSearchAvailableFields(){
         List<model.domain.Field> fields = fieldDAO.findByCity("Milano");
 
         assertNotNull(fields);
@@ -83,7 +82,7 @@ class BookFieldTest {
 
     @Test
     @DisplayName("Verifica calcolo prezzo totale per 2 ore")
-    void testPriceCalculation() throws Exception {
+    void testPriceCalculation(){
         model.domain.Field field = fieldDAO.findById("1");
         assertNotNull(field);
 

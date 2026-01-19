@@ -19,6 +19,7 @@ import javafx.stage.Stage;
 import model.bean.FieldBean;
 import model.bean.MatchBean;
 import view.ViewUtils;
+import model.utils.Constants;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -271,7 +272,7 @@ public class GraphicBookFieldView implements BookFieldView {
         perHour.getStyleClass().add("text-caption");
 
         Label perPerson = new Label(String.format("€%.2f per person", field.getPricePerPerson()));
-        perPerson.getStyleClass().addAll("text-bold", "accent");
+        perPerson.getStyleClass().addAll("text-bold", Constants.CSS_ACCENT);
 
         prices.getChildren().addAll(perHour, perPerson);
 
@@ -312,15 +313,15 @@ public class GraphicBookFieldView implements BookFieldView {
         fieldsContainer.getChildren().stream()
                 .filter(VBox.class::isInstance)
                 .forEach(n -> {
-                    n.getStyleClass().remove("accent"); // Remove accent border/glow
+                    n.getStyleClass().remove(Constants.CSS_ACCENT); // Remove accent border/glow
                     n.setStyle(""); // Reset inline styles
                 });
 
         // Seleziona nuovo
-        card.getStyleClass().add("accent"); // Highlights border in AtlantaFX
-        // Add subtle background change to indicate selection
-        card.setStyle(
-                "-fx-border-color: -color-accent-emphasis; -fx-border-width: 2px; -fx-background-color: -color-bg-subtle;");
+        card.getStyleClass().add(Constants.CSS_ACCENT); // Highlights border in AtlantaFX
+         // Add subtle background change to indicate selection
+         card.setStyle(
+                 "-fx-border-color: -color-accent-emphasis; -fx-border-width: 2px; -fx-background-color: -color-bg-subtle;");
 
         this.selectedField = field;
         controller.setSelectedField(field);
@@ -425,3 +426,4 @@ public class GraphicBookFieldView implements BookFieldView {
         showAlert("Success", message, Alert.AlertType.INFORMATION);
     }
 }
+

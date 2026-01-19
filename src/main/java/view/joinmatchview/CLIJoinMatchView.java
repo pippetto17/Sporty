@@ -90,5 +90,6 @@ public class CLIJoinMatchView implements JoinMatchView {
 
     @Override
     public void close() {
+        // Nothing to close for CLI
     }
 }

@@ -51,6 +51,7 @@ public class GraphicJoinMatchView implements JoinMatchView {
     }
     @Override
     public void displayMatchDetails() {
+        /*TO DO*/
     }
     private void displayMatchDetails(VBox root) {
         Match match = controller.getMatch();

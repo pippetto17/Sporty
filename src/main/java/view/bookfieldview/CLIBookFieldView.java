@@ -4,6 +4,7 @@ import controller.ApplicationController;
 import controller.BookFieldController;
 import model.bean.FieldBean;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
 
@@ -77,18 +78,18 @@ public class CLIBookFieldView implements BookFieldView {
             sportChoice = Integer.parseInt(scanner.nextLine().trim());
             if (sportChoice < 1 || sportChoice > sports.length) {
                 displayError("Invalid sport selection");
-                return null;
+                return Collections.emptyList();
             }
         } catch (NumberFormatException e) {
             displayError("Invalid input");
-            return null;
+            return Collections.emptyList();
         }
 
         System.out.print("Enter city: ");
         String city = scanner.nextLine().trim();
         if (city.isEmpty()) {
             displayError("City cannot be empty");
-            return null;
+            return Collections.emptyList();
         }
 
         System.out.print("Enter date (yyyy-mm-dd): ");
@@ -98,7 +99,7 @@ public class CLIBookFieldView implements BookFieldView {
             bookFieldController.getCurrentMatchBean().setMatchDate(date);
         } catch (Exception e) {
             displayError("Invalid date format");
-            return null;
+            return Collections.emptyList();
         }
 
         System.out.print("Enter time (HH:mm): ");
@@ -108,7 +109,7 @@ public class CLIBookFieldView implements BookFieldView {
             bookFieldController.getCurrentMatchBean().setMatchTime(time);
         } catch (Exception e) {
             displayError("Invalid time format");
-            return null;
+            return Collections.emptyList();
         }
 
         System.out.println("\nSearching for available fields...");

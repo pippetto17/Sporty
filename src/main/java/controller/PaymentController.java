@@ -30,7 +30,7 @@ public class PaymentController {
         try {
             this.matchDAO = model.dao.DAOFactory.getMatchDAO(applicationController.getPersistenceType());
         } catch (SQLException e) {
-            throw new DataAccessException(Constants.ERROR_DAO_INIT + e.getMessage(), e);
+            throw new DataAccessException(String.format("%s%s", Constants.ERROR_DAO_INIT, e.getMessage()), e);
         }
         this.notificationService = new model.notification.NotificationService();
     }
@@ -123,7 +123,7 @@ public class PaymentController {
                 }
             }
         } catch (Exception e) {
-            logger.log(Level.WARNING, "Could not send match notification: " + e.getMessage());
+            logger.log(Level.WARNING, "Could not send match notification: {0}", e.getMessage());
         }
 
         // Back to OrganizeMatchView e mostra recap
@@ -172,7 +172,7 @@ public class PaymentController {
                         booking.getStartTime().toString());
             }
         } catch (Exception e) {
-            logger.log(Level.WARNING, "Could not send notification: " + e.getMessage());
+            logger.log(Level.WARNING, "Could not send notification: {0}", e.getMessage());
         }
 
         // Torna alla home: Payment -> BookField -> Home

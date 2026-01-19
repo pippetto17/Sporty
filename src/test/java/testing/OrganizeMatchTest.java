@@ -39,7 +39,7 @@ class OrganizeMatchTest {
 
     @Test
     @DisplayName("Organizza match: creazione bean con dati validi")
-    void testOrganizeMatchCreation() throws ValidationException {
+    void testOrganizeMatchCreation() {
         MatchBean matchBean = new MatchBean();
         matchBean.setOrganizerUsername("organizer1");
         matchBean.setSport(Sport.FOOTBALL_5);
@@ -55,7 +55,7 @@ class OrganizeMatchTest {
 
     @Test
     @DisplayName("Organizza match: verifica campo disponibile")
-    void testFieldAvailability() throws ValidationException {
+    void testFieldAvailability() {
         model.domain.Field field = fieldDAO.findById("1");
 
         assertNotNull(field);
@@ -67,7 +67,7 @@ class OrganizeMatchTest {
 
     @Test
     @DisplayName("Organizza match: conferma e persistenza con status CONFIRMED")
-    void testMatchConfirmation() throws ValidationException {
+    void testMatchConfirmation(){
         MatchBean matchBean = new MatchBean();
         matchBean.setOrganizerUsername("organizer1");
         matchBean.setSport(Sport.FOOTBALL_5);

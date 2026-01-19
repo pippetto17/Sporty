@@ -27,9 +27,10 @@ public class GraphicHomeView implements HomeView {
     private Stage stage;
 
     private static final String CSS_ACTIVE = "active";
-    private static final String CSS_SEARCH_FIELD_CONTAINER = "search-field-container";
-    private static final String CSS_TEXT_CAPTION = "text-caption";
-    private static final String CSS_TEXT_MUTED = "text-muted";
+    // Use centralized constants
+    private static final String CSS_SEARCH_FIELD_CONTAINER = model.utils.Constants.CSS_SEARCH_FIELD_CONTAINER;
+    private static final String CSS_TEXT_CAPTION = model.utils.Constants.CSS_TEXT_CAPTION;
+    private static final String CSS_TEXT_MUTED = model.utils.Constants.CSS_TEXT_MUTED;
 
     // FXML fields
     @FXML
@@ -92,7 +93,7 @@ public class GraphicHomeView implements HomeView {
                 initialize();
                 stage.show();
             } catch (IOException e) {
-                showError("Impossibile caricare la home: " + e.getMessage());
+                showError(model.utils.Constants.ERROR_LOAD_HOME_VIEW_IT + e.getMessage());
             }
         });
     }
@@ -115,15 +116,15 @@ public class GraphicHomeView implements HomeView {
         roleSwitchContainer.getChildren().clear();
 
         HBox toggleBox = new HBox(0);
-        toggleBox.getStyleClass().add("toggle-container");
+        toggleBox.getStyleClass().add(model.utils.Constants.CSS_TOGGLE_CONTAINER);
         toggleBox.setAlignment(Pos.CENTER); // Center content vertically/horizontally
         toggleBox.setMaxHeight(Region.USE_PREF_SIZE); // Prevent stretching to header height
 
-        Button btnPlayer = new Button("Player");
+        Button btnPlayer = new Button(model.utils.Constants.BTN_PLAYER);
         btnPlayer.getStyleClass().add("toggle-button");
         btnPlayer.setPrefWidth(120);
 
-        Button btnOrg = new Button("Organizer");
+        Button btnOrg = new Button(model.utils.Constants.BTN_ORGANIZER);
         btnOrg.getStyleClass().add("toggle-button");
         btnOrg.setPrefWidth(120);
 
@@ -164,13 +165,12 @@ public class GraphicHomeView implements HomeView {
         filterContainer.getChildren().clear();
 
         HBox capsule = new HBox(0);
-        capsule.getStyleClass().add("search-capsule"); // Kept custom for specific shape
+        capsule.getStyleClass().add(model.utils.Constants.CSS_SEARCH_CAPSULE); // Kept custom for specific shape
         capsule.setAlignment(Pos.CENTER_LEFT);
 
         // 1. CITY
         VBox cityBox = new VBox(0);
-        cityBox.getStyleClass().add("search-field-container");
-        cityBox.getStyleClass().add(CSS_SEARCH_FIELD_CONTAINER);
+        cityBox.getStyleClass().add(model.utils.Constants.CSS_SEARCH_FIELD_CONTAINER);
         cityBox.setAlignment(Pos.CENTER_LEFT);
         Label cityLbl = new Label("Where");
         cityLbl.getStyleClass().addAll(CSS_TEXT_CAPTION, CSS_TEXT_MUTED);
@@ -178,7 +178,7 @@ public class GraphicHomeView implements HomeView {
         cityFilter = new ComboBox<>();
         cityFilter.setEditable(true);
         cityFilter.setPromptText("Search destination");
-        cityFilter.getStyleClass().add("integrated-combo");
+        cityFilter.getStyleClass().add(model.utils.Constants.CSS_INTEGRATED_COMBO);
         cityFilter.setMaxWidth(Double.MAX_VALUE);
         cityFilter.setPrefWidth(250);
         cityFilter.getItems().addAll(ALL_CITIES);
@@ -223,14 +223,14 @@ public class GraphicHomeView implements HomeView {
 
         dateFilter = new DatePicker();
         dateFilter.setPromptText("Add dates");
-        dateFilter.getStyleClass().add("integrated-date");
+        dateFilter.getStyleClass().add(model.utils.Constants.CSS_INTEGRATED_DATE);
         dateFilter.setPrefWidth(160);
 
         dateBox.getChildren().addAll(dateLbl, dateFilter);
 
         // 4. SEARCH BUTTON
-        Button searchBtn = new Button("Search");
-        searchBtn.getStyleClass().addAll("search-action-button", "success");
+        Button searchBtn = new Button(model.utils.Constants.BTN_SEARCH);
+        searchBtn.getStyleClass().addAll(model.utils.Constants.CSS_SEARCH_ACTION_BUTTON, model.utils.Constants.CSS_SUCCESS);
         searchBtn.setOnAction(e -> applyFilters());
 
         capsule.getChildren().addAll(cityBox, sep1, sportBox, sep2, dateBox, searchBtn);
@@ -253,8 +253,8 @@ public class GraphicHomeView implements HomeView {
                 "-fx-font-size: 52px; -fx-text-fill: rgba(255,255,255,0.9); -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 5, 0, 0, 1);");
 
         Label priceBadge = new Label(
-                match.getPricePerPerson() != null ? String.format("€%.0f", match.getPricePerPerson()) : "Free");
-        priceBadge.getStyleClass().add("card-price-badge");
+                match.getPricePerPerson() != null ? String.format("€%.0f", match.getPricePerPerson()) : model.utils.Constants.MATCH_DETAIL_FREE);
+        priceBadge.getStyleClass().add(model.utils.Constants.CSS_CARD_PRICE_BADGE);
         StackPane.setAlignment(priceBadge, Pos.TOP_RIGHT);
         StackPane.setMargin(priceBadge, new Insets(10));
 
@@ -262,32 +262,32 @@ public class GraphicHomeView implements HomeView {
 
         // 2. CONTENT
         VBox content = new VBox(5);
-        content.getStyleClass().add("card-content");
+        content.getStyleClass().add(model.utils.Constants.CSS_CARD_CONTENT);
 
-        Label locationTitle = new Label(match.getCity() + " • " + match.getSport().getDisplayName());
-        locationTitle.getStyleClass().add("card-title");
+        Label locationTitle = new Label(match.getCity() + model.utils.Constants.BULLET + match.getSport().getDisplayName());
+        locationTitle.getStyleClass().add(model.utils.Constants.CSS_CARD_TITLE);
         locationTitle.setWrapText(true);
 
-        Label dateLabel = new Label("📅 " + match.getMatchDate() + "  🕒 " + match.getMatchTime());
-        dateLabel.getStyleClass().add("card-subtitle");
+        Label dateLabel = new Label(model.utils.Constants.ICON_CALENDAR + match.getMatchDate() + "  " + model.utils.Constants.ICON_CLOCK + match.getMatchTime());
+        dateLabel.getStyleClass().add(model.utils.Constants.CSS_CARD_SUBTITLE);
 
         int current = match.getParticipants() != null ? match.getParticipants().size() : 0;
         int max = match.getRequiredParticipants();
         ProgressBar capacityBar = new ProgressBar((double) current / max);
-        capacityBar.getStyleClass().addAll("card-progress-bar", sportClass + "-bar"); // Barra progressiva coordinata
+        capacityBar.getStyleClass().addAll(model.utils.Constants.CSS_CARD_PROGRESS_BAR, sportClass + "-bar"); // Barra progressiva coordinata
         capacityBar.setPrefWidth(Double.MAX_VALUE);
 
         Label playersLabel = new Label(current + "/" + max + " joined");
-        playersLabel.getStyleClass().add("card-detail-text");
-        HBox playersBox = new HBox(5, new Label("👥"), playersLabel);
+        playersLabel.getStyleClass().add(model.utils.Constants.CSS_CARD_DETAIL_TEXT);
+        HBox playersBox = new HBox(5, new Label(model.utils.Constants.ICON_PLAYERS), playersLabel);
         playersBox.setAlignment(Pos.CENTER_LEFT);
 
         content.getChildren().addAll(locationTitle, dateLabel, new Region(), playersBox, capacityBar);
 
         // Aggiungi pulsante Join se l'utente sta visualizzando come player
         if (homeController.isViewingAsPlayer() && !match.isFull()) {
-            Button joinButton = new Button("Join Match");
-            joinButton.getStyleClass().addAll("success", "small"); // AtlantaFX classes
+            Button joinButton = new Button(model.utils.Constants.BTN_JOIN_MATCH);
+            joinButton.getStyleClass().addAll(model.utils.Constants.CSS_SUCCESS, model.utils.Constants.CSS_SMALL); // AtlantaFX classes
             joinButton.setOnAction(e -> {
                 e.consume();
                 homeController.joinMatch(match.getMatchId());
@@ -358,37 +358,37 @@ public class GraphicHomeView implements HomeView {
     @Override
     public void displayWelcome() {
         model.domain.User u = homeController.getCurrentUser();
-        welcomeLabel.setText("Hello, " + u.getName() + " " + u.getSurname());
+        welcomeLabel.setText(model.utils.Constants.LABEL_HELLO_PREFIX + u.getName() + " " + u.getSurname());
         roleLabel.setText(homeController.getUserRole().getDisplayName());
 
         // Load User Image
         try {
-            String imagePath = "/image/player.png"; // Default
-            if (homeController.getUserRole() == model.domain.Role.ORGANIZER) {
-                imagePath = "/image/organizer.jpg";
-            }
+            // Allow overriding the image paths via system properties so the URI is configurable
+            String playerPath = System.getProperty("sporty.image.player", model.utils.Constants.IMAGE_PLAYER_PATH);
+            String organizerPath = System.getProperty("sporty.image.organizer", model.utils.Constants.IMAGE_ORGANIZER_PATH);
+            String imagePath = homeController.getUserRole() == model.domain.Role.ORGANIZER ? organizerPath : playerPath;
 
             javafx.scene.image.Image img = new javafx.scene.image.Image(
                     java.util.Objects.requireNonNull(getClass().getResourceAsStream(imagePath)),
                     120, 120, true, true); // Load at higher res for sharpness
-            userImageView.setImage(img);
+             userImageView.setImage(img);
 
-            // Circular Clip
-            javafx.scene.shape.Circle clip = new javafx.scene.shape.Circle(30, 30, 30);
-            userImageView.setClip(clip);
-        } catch (Exception e) {
-            // Fallback
-            java.util.logging.Logger.getLogger(getClass().getName()).log(java.util.logging.Level.WARNING,
-                    "User image not found: " + e.getMessage());
-        }
+             // Circular Clip
+             javafx.scene.shape.Circle clip = new javafx.scene.shape.Circle(30, 30, 30);
+             userImageView.setClip(clip);
+         } catch (Exception e) {
+             // Fallback
+             java.util.logging.Logger.getLogger(getClass().getName()).log(java.util.logging.Level.WARNING,
+                     String.format("User image not found: %s", e.getMessage()));
+         }
     }
 
     @Override
     public void displayMatches(List<model.bean.MatchBean> matches) {
         matchesContainer.getChildren().clear();
         if (matches == null || matches.isEmpty()) {
-            Label empty = new Label("No matches found.");
-            empty.getStyleClass().addAll("text-muted", "title-4");
+            Label empty = new Label(model.utils.Constants.LABEL_NO_MATCHES_FOUND);
+            empty.getStyleClass().addAll(model.utils.Constants.CSS_TEXT_MUTED, model.utils.Constants.CSS_TITLE_4);
             empty.setPadding(new Insets(20));
             matchesContainer.getChildren().add(empty);
             return;
@@ -401,11 +401,11 @@ public class GraphicHomeView implements HomeView {
         if (homeController.isViewingAsPlayer()) {
             organizerActionsBox.setVisible(false);
             organizerActionsBox.setManaged(false);
-            matchesTitle.setText("Explore Matches");
+            matchesTitle.setText(model.utils.Constants.LABEL_EXPLORE_MATCHES);
         } else {
             organizerActionsBox.setVisible(true);
             organizerActionsBox.setManaged(true);
-            matchesTitle.setText("Your Matches");
+            matchesTitle.setText(model.utils.Constants.LABEL_YOUR_MATCHES);
         }
     }
 
@@ -426,6 +426,8 @@ public class GraphicHomeView implements HomeView {
 
     @Override
     public void displayMenu() {
+        // Intentionally empty: menu interactions are handled directly in the graphic UI (toolbar/buttons)
+        // This method exists to satisfy the View interface used by other implementations (e.g., CLI).
     }
 
     @FXML

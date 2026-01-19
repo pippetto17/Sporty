@@ -103,11 +103,16 @@ public final class Constants {
     public static final String BTN_APPLY = "Apply";
     public static final String BTN_CLEAR = "Clear";
     public static final String BTN_REFRESH = "Refresh";
+    public static final String BTN_SEARCH = "Search";
+    public static final String BTN_JOIN_MATCH = "Join Match";
 
     // Prompt Text
     public static final String PROMPT_SPORT = "Sport";
     public static final String PROMPT_CITY = "City";
     public static final String PROMPT_DATE = "Date";
+    public static final String PROMPT_SEARCH_DESTINATION = "Search destination";
+    public static final String PROMPT_ANY = "Any";
+    public static final String PROMPT_ADD_DATES = "Add dates";
 
     // Status Messages - Home View
     public static final String STATUS_READY = "Ready";
@@ -170,19 +175,58 @@ public final class Constants {
     public static final String CSS_PRIMARY_BUTTON = "primary-button";
     public static final String CSS_MATCH_CARD = "match-card";
     public static final String CSS_MATCH_TITLE = "match-title";
-    public static final String CSS_STATUS_BADGE = "status-badge";
+    public static final String CSS_STATUS_BADE = "status-badge";
     public static final String CSS_ROLE_SWITCH_CONTAINER = "role-switch-container";
     public static final String CSS_ROLE_SWITCH_BUTTON = "role-switch-button";
     public static final String CSS_ACTIVE = "active";
+    public static final String CSS_ACCENT = "accent";
+    // Common CSS helpers used by views
+    public static final String CSS_SEARCH_FIELD_CONTAINER = "search-field-container";
+    public static final String CSS_TEXT_CAPTION = "text-caption";
+    public static final String CSS_TEXT_MUTED = "text-muted";
+    public static final String CSS_TITLE_4 = "title-4";
 
-    // Role names
-    public static final String ROLE_PLAYER = "Player";
-    public static final String ROLE_ORGANIZER = "Organizer";
-    public static final String ROLE_FIELD_MANAGER = "Field Manager";
+    // Home view specific labels and UI strings
+    public static final String LABEL_WHERE = "Where";
+    public static final String LABEL_WHEN = "When";
+    public static final String LABEL_NO_MATCHES_FOUND = "No matches found.";
+    public static final String LABEL_EXPLORE_MATCHES = "Explore Matches";
+    public static final String LABEL_YOUR_MATCHES = "Your Matches";
+    public static final String LABEL_HELLO_PREFIX = "Hello, ";
+    public static final String LABEL_MATCH_PREFIX = "Match: ";
 
-    // Separators
-    public static final String SEPARATOR = "=================================";
+    // Icons
+    public static final String ICON_CALENDAR = "📅 ";
+    public static final String ICON_CLOCK = "🕒 ";
+    public static final String ICON_PLAYERS = "👥";
 
-    // Prefixes
-    public static final String FOUND_PREFIX = "Found ";
+    // Bullet
+    public static final String BULLET = " • ";
+
+    // Additional CSS helpers used by home view
+    public static final String CSS_TOGGLE_CONTAINER = "toggle-container";
+    public static final String CSS_TOGGLE_BUTTON = "toggle-button";
+    public static final String CSS_SEARCH_CAPSULE = "search-capsule";
+    public static final String CSS_INTEGRATED_COMBO = "integrated-combo";
+    public static final String CSS_INTEGRATED_DATE = "integrated-date";
+    public static final String CSS_SEARCH_ACTION_BUTTON = "search-action-button";
+    public static final String CSS_CARD_IMAGE_AREA = "card-image-area";
+    public static final String CSS_CARD_PRICE_BADGE = "card-price-badge";
+    public static final String CSS_CARD_CONTENT = "card-content";
+    public static final String CSS_CARD_TITLE = "card-title";
+    public static final String CSS_CARD_SUBTITLE = "card-subtitle";
+    public static final String CSS_CARD_PROGRESS_BAR = "card-progress-bar";
+    public static final String CSS_CARD_DETAIL_TEXT = "card-detail-text";
+    public static final String CSS_SMALL = "small";
+
+    // Localized messages
+    public static final String ERROR_LOAD_HOME_VIEW_IT = "Impossibile caricare la home: ";
+
+    // Default image resource paths; can be overridden via system properties:
+    // -Dsporty.image.player=... and -Dsporty.image.organizer=...
+    public static final String IMAGE_PLAYER_PATH = "/image/player.png";
+    public static final String IMAGE_ORGANIZER_PATH = "/image/organizer.jpg";
+
+    // Small UI fragments
+    public static final String LABEL_JOINED_SUFFIX = " joined";
 }

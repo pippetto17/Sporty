@@ -11,7 +11,10 @@ public class NotificationBean {
     private LocalDateTime timestamp;
     private boolean read;
 
-    public NotificationBean() {}
+    public NotificationBean() {
+        // Intentionally empty: required no-arg constructor for frameworks and bean instantiation
+        // (serialization/deserialization, reflection-based mappers, JavaBeans conventions).
+    }
 
     public String getRecipient() {
         return recipient;
@@ -69,4 +72,3 @@ public class NotificationBean {
         this.read = read;
     }
 }
-
