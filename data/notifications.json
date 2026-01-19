@@ -835,5 +835,14 @@
     "message": "org_calcio ha organizzato una partita di FOOTBALL_5 al campo \u0027Campo A - Esterno\u0027 per il 2026-01-22 alle 21:00",
     "timestamp": "2026-01-19T22:47:50.805716",
     "read": true
+  },
+  {
+    "recipient": "manager_roma",
+    "sender": "org_calcio",
+    "type": "MATCH_CREATED",
+    "title": "Nuova partita organizzata!",
+    "message": "org_calcio ha organizzato una partita di FOOTBALL_5 al campo \u0027Calcetto Ostiense\u0027 per il 2026-01-22 alle 21:00",
+    "timestamp": "2026-01-19T22:55:16.068287",
+    "read": false
   }
 ]

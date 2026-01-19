@@ -411,10 +411,7 @@ public class GraphicOrganizeMatchView implements OrganizeMatchView {
 
     @FXML
     private void handleHomeFromRecap() {
-        stage.close();
-        for (int i = 0; i < 4; i++) {
-            organizeMatchController.navigateBack();
-        }
+        organizeMatchController.navigateBack();
     }
 
     private void showError(String message) {
