@@ -29,6 +29,9 @@ public class PaymentController {
 
     public void setView(PaymentView view) {
         this.view = view;
+        if (view instanceof view.paymentview.GraphicPaymentView graphicView) {
+            graphicView.setController(this);
+        }
     }
 
     public void setMatchBean(MatchBean matchBean) {
@@ -52,6 +55,8 @@ public class PaymentController {
     }
 
     public void start() {
+        view.display();
+
         if (bookingMode) {
             view.displayBookingInfo(fieldBean, matchBean);
         } else {
@@ -59,11 +64,22 @@ public class PaymentController {
             view.displayMatchInfo(matchBean, availableShares);
         }
 
-        PaymentBean paymentData = view.collectPaymentData(bookingMode ? 0 : calculateAvailableShares());
+        // For CLI views, collect data synchronously. For GUI views, wait for button callback
+        if (!(view instanceof view.paymentview.GraphicPaymentView)) {
+            PaymentBean paymentData = view.collectPaymentData(bookingMode ? 0 : calculateAvailableShares());
 
+            if (paymentData == null) {
+                applicationController.back();
+                return;
+            }
+
+            processPaymentFromView(paymentData);
+        }
+    }
+
+    public void processPaymentFromView(PaymentBean paymentData) {
         if (paymentData == null) {
             view.showError("Dati di pagamento non validi");
-            applicationController.back();
             return;
         }
 
@@ -73,12 +89,47 @@ public class PaymentController {
         try {
             boolean success = processPayment(paymentData);
             if (success) {
-                view.showSuccess("Pagamento completato con successo!");
+                handlePaymentSuccess();
             } else {
                 view.showError("Pagamento rifiutato. Verifica i dati.");
             }
         } catch (ValidationException e) {
             view.showError(e.getMessage());
+        }
+    }
+
+    private void handlePaymentSuccess() {
+        view.showSuccess("Pagamento completato con successo!");
+        if (view instanceof view.paymentview.GraphicPaymentView) {
+            handleGraphicViewSuccess();
+        } else {
+            handleCliViewSuccess();
+        }
+    }
+
+    private void handleGraphicViewSuccess() {
+        new Thread(() -> {
+            try {
+                Thread.sleep(1500);
+                javafx.application.Platform.runLater(this::closeAndNavigateBack);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }).start();
+    }
+
+    private void closeAndNavigateBack() {
+        view.close();
+        navigateBackIfNeeded();
+    }
+
+    private void handleCliViewSuccess() {
+        navigateBackIfNeeded();
+    }
+
+    private void navigateBackIfNeeded() {
+        if (joinMode || bookingMode) {
+            applicationController.back();
         }
     }
 

@@ -826,5 +826,14 @@
     "message": "player2 ha prenotato il campo \u0027Campo Sud\u0027 per il 2026-01-27 alle 14:00",
     "timestamp": "2026-01-19T22:06:18.862676",
     "read": false
+  },
+  {
+    "recipient": "manager_roma",
+    "sender": "org_calcio",
+    "type": "MATCH_CREATED",
+    "title": "Nuova partita organizzata!",
+    "message": "org_calcio ha organizzato una partita di FOOTBALL_5 al campo \u0027Campo A - Esterno\u0027 per il 2026-01-22 alle 21:00",
+    "timestamp": "2026-01-19T22:47:50.805716",
+    "read": true
   }
 ]

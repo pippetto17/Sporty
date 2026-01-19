@@ -1,6 +1,7 @@
 package view.paymentview;
 
 import controller.ApplicationController;
+import controller.PaymentController;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -27,6 +28,8 @@ public class GraphicPaymentView implements PaymentView {
     private Stage stage;
     private PaymentBean collectedPaymentData;
     private int maxAvailableShares;
+    private PaymentController controller;
+    private ApplicationController applicationController;
 
     @FXML
     private Label matchInfoLabel;
@@ -47,32 +50,39 @@ public class GraphicPaymentView implements PaymentView {
     @FXML
     private Label errorLabel;
 
-    // Default constructor for FXML loader
     public GraphicPaymentView() {
-        // No-arg constructor required by FXMLLoader
+        // Constructor
+    }
+
+    public void setController(PaymentController controller) {
+        this.controller = controller;
     }
 
     @Override
     public void setApplicationController(ApplicationController applicationController) {
-    // Not needed in this view
+        this.applicationController = applicationController;
     }
 
     @Override
     public void display() {
         Platform.runLater(() -> {
             try {
-                stage = new Stage();
-                stage.setTitle("Sporty - Payment");
+                if (stage == null) {
+                    stage = new Stage();
+                    stage.setTitle("Sporty - Payment");
 
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/payment.fxml"));
-                loader.setController(this);
-                Parent root = loader.load();
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/payment.fxml"));
+                    loader.setController(this);
+                    Parent root = loader.load();
 
-                Scene scene = new Scene(root, 600, 550);
-                ViewUtils.applyStylesheets(scene);
+                    Scene scene = new Scene(root, 600, 550);
+                    ViewUtils.applyStylesheets(scene);
 
-                stage.setScene(scene);
+                    stage.setScene(scene);
+                }
+
                 stage.show();
+                stage.toFront();
             } catch (IOException e) {
                 logger.severe("Failed to load payment view: " + e.getMessage());
             }
@@ -144,7 +154,7 @@ public class GraphicPaymentView implements PaymentView {
     @FXML
     private void handlePay() {
         errorLabel.setText("");
-        errorLabel.setStyle(""); // Reset style
+        errorLabel.setStyle("");
 
         PaymentBean data = collectPaymentData(maxAvailableShares);
         if (data == null) {
@@ -152,14 +162,22 @@ public class GraphicPaymentView implements PaymentView {
             return;
         }
 
-        collectedPaymentData = data;
-        stage.close();
+        if (controller != null) {
+            controller.processPaymentFromView(data);
+        } else {
+            collectedPaymentData = data;
+            stage.close();
+        }
     }
 
     @FXML
     private void handleBack() {
-        collectedPaymentData = null; // Indicate cancellation
-        stage.close();
+        if (applicationController != null) {
+            applicationController.back();
+        }
+        if (stage != null) {
+            stage.close();
+        }
     }
 
     @Override

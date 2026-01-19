@@ -86,23 +86,25 @@ public class GraphicOrganizeMatchView implements OrganizeMatchView {
     public void display() {
         Platform.runLater(() -> {
             try {
-                stage = new Stage();
-                stage.setTitle("Sporty - Organize Match");
+                if (stage == null) {
+                    stage = new Stage();
+                    stage.setTitle("Sporty - Organize Match");
 
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/organize_match.fxml"));
-                loader.setController(this);
-                Parent root = loader.load();
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/organize_match.fxml"));
+                    loader.setController(this);
+                    Parent root = loader.load();
 
-                Scene scene = new Scene(root, 700, 750);
-                scene.getStylesheets().add(getClass().getResource("/css/style.css").toExternalForm());
-                // controls-dark.css removed
+                    Scene scene = new Scene(root, 700, 750);
+                    scene.getStylesheets().add(getClass().getResource("/css/style.css").toExternalForm());
 
-                stage.setScene(scene);
-                stage.setResizable(true);
+                    stage.setScene(scene);
+                    stage.setResizable(true);
 
-                initialize();
+                    initialize();
+                }
 
                 stage.show();
+                stage.toFront();
             } catch (IOException e) {
                 logger.severe(Constants.ERROR_LOAD_ORGANIZE_MATCH_VIEW + e.getMessage());
                 showErrorDialog(Constants.ERROR_LOAD_ORGANIZE_MATCH_VIEW + e.getMessage());

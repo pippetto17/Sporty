@@ -59,31 +59,35 @@ public class GraphicBookFieldView implements BookFieldView {
 
     private void initStage() {
         try {
-            stage = new Stage();
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/book_field.fxml"));
-            loader.setController(this);
+            if (stage == null) {
+                stage = new Stage();
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/book_field.fxml"));
+                loader.setController(this);
 
-            Scene scene = new Scene(loader.load(), 800, 700);
-            scene.getStylesheets().addAll(
-                    getClass().getResource("/css/style.css").toExternalForm());
+                Scene scene = new Scene(loader.load(), 800, 700);
+                scene.getStylesheets().addAll(
+                        getClass().getResource("/css/style.css").toExternalForm());
 
-            stage.setTitle("Sporty - " + (controller.isStandaloneMode() ? "Book Field" : "Select Field"));
-            stage.setScene(scene);
-            stage.show();
+                stage.setTitle("Sporty - " + (controller.isStandaloneMode() ? "Book Field" : "Select Field"));
+                stage.setScene(scene);
 
-            if (controller.isStandaloneMode()) {
-                showStandaloneSearchForm();
-            } else {
-                displayMatchInfo();
-                searchFields();
+                if (controller.isStandaloneMode()) {
+                    showStandaloneSearchForm();
+                } else {
+                    displayMatchInfo();
+                    searchFields();
+                }
+
+                // Initialize Sort ComboBox
+                sortComboBox.getItems().addAll(
+                        "Distance (Coming Soon)",
+                        "Price: Low to High",
+                        "Price: High to Low");
+                sortComboBox.setOnAction(e -> handleSort());
             }
 
-            // Initialize Sort ComboBox
-            sortComboBox.getItems().addAll(
-                    "Distance (Coming Soon)",
-                    "Price: Low to High",
-                    "Price: High to Low");
-            sortComboBox.setOnAction(e -> handleSort());
+            stage.show();
+            stage.toFront();
 
         } catch (Exception e) {
             logger.severe("View load failed: " + e.getMessage());
