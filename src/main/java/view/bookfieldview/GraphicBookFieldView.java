@@ -18,8 +18,8 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import model.bean.FieldBean;
 import model.bean.MatchBean;
-import view.ViewUtils;
 import model.utils.Constants;
+import view.ViewUtils;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;

@@ -1,6 +1,5 @@
 package testing;
 
-import exception.ValidationException;
 import model.bean.MatchBean;
 import model.dao.DAOFactory;
 import model.domain.MatchStatus;
