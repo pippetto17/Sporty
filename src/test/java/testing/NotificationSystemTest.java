@@ -30,7 +30,7 @@ class NotificationSystemTest {
     }
 
     @Test
-    @DisplayName("Observer riceve notifica in real-time quando viene creato un match")
+    @DisplayName("Observer receives real-time notification when a match is created")
     void testObserverReceivesMatchCreationNotification() throws InterruptedException {
         CountDownLatch latch = new CountDownLatch(1);
         List<NotificationEvent> receivedEvents = new ArrayList<>();
@@ -55,7 +55,7 @@ class NotificationSystemTest {
     }
 
     @Test
-    @DisplayName("Observer riceve notifica quando viene prenotato un campo")
+    @DisplayName("Observer receives notification when a field is booked")
     void testObserverReceivesBookingNotification() throws InterruptedException {
         CountDownLatch latch = new CountDownLatch(1);
         List<NotificationEvent> receivedEvents = new ArrayList<>();
@@ -74,13 +74,14 @@ class NotificationSystemTest {
         assertTrue(received);
         assertEquals(1, receivedEvents.size());
         assertEquals(NotificationEvent.Type.BOOKING_CREATED, receivedEvents.get(0).type);
-        assertTrue(receivedEvents.get(0).message.contains("ha prenotato"));
+        // assert message follows NotificationService formatting (english)
+        assertTrue(receivedEvents.get(0).message.contains("has booked"));
 
         notificationService.unsubscribe(observer);
     }
 
     @Test
-    @DisplayName("Notifica viene persistita (Access via Service)")
+    @DisplayName("Notification is persisted (Service access)")
     void testNotificationPersistence() {
         notificationService.notifyBookingCreated(
                 "manager2", "player2", "Campo Sud",
@@ -89,12 +90,13 @@ class NotificationSystemTest {
         List<String> unreadNotifications = notificationService.getUnreadNotifications("manager2");
 
         assertFalse(unreadNotifications.isEmpty());
-        assertTrue(unreadNotifications.get(0).contains("Nuova prenotazione!"));
+        // persist title is "New booking!" in NotificationService
+        assertTrue(unreadNotifications.get(0).contains("New booking!"));
         assertTrue(unreadNotifications.get(0).contains("player2"));
     }
 
     @Test
-    @DisplayName("Mark as read funziona correttamente")
+    @DisplayName("Mark as read works correctly")
     void testMarkAsRead() {
         notificationService.notifyMatchCreated(
                 "manager3", "organizer3", "Campo Est",
@@ -110,7 +112,7 @@ class NotificationSystemTest {
     }
 
     @Test
-    @DisplayName("Multiple observers ricevono la stessa notifica")
+    @DisplayName("Multiple observers receive the same notification")
     void testMultipleObservers() throws InterruptedException {
         CountDownLatch latch1 = new CountDownLatch(1);
         CountDownLatch latch2 = new CountDownLatch(1);
@@ -136,7 +138,7 @@ class NotificationSystemTest {
     }
 
     @Test
-    @DisplayName("Unsubscribe funziona correttamente")
+    @DisplayName("Unsubscribe works correctly")
     void testUnsubscribe() throws InterruptedException {
         CountDownLatch latch = new CountDownLatch(1);
 
