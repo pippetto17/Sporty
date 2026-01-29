@@ -10,9 +10,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class FieldDAOMemory implements FieldDAO {
-    private static final Map<String, Field> fields = new HashMap<>();
+    private static final Map<Integer, Field> fields = new HashMap<>();
+    private static int idCounter = 1;
     private static final String DEMO_CITY = "Milano";
 
     static {
@@ -20,62 +22,39 @@ public class FieldDAOMemory implements FieldDAO {
         initializeDemoFields();
     }
 
-    private static void createAndAddField(String id, String name, Sport sport, String address, String city,
-            double price, boolean indoor) {
-        Field field = new Field(id, name, sport, address, city);
-        field.setPricePerHour(price);
-        field.setIndoor(indoor);
-        field.setAvailability("available");
-        fields.put(field.getFieldId(), field);
+    private static void createAndAddField(String name, Sport sport, String city, int managerId) {
+        int id = idCounter++;
+        Field field = new Field(id, name, city, sport, managerId);
+        fields.put(id, field);
     }
 
     private static void initializeDemoFields() {
         // Football 5 fields - Zona Centro
-        createAndAddField("F001", "City Sports Center", Sport.FOOTBALL_5, "Via Roma 123", DEMO_CITY, 50.0, false);
-        createAndAddField("F002", "Arena Calcetto Centrale", Sport.FOOTBALL_5, "Corso Buenos Aires 88", DEMO_CITY, 55.0,
-                true);
-        createAndAddField("F003", "San Siro Five", Sport.FOOTBALL_5, "Via dei Missaglia 151", DEMO_CITY, 45.0, false);
+        createAndAddField("City Sports Center", Sport.FOOTBALL_5, DEMO_CITY, 3);
+        createAndAddField("Arena Calcetto Centrale", Sport.FOOTBALL_5, DEMO_CITY, 3);
+        createAndAddField("San Siro Five", Sport.FOOTBALL_5, DEMO_CITY, 3);
 
         // Football 8 fields
-        createAndAddField("F004", "Campo 8 Navigli", Sport.FOOTBALL_8, "Via Gola 20", DEMO_CITY, 70.0, false);
+        createAndAddField("Campo 8 Navigli", Sport.FOOTBALL_8, DEMO_CITY, 3);
 
         // Football 11 fields
-        createAndAddField("F005", "Green Stadium", Sport.FOOTBALL_11, "Via Dante 45", DEMO_CITY, 120.0, false);
-        createAndAddField("F006", "Stadio Bicocca", Sport.FOOTBALL_11, "Viale Sarca 202", DEMO_CITY, 110.0, false);
+        createAndAddField("Green Stadium", Sport.FOOTBALL_11, DEMO_CITY, 3);
+        createAndAddField("Stadio Bicocca", Sport.FOOTBALL_11, DEMO_CITY, 3);
 
         // Basketball fields
-        createAndAddField("B001", "Indoor Basketball Arena", Sport.BASKETBALL, "Corso Italia 78", DEMO_CITY, 40.0,
-                true);
-        createAndAddField("B002", "Basket City Loreto", Sport.BASKETBALL, "Piazzale Loreto 5", DEMO_CITY, 35.0, true);
-        createAndAddField("B003", "PlayBasket Porta Romana", Sport.BASKETBALL, "Via Orti 10", DEMO_CITY, 38.0, false);
+        createAndAddField("Indoor Basketball Arena", Sport.BASKETBALL, DEMO_CITY, 3);
+        createAndAddField("Basket City Loreto", Sport.BASKETBALL, DEMO_CITY, 3);
+        createAndAddField("PlayBasket Porta Romana", Sport.BASKETBALL, DEMO_CITY, 3);
 
         // Tennis fields
-        createAndAddField("T001", "Tennis Club Milano", Sport.TENNIS_SINGLE, "Via Sempione 200", DEMO_CITY, 25.0,
-                false);
-        createAndAddField("T002", "Tennis Forlanini", Sport.TENNIS_SINGLE, "Via Corelli 136", DEMO_CITY, 22.0, false);
-        createAndAddField("T003", "Tennis Double Garibaldi", Sport.TENNIS_DOUBLE, "Via Farini 70", DEMO_CITY, 30.0,
-                true);
+        createAndAddField("Tennis Club Milano", Sport.TENNIS_SINGLE, DEMO_CITY, 3);
+        createAndAddField("Tennis Forlanini", Sport.TENNIS_SINGLE, DEMO_CITY, 3);
+        createAndAddField("Tennis Double Garibaldi", Sport.TENNIS_DOUBLE, DEMO_CITY, 3);
 
         // Padel fields
-        createAndAddField("P001", "Padel Center", Sport.PADEL_DOUBLE, "Via Tortona 56", DEMO_CITY, 40.0, true);
-        createAndAddField("P002", "Padel Arena Citylife", Sport.PADEL_DOUBLE, "Via Stanislao Cannizzaro 2", DEMO_CITY,
-                45.0, true);
-        createAndAddField("P003", "Padel Club Lambrate", Sport.PADEL_SINGLE, "Via Conte Rosso 12", DEMO_CITY, 28.0,
-                true);
-
-        // Campi più lontani dal centro per testare distanze
-        createAndAddField("F007", "Campo Nord Milano", Sport.FOOTBALL_5, "Via Fulvio Testi 123", DEMO_CITY, 45.0,
-                false);
-        createAndAddField("B004", "Basket Sud Milano", Sport.BASKETBALL, "Via Ripamonti 300", DEMO_CITY, 35.0, false);
-        createAndAddField("T004", "Tennis Ovest", Sport.TENNIS_SINGLE, "Via Novara 350", DEMO_CITY, 20.0, false);
-        createAndAddField("F008", "Campo Est Milano", Sport.FOOTBALL_8, "Via Mecenate 76", DEMO_CITY, 65.0, false);
-
-        // Campo economico lontano
-        Field field20 = new Field("F009", "Budget Field Barona", Sport.FOOTBALL_5, "Via Lorenteggio 255", DEMO_CITY);
-        field20.setPricePerHour(30.0);
-        field20.setIndoor(false);
-        field20.setAvailability("available");
-        fields.put(field20.getFieldId(), field20);
+        createAndAddField("Padel Center", Sport.PADEL_DOUBLE, DEMO_CITY, 3);
+        createAndAddField("Padel Arena Citylife", Sport.PADEL_DOUBLE, DEMO_CITY, 3);
+        createAndAddField("Padel Club Lambrate", Sport.PADEL_SINGLE, DEMO_CITY, 3);
     }
 
     @Override
@@ -84,49 +63,43 @@ public class FieldDAOMemory implements FieldDAO {
     }
 
     @Override
-    public Field findById(String fieldId) {
-        return fields.get(fieldId);
+    public Field findById(int id) {
+        return fields.get(id);
     }
 
     @Override
     public List<Field> findByCity(String city) {
         return fields.values().stream()
-                .filter(field -> field.isInCity(city))
-                .toList();
+                .filter(field -> field.getCity().equalsIgnoreCase(city))
+                .collect(Collectors.toList());
     }
 
     @Override
-    public List<Field> findBySport(Sport sport) {
+    public List<Field> findAvailableFields(String city, Sport sport, LocalDate date, LocalTime time) {
         return fields.values().stream()
+                .filter(field -> field.getCity().equalsIgnoreCase(city))
                 .filter(field -> field.getSport() == sport)
-                .toList();
+                .collect(Collectors.toList());
     }
 
     @Override
-    public List<Field> findAvailableFields(Sport sport, String city, LocalDate date, LocalTime time) {
+    public List<Field> findByManagerId(int managerId) {
         return fields.values().stream()
-                .filter(field -> field.getSport() == sport)
-                .filter(field -> field.isInCity(city))
-                .filter(Field::isAvailable)
-                .sorted((f1, f2) -> Double.compare(f1.getPricePerHour(), f2.getPricePerHour()))
-                .toList();
-    }
-
-    @Override
-    public List<Field> findByManagerId(String managerId) {
-        return fields.values().stream()
-                .filter(field -> managerId.equals(field.getManagerId()))
-                .toList();
+                .filter(field -> field.getManagerId() == managerId)
+                .collect(Collectors.toList());
     }
 
     @Override
     public void save(Field field) {
-        fields.put(field.getFieldId(), field);
+        if (field.getId() == 0) {
+            field.setId(idCounter++);
+        }
+        fields.put(field.getId(), field);
     }
 
     @Override
-    public void delete(String fieldId) {
-        fields.remove(fieldId);
+    public void delete(int id) {
+        fields.remove(id);
     }
 
     public static void clearAll() {

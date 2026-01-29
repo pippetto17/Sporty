@@ -6,8 +6,6 @@ import model.bean.MatchBean;
 import model.domain.Sport;
 import model.domain.User;
 
-import model.utils.Utils;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Arrays;
@@ -17,59 +15,64 @@ import java.util.stream.Collectors;
 
 import static model.utils.Utils.ITALIAN_CITIES;
 
-/**
- * Controller per l'organizzazione di un nuovo match.
- * Gestisce il flusso di creazione del match, con validazione e accesso ai dati.
- */
 public class OrganizeMatchController {
     private final User organizer;
     private final ApplicationController applicationController;
     private final model.dao.MatchDAO matchDAO;
+    private final model.dao.FieldDAO fieldDAO;
     private MatchBean currentMatchBean;
 
-    // BCE Criterion 3: Preloaded data (stored after initialization)
     private List<Sport> availableSports;
     private List<String> availableCities;
     private String preferredCity;
 
     public OrganizeMatchController(User organizer, ApplicationController applicationController) {
+        if (!organizer.isOrganizer()) {
+            throw new IllegalArgumentException("User must be an organizer");
+        }
         this.organizer = organizer;
         this.applicationController = applicationController;
-        this.matchDAO = model.dao.DAOFactory.getMatchDAO(applicationController.getPersistenceType());
+        this.matchDAO = applicationController.getDaoFactory().getMatchDAO();
+        this.fieldDAO = applicationController.getDaoFactory().getFieldDAO();
     }
 
     public void startNewMatch() {
         this.currentMatchBean = new MatchBean();
-        this.currentMatchBean.setOrganizerUsername(organizer.getUsername());
+        this.currentMatchBean.setOrganizerId(organizer.getId());
+        this.currentMatchBean.setOrganizerName(organizer.getName() + " " + organizer.getSurname());
     }
 
-    /**
-     * BCE Criterion 3: First interaction loads all required entities into memory.
-     * This method MUST be called at the start of the use case.
-     */
     public void initializeOrganizeMatch() {
-        // 1. Load available sports
-        this.availableSports = Arrays.asList(Sport.values());
+        try {
+            this.availableSports = Arrays.asList(Sport.values());
+            this.availableCities = ITALIAN_CITIES;
+            List<MatchBean> previousMatches = matchDAO.findByOrganizer(organizer.getId())
+                    .stream()
+                    .map(model.converter.MatchConverter::toBean)
+                    .toList();
 
-        // 2. Load available cities
-        this.availableCities = ITALIAN_CITIES;
+            for (MatchBean mb : previousMatches) {
+                model.domain.Field f = fieldDAO.findById(mb.getFieldId());
+                if (f != null) {
+                    mb.setCity(f.getCity());
+                }
+            }
 
-        // 3. Load organizer's previous matches (for suggestions)
-        List<MatchBean> previousMatches = matchDAO.findByOrganizer(organizer.getUsername())
-                .stream()
-                .map(model.converter.MatchConverter::toBean)
-                .toList();
-
-        // 4. Derive preferred city from history (most frequently used)
-        this.preferredCity = previousMatches.stream()
-                .collect(Collectors.groupingBy(MatchBean::getCity, Collectors.counting()))
-                .entrySet().stream()
-                .max(Map.Entry.comparingByValue())
-                .map(Map.Entry::getKey)
-                .orElse(null);
-
-        // 5. Start new match (as part of initialization)
-        startNewMatch();
+            this.preferredCity = previousMatches.stream()
+                    .filter(m -> m.getCity() != null)
+                    .collect(Collectors.groupingBy(MatchBean::getCity, Collectors.counting()))
+                    .entrySet().stream()
+                    .max(Map.Entry.comparingByValue())
+                    .map(Map.Entry::getKey)
+                    .orElse(null);
+            startNewMatch();
+        } catch (DataAccessException e) {
+            this.availableSports = Arrays.asList(Sport.values());
+            this.availableCities = ITALIAN_CITIES;
+            this.preferredCity = null;
+            startNewMatch();
+            throw new DataAccessException("Failed to initialize organize match data: " + e.getMessage(), e);
+        }
     }
 
     public List<Sport> getAvailableSports() {
@@ -89,28 +92,41 @@ public class OrganizeMatchController {
     }
 
     public boolean validateMatchDetails(Sport sport, LocalDate date, LocalTime time,
-            String city, int additionalParticipants) {
-        if (sport == null || date == null || time == null)
-            return false;
+            String city, int additionalParticipants) throws ValidationException {
+        if (sport == null)
+            throw new ValidationException(model.utils.Constants.ERROR_SPORT_REQUIRED);
+        if (date == null)
+            throw new ValidationException(model.utils.Constants.ERROR_DATE_REQUIRED);
+        if (time == null)
+            throw new ValidationException(model.utils.Constants.ERROR_TIME_REQUIRED);
         if (city == null || city.trim().isEmpty())
-            return false;
+            throw new ValidationException(model.utils.Constants.ERROR_CITY_REQUIRED);
+        if (!isValidCity(city))
+            throw new ValidationException(model.utils.Constants.ERROR_CITY_INVALID);
         if (date.isBefore(LocalDate.now()))
-            return false;
+            throw new ValidationException(model.utils.Constants.ERROR_DATE_IN_PAST);
+        if (date.equals(LocalDate.now()) && time.isBefore(LocalTime.now()))
+            throw new ValidationException(model.utils.Constants.ERROR_TIME_IN_PAST);
 
-        return sport.isValidAdditionalParticipants(additionalParticipants);
+        if (!sport.isValidAdditionalParticipants(additionalParticipants)) {
+            throw new ValidationException(model.utils.Constants.ERROR_INVALID_PARTICIPANTS + sport.getDisplayName());
+        }
+
+        return true;
     }
 
-    /**
-     * Save match logic moved here.
-     */
     public void saveMatch() throws ValidationException {
         if (currentMatchBean == null)
             throw new ValidationException("MatchBean cannot be null");
         try {
             model.domain.Match match = model.converter.MatchConverter.toEntity(currentMatchBean);
             matchDAO.save(match);
-            if (match.getMatchId() != null) {
-                currentMatchBean.setMatchId(match.getMatchId());
+            if (match.getId() != 0) {
+                currentMatchBean.setMatchId(match.getId());
+            }
+            model.domain.Field field = fieldDAO.findById(match.getFieldId());
+            if (field != null) {
+                // IMPLEMENT NOTIFICATION TO MANAGER
             }
         } catch (exception.DataAccessException e) {
             throw new DataAccessException("Error saving match: " + e.getMessage(), e);
@@ -123,24 +139,11 @@ public class OrganizeMatchController {
         currentMatchBean.setMatchDate(date);
         currentMatchBean.setMatchTime(time);
         currentMatchBean.setCity(city);
-        currentMatchBean.setRequiredParticipants(additionalParticipants);
+        currentMatchBean.setMissingPlayers(additionalParticipants);
     }
 
     public void proceedToFieldSelection() {
-        // Potentially save draft state here if needed, or just navigate
         applicationController.navigateToBookField(currentMatchBean);
-    }
-
-    public Sport[] getAvailableSportsArray() {
-        return Sport.values();
-    }
-
-    public java.util.List<String> getCities() {
-        return ITALIAN_CITIES;
-    }
-
-    public java.util.List<String> searchCitiesByPrefix(String prefix) {
-        return Utils.searchCitiesByPrefix(prefix);
     }
 
     public boolean isValidCity(String city) {
@@ -179,8 +182,6 @@ public class OrganizeMatchController {
         }
     }
 
-    // --- UI Helper Methods ---
-
     public String getParticipantsInfoText(Sport sport) {
         if (sport == null) {
             return model.utils.Constants.ERROR_SELECT_SPORT_FIRST;
@@ -193,8 +194,12 @@ public class OrganizeMatchController {
 
     public int getMaxAdditionalParticipants(Sport sport) {
         if (sport == null) {
-            return 1; // Default fallback
+            return 1;
         }
         return sport.getAdditionalParticipantsNeeded();
+    }
+
+    public boolean isDateValid(LocalDate date) {
+        return date != null && !date.isBefore(LocalDate.now());
     }
 }

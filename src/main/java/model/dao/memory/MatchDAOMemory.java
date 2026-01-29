@@ -1,51 +1,81 @@
 package model.dao.memory;
 
 import model.dao.MatchDAO;
+
 import model.domain.Match;
 import model.domain.MatchStatus;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class MatchDAOMemory implements MatchDAO {
-    private final Map<Integer, Match> matches = new HashMap<>();
-    private int nextId = 1;
+    private static final Map<Integer, Match> matches = new HashMap<>();
+    private static int nextId = 1;
 
     @Override
     public void save(Match match) {
-        if (match.getMatchId() == null) {
-            match.setMatchId(nextId++);
+        if (match.getId() == 0) {
+            match.setId(nextId++);
         }
-        matches.put(match.getMatchId(), match);
+        matches.put(match.getId(), match);
     }
 
     @Override
-    public Match findById(int matchId) {
-        return matches.get(matchId);
+    public Match findById(int id) {
+        return matches.get(id);
     }
 
     @Override
-    public List<Match> findByOrganizer(String organizerUsername) {
+    public List<Match> findByOrganizer(int organizerId) {
         return matches.values().stream()
-                .filter(match -> match.getOrganizerUsername().equals(organizerUsername))
-                .toList();
+                .filter(match -> match.getOrganizerId() == organizerId)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public List<Match> findAllAvailable() {
-        return matches.values().stream()
-                .filter(match -> match.getStatus() == MatchStatus.CONFIRMED)
-                .toList();
+    public List<Match> findPendingForManager(int managerId) {
+        List<Match> pendingMatches = new ArrayList<>();
+        model.dao.FieldDAO fieldDAO = new FieldDAOMemory();
+
+        for (Match match : matches.values()) {
+            if (match.getStatus() == model.domain.MatchStatus.PENDING) {
+                model.domain.Field field = fieldDAO.findById(match.getFieldId());
+                if (field != null && field.getManagerId() == managerId) {
+                    pendingMatches.add(match);
+                }
+            }
+        }
+        return pendingMatches;
     }
 
     @Override
-    public void delete(int matchId) {
-        matches.remove(matchId);
+    public List<Match> findApprovedMatches() {
+        List<Match> approvedMatches = new ArrayList<>();
+        for (Match match : matches.values()) {
+            if (match.getStatus() == model.domain.MatchStatus.APPROVED) {
+                approvedMatches.add(match);
+            }
+        }
+        return approvedMatches;
     }
 
-    // Metodo per testing - pulisce tutti i dati
-    public void clearAll() {
+    @Override
+    public void updateStatus(int matchId, MatchStatus status) {
+        Match match = matches.get(matchId);
+        if (match != null) {
+            match.setStatus(status);
+        }
+    }
+
+    @Override
+    public void delete(int id) {
+        matches.remove(id);
+    }
+
+    public static void clearAll() {
         matches.clear();
         nextId = 1;
     }

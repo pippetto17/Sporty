@@ -7,7 +7,7 @@ public class PaymentBean {
     private String cardHolder;
     private double amount;
     private int sharesToPay;
-    private String matchId; // Optional connection to match
+    private String matchId;
 
     public String getCardNumber() {
         return cardNumber;

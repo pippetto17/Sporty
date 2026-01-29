@@ -7,11 +7,15 @@ import java.util.List;
 public interface MatchDAO {
     void save(Match match);
 
-    Match findById(int matchId);
+    Match findById(int id);
 
-    List<Match> findByOrganizer(String organizerUsername);
+    List<Match> findByOrganizer(int organizerId);
 
-    List<Match> findAllAvailable();
+    List<Match> findPendingForManager(int managerId);
 
-    void delete(int matchId);
+    List<Match> findApprovedMatches();
+
+    void updateStatus(int matchId, model.domain.MatchStatus status);
+
+    void delete(int id);
 }

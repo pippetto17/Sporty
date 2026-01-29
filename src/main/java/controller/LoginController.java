@@ -2,7 +2,6 @@ package controller;
 
 import exception.ValidationException;
 import model.bean.UserBean;
-import model.dao.DAOFactory;
 import model.dao.UserDAO;
 import model.domain.User;
 import model.utils.Constants;
@@ -10,15 +9,28 @@ import model.utils.Constants;
 public class LoginController {
     private final UserDAO userDAO;
 
-    public LoginController(DAOFactory.PersistenceType persistenceType) {
-        this.userDAO = DAOFactory.getUserDAO(persistenceType);
+    public LoginController(model.dao.DAOFactory daoFactory) {
+        this.userDAO = daoFactory.getUserDAO();
     }
 
-    public User login(UserBean userBean) {
+    public UserBean login(UserBean userBean) throws ValidationException {
         validateNotEmpty(userBean.getUsername(), Constants.ERROR_USERNAME_EMPTY);
         validateNotEmpty(userBean.getPassword(), Constants.ERROR_PASSWORD_EMPTY);
 
-        return userDAO.authenticate(userBean.getUsername(), userBean.getPassword());
+        User user = userDAO.authenticate(userBean.getUsername(), userBean.getPassword());
+
+        if (user == null) {
+            return null;
+        }
+
+        UserBean resultBean = new UserBean();
+        resultBean.setId(user.getId());
+        resultBean.setUsername(user.getUsername());
+        resultBean.setName(user.getName());
+        resultBean.setSurname(user.getSurname());
+        resultBean.setRole(user.getRole().getCode());
+
+        return resultBean;
     }
 
     public void register(UserBean userBean, String name, String surname, int role) throws ValidationException {
@@ -32,7 +44,8 @@ public class LoginController {
             throw new ValidationException(Constants.ERROR_USERNAME_EXISTS);
         }
 
-        var newUser = new User(userBean.getUsername(), userBean.getPassword(), name, surname, role);
+        var newUser = new User(0, userBean.getUsername(), userBean.getPassword(), name, surname,
+                model.domain.Role.fromCode(role));
         userDAO.save(newUser);
     }
 
@@ -49,17 +62,12 @@ public class LoginController {
         };
     }
 
-    private void validateNotEmpty(String value, String errorMessage) {
+    private void validateNotEmpty(String value, String errorMessage) throws ValidationException {
         if (value == null || value.isEmpty()) {
-            throw new IllegalArgumentException(errorMessage);
+            throw new ValidationException(errorMessage);
         }
     }
 
-    /**
-     * Validates all registration input fields
-     * 
-     * @return null if valid, error message string if invalid
-     */
     public String validateRegistrationInputs(String username, String password, String name,
             String surname, String role) {
         if (username == null || username.trim().isEmpty()) {
@@ -77,6 +85,6 @@ public class LoginController {
         if (role == null || role.isEmpty()) {
             return Constants.ERROR_ALL_FIELDS_REQUIRED;
         }
-        return null; // All valid
+        return null;
     }
 }

@@ -16,7 +16,7 @@ public class CLIPaymentView implements PaymentView {
 
     @Override
     public void setApplicationController(ApplicationController applicationController) {
-    // No action needed for CLI view
+        // No action needed for CLI view
     }
 
     @Override
@@ -32,8 +32,9 @@ public class CLIPaymentView implements PaymentView {
     @Override
     public void displayMatchInfo(MatchBean match, int availableShares) {
         System.out.printf("Pagamento per: %s - %s @ %s%n",
+                // getSport() returns Enum, getDisplayName() usage if needed, but keeping simple
                 match.getSport(), match.getCity(), match.getMatchTime());
-        System.out.printf("Prezzo per persona: €%.2f%n", match.getPricePerPerson());
+        // Price moved to dynamic calculation or removed
         System.out.printf("Quote disponibili: 1-%d%n", availableShares);
     }
 
@@ -41,7 +42,7 @@ public class CLIPaymentView implements PaymentView {
     public void displayBookingInfo(FieldBean field, MatchBean context) {
         System.out.printf("Prenotazione: %s - %s il %s @ %s%n",
                 field.getName(), field.getCity(), context.getMatchDate(), context.getMatchTime());
-        System.out.printf("Totale: €%.2f (2h)%n", field.getPricePerHour() * 2);
+        // Total price removed
     }
 
     @Override

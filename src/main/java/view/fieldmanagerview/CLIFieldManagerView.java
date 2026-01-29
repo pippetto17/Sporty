@@ -2,7 +2,7 @@ package view.fieldmanagerview;
 
 import controller.ApplicationController;
 import controller.FieldManagerController;
-import model.bean.BookingBean;
+import model.bean.MatchBean;
 import model.domain.User;
 
 import java.util.List;
@@ -70,8 +70,8 @@ public class CLIFieldManagerView implements FieldManagerView {
 
     private void printMenu() {
         System.out.println("\n1) List Pending Requests");
-        System.out.println("2) Approve Booking");
-        System.out.println("3) Reject Booking");
+        System.out.println("2) Approve Match");
+        System.out.println("3) Reject Match");
         System.out.println("0) Logout");
         System.out.print("> ");
     }
@@ -80,7 +80,7 @@ public class CLIFieldManagerView implements FieldManagerView {
 
     private void listPendingRequests() {
         try {
-            List<BookingBean> pending = controller.getPendingRequests();
+            List<MatchBean> pending = controller.getPendingRequests();
             if (pending.isEmpty()) {
                 System.out.println("\n✓ No pending requests.");
                 return;
@@ -88,16 +88,17 @@ public class CLIFieldManagerView implements FieldManagerView {
 
             System.out.println("\n--- PENDING REQUESTS ---");
             // Intestazione Tabella
-            System.out.printf("%-8s %-15s %-15s %-12s %-12s %s%n", "ID", "FIELD", "USER", "DATE", "TIME", "PRICE");
+            System.out.printf("%-8s %-15s %-15s %-15s %-12s %-12s%n", "ID", "FIELD", "ORGANIZER", "SPORT", "DATE",
+                    "TIME");
 
-            for (BookingBean b : pending) {
-                System.out.printf("[%-6d] %-15s %-15s %-12s %s-%-6s €%.2f%n",
-                        b.getBookingId(), // Mostriamo il VERO ID
-                        truncate(b.getFieldName(), 15),
-                        truncate(b.getRequesterUsername(), 15),
-                        b.getBookingDate(),
-                        b.getStartTime(), b.getEndTime(),
-                        b.getTotalPrice());
+            for (MatchBean m : pending) {
+                System.out.printf("[%-6d] %-15s %-15s %-15s %-12s %s%n",
+                        m.getMatchId(),
+                        truncate(m.getFieldName(), 15),
+                        truncate(m.getOrganizerName(), 15),
+                        truncate(m.getSport().name(), 15),
+                        m.getMatchDate(),
+                        m.getMatchTime());
             }
         } catch (Exception e) {
             System.out.println("Error fetching list: " + e.getMessage());
@@ -105,26 +106,26 @@ public class CLIFieldManagerView implements FieldManagerView {
     }
 
     private void handleApprove() {
-        int id = readInt("Enter Booking ID to APPROVE: ");
+        int id = readInt("Enter Match ID to APPROVE: ");
         if (id == -1)
             return;
 
         try {
-            controller.approveBooking(id);
-            System.out.println("✓ Booking " + id + " approved.");
+            controller.approveMatch(id);
+            System.out.println("✓ Match " + id + " approved.");
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
         }
     }
 
     private void handleReject() {
-        int id = readInt("Enter Booking ID to REJECT: ");
+        int id = readInt("Enter Match ID to REJECT: ");
         if (id == -1)
             return;
 
         try {
-            controller.rejectBooking(id);
-            System.out.println("✓ Booking " + id + " rejected.");
+            controller.rejectMatch(id);
+            System.out.println("✓ Match " + id + " rejected.");
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
         }

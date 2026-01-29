@@ -23,7 +23,6 @@ public class ConnectionFactory {
             }
             properties.load(input);
 
-            // Carica il driver JDBC
             String driver = properties.getProperty("db.driver");
             if (driver != null) {
                 Class.forName(driver);
@@ -33,15 +32,26 @@ public class ConnectionFactory {
         }
     }
 
-    public static Connection getConnection() throws SQLException {
-        String url = properties.getProperty("db.url");
-        String user = properties.getProperty("db.user");
-        String password = properties.getProperty("db.password");
+    private static Connection connection;
 
-        if (url == null || user == null || password == null) {
-            throw new SQLException("Database connection properties are not properly configured.");
+    public static synchronized Connection getConnection() throws SQLException {
+        if (connection == null || connection.isClosed()) {
+            String url = properties.getProperty("db.url");
+            String user = properties.getProperty("db.user");
+            String password = properties.getProperty("db.password");
+
+            if (url == null || user == null || password == null) {
+                throw new SQLException("Database connection properties are not properly configured.");
+            }
+
+            connection = DriverManager.getConnection(url, user, password);
         }
+        return connection;
+    }
 
-        return DriverManager.getConnection(url, user, password);
+    public static synchronized void closeConnection() throws SQLException {
+        if (connection != null && !connection.isClosed()) {
+            connection.close();
+        }
     }
 }

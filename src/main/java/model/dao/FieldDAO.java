@@ -10,17 +10,15 @@ import java.util.List;
 public interface FieldDAO {
     List<Field> findAll();
 
-    Field findById(String fieldId);
+    Field findById(int id);
 
     List<Field> findByCity(String city);
 
-    List<Field> findBySport(Sport sport);
+    List<Field> findAvailableFields(String city, Sport sport, LocalDate date, LocalTime time);
 
-    List<Field> findAvailableFields(Sport sport, String city, LocalDate date, LocalTime time);
-
-    List<Field> findByManagerId(String managerId);
+    List<Field> findByManagerId(int managerId);
 
     void save(Field field);
 
-    void delete(String fieldId);
+    void delete(int id);
 }

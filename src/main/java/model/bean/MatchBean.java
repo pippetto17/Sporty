@@ -5,41 +5,29 @@ import model.domain.Sport;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
 
 public class MatchBean {
-    private Integer matchId;
+    private int matchId;
     private Sport sport;
     private LocalDate matchDate;
     private LocalTime matchTime;
     private String city;
-    private int requiredParticipants;
-    private String organizerUsername;
-    private String fieldId;
-    private Double pricePerPerson;
+    private int missingPlayers;
+    private int organizerId;
+    private String organizerName;
+    private int fieldId;
     private MatchStatus status;
-    private Integer bookingId;
-    private List<String> participants;
 
     public MatchBean() {
-        this.participants = new ArrayList<>();
     }
 
     // Getters and Setters
-    public Integer getBookingId() {
-        return bookingId;
-    }
 
-    public void setBookingId(Integer bookingId) {
-        this.bookingId = bookingId;
-    }
-
-    public Integer getMatchId() {
+    public int getMatchId() {
         return matchId;
     }
 
-    public void setMatchId(Integer matchId) {
+    public void setMatchId(int matchId) {
         this.matchId = matchId;
     }
 
@@ -75,27 +63,35 @@ public class MatchBean {
         this.city = city;
     }
 
-    public int getRequiredParticipants() {
-        return requiredParticipants;
+    public int getMissingPlayers() {
+        return missingPlayers;
     }
 
-    public void setRequiredParticipants(int requiredParticipants) {
-        this.requiredParticipants = requiredParticipants;
+    public void setMissingPlayers(int missingPlayers) {
+        this.missingPlayers = missingPlayers;
     }
 
-    public String getOrganizerUsername() {
-        return organizerUsername;
+    public int getOrganizerId() {
+        return organizerId;
     }
 
-    public void setOrganizerUsername(String organizerUsername) {
-        this.organizerUsername = organizerUsername;
+    public void setOrganizerId(int organizerId) {
+        this.organizerId = organizerId;
     }
 
-    public String getFieldId() {
+    public String getOrganizerName() {
+        return organizerName;
+    }
+
+    public void setOrganizerName(String organizerName) {
+        this.organizerName = organizerName;
+    }
+
+    public int getFieldId() {
         return fieldId;
     }
 
-    public void setFieldId(String fieldId) {
+    public void setFieldId(int fieldId) {
         this.fieldId = fieldId;
     }
 
@@ -107,20 +103,13 @@ public class MatchBean {
         this.status = status;
     }
 
-    public Double getPricePerPerson() {
-        return pricePerPerson;
+    private String fieldName;
+
+    public void setFieldName(String fieldName) {
+        this.fieldName = fieldName;
     }
 
-    public void setPricePerPerson(Double pricePerPerson) {
-        this.pricePerPerson = pricePerPerson;
+    public String getFieldName() {
+        return fieldName;
     }
-
-    public List<String> getParticipants() {
-        return participants;
-    }
-
-    public void setParticipants(List<String> participants) {
-        this.participants = participants;
-    }
-
 }

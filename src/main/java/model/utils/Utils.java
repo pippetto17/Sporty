@@ -1,25 +1,11 @@
 package model.utils;
 
-import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.List;
 
 public final class Utils {
 
-    private Utils() {}
-
-    // Time utilities
-    public static boolean timeRangesOverlap(LocalTime start1, LocalTime end1, LocalTime start2, LocalTime end2) {
-        if (start1 == null || end1 == null || start2 == null || end2 == null) return false;
-        return start1.isBefore(end2) && end1.isAfter(start2);
-    }
-
-    // Price calculation
-    public static double calculatePricePerPerson(double pricePerHour, double hoursBooked, int participants) {
-        if (pricePerHour < 0 || hoursBooked <= 0 || participants <= 0) {
-            throw new IllegalArgumentException("Invalid parameters");
-        }
-        return (pricePerHour * hoursBooked) / participants;
+    private Utils() {
     }
 
     // Italian cities
@@ -41,14 +27,15 @@ public final class Utils {
             "Venezia", "Verbano-Cusio-Ossola", "Vercelli", "Verona", "Vibo Valentia", "Vicenza", "Viterbo"));
 
     public static List<String> searchCitiesByPrefix(String prefix) {
-        if (prefix == null || prefix.trim().isEmpty()) return ITALIAN_CITIES;
+        if (prefix == null || prefix.trim().isEmpty())
+            return ITALIAN_CITIES;
         String lower = prefix.toLowerCase();
         return ITALIAN_CITIES.stream().filter(c -> c.toLowerCase().startsWith(lower)).toList();
     }
 
     public static boolean isValidCity(String city) {
-        if (city == null) return false;
+        if (city == null)
+            return false;
         return ITALIAN_CITIES.stream().anyMatch(c -> c.equalsIgnoreCase(city.trim()));
     }
 }
-

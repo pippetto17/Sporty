@@ -143,10 +143,7 @@ public class CLIBookFieldView implements BookFieldView {
             FieldBean field = fields.get(i);
             System.out.printf("%n%d. %s%n", (i + 1), field.getName());
             System.out.printf("   Sport: %s%n", field.getSport().getDisplayName());
-            System.out.printf("   Address: %s%n", field.getAddress());
-            System.out.printf("   Price: €%.2f/hour (€%.2f/person)%n",
-                    field.getPricePerHour(), field.getPricePerPerson());
-            System.out.printf("   Type: %s%n", field.isIndoor() ? "Indoor" : "Outdoor");
+            System.out.printf("   City: %s%n", field.getCity());
         }
         System.out.println("\n" + SEPARATOR);
     }
@@ -167,10 +164,7 @@ public class CLIBookFieldView implements BookFieldView {
         System.out.println(SEPARATOR);
         System.out.println("Name: " + field.getName());
         System.out.println("Sport: " + field.getSport().getDisplayName());
-        System.out.println("Address: " + field.getAddress() + ", " + field.getCity());
-        System.out.printf("Price per hour: €%.2f%n", field.getPricePerHour());
-        System.out.printf("Price per person: €%.2f%n", field.getPricePerPerson());
-        System.out.println("Type: " + (field.isIndoor() ? "Indoor" : "Outdoor"));
+        System.out.println("City: " + field.getCity());
         System.out.println(SEPARATOR);
     }
 
@@ -192,7 +186,8 @@ public class CLIBookFieldView implements BookFieldView {
         System.out.println("Date: " + bookFieldController.getCurrentMatchBean().getMatchDate());
         System.out.println("Time: " + bookFieldController.getCurrentMatchBean().getMatchTime());
         System.out.println("City: " + bookFieldController.getCurrentMatchBean().getCity());
-        System.out.println("Participants: " + bookFieldController.getCurrentMatchBean().getRequiredParticipants());
+        System.out
+                .println("Participants: " + bookFieldController.getCurrentMatchBean().getSport().getRequiredPlayers());
         System.out.println(SEPARATOR);
     }
 
@@ -252,8 +247,6 @@ public class CLIBookFieldView implements BookFieldView {
         System.out.println("    FIELD SELECTED");
         System.out.println(SEPARATOR);
         System.out.println("Field: " + selectedField.getName());
-        System.out.printf("Total cost: €%.2f (€%.2f per person)%n",
-                selectedField.getPricePerHour(), selectedField.getPricePerPerson());
         System.out.println(SEPARATOR);
 
         System.out.print("\nConfirm selection? (y/n): ");

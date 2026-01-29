@@ -12,9 +12,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
-import model.bean.BookingBean;
+
 import model.domain.User;
-import model.notification.FieldManagerNotificationObserver;
 import model.utils.Constants;
 import view.ViewUtils;
 
@@ -44,25 +43,23 @@ public class GraphicFieldManagerView implements FieldManagerView {
     @FXML
     private Label messageLabel;
     @FXML
-    private TableView<BookingBean> bookingsTable;
+    private TableView<model.bean.MatchBean> bookingsTable;
     @FXML
-    private TableColumn<BookingBean, String> fieldNameColumn;
+    private TableColumn<model.bean.MatchBean, String> fieldNameColumn;
     @FXML
-    private TableColumn<BookingBean, String> requesterColumn;
+    private TableColumn<model.bean.MatchBean, String> requesterColumn;
     @FXML
-    private TableColumn<BookingBean, String> dateColumn;
+    private TableColumn<model.bean.MatchBean, String> dateColumn;
     @FXML
-    private TableColumn<BookingBean, String> timeColumn;
+    private TableColumn<model.bean.MatchBean, String> timeColumn;
     @FXML
-    private TableColumn<BookingBean, String> typeColumn;
-    @FXML
-    private TableColumn<BookingBean, String> priceColumn;
+    private TableColumn<model.bean.MatchBean, String> typeColumn;
     @FXML
     private Button approveButton;
     @FXML
     private Button rejectButton;
 
-    private final ObservableList<BookingBean> bookingsList = FXCollections.observableArrayList();
+    private final ObservableList<model.bean.MatchBean> bookingsList = FXCollections.observableArrayList();
 
     public GraphicFieldManagerView(FieldManagerController controller, User manager) {
         this.controller = controller;
@@ -72,8 +69,8 @@ public class GraphicFieldManagerView implements FieldManagerView {
     @Override
     public void setApplicationController(ApplicationController appController) {
         this.appController = appController;
-        this.notificationService = new model.notification.NotificationService();
-        this.notificationService.subscribe(new FieldManagerNotificationObserver());
+        this.notificationService = model.notification.NotificationService.getInstance();
+        this.notificationService.subscribe(new model.notification.FieldManagerNotificationObserver());
     }
 
     @Override
@@ -108,7 +105,6 @@ public class GraphicFieldManagerView implements FieldManagerView {
     private javafx.scene.image.ImageView managerImageView;
 
     @FXML
-    @SuppressWarnings("unused")
     private void initialize() {
         managerNameLabel.setText("Manager: " + manager.getName() + " " + manager.getSurname());
 
@@ -197,32 +193,32 @@ public class GraphicFieldManagerView implements FieldManagerView {
         VBox requestsBox = new VBox(10);
         requestsBox.setPadding(new javafx.geometry.Insets(10));
 
-        List<BookingBean> pendingRequests = controller.getPendingRequests();
+        List<model.bean.MatchBean> pendingRequests = controller.getPendingRequests();
         populateRequestsBox(requestsBox, pendingRequests);
 
         requestsTab.setContent(new ScrollPane(requestsBox));
         return requestsTab;
     }
 
-    private void populateRequestsBox(VBox requestsBox, List<BookingBean> pendingRequests) {
+    private void populateRequestsBox(VBox requestsBox, List<model.bean.MatchBean> pendingRequests) {
         if (pendingRequests.isEmpty()) {
             requestsBox.getChildren().add(new Label("No pending requests."));
             return;
         }
 
-        for (BookingBean b : pendingRequests) {
-            requestsBox.getChildren().add(createBookingRequestRow(b, requestsBox));
+        for (model.bean.MatchBean m : pendingRequests) {
+            requestsBox.getChildren().add(createMatchRequestRow(m, requestsBox));
         }
     }
 
-    private HBox createBookingRequestRow(BookingBean b, VBox requestsBox) {
+    private HBox createMatchRequestRow(model.bean.MatchBean m, VBox requestsBox) {
         HBox row = new HBox(10);
         row.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
 
         VBox info = new VBox(2);
-        Label title = new Label(b.getFieldName() + " - " + b.getBookingDate());
+        Label title = new Label(m.getFieldName() + " - " + m.getMatchDate());
         title.setStyle("-fx-font-weight: bold");
-        Label subtitle = new Label(b.getStartTime() + " (" + b.getRequesterUsername() + ")");
+        Label subtitle = new Label(m.getMatchTime() + " (" + m.getOrganizerName() + ")");
         info.getChildren().addAll(title, subtitle);
 
         Region spacer = new Region();
@@ -230,19 +226,19 @@ public class GraphicFieldManagerView implements FieldManagerView {
 
         Button approveBtn = new Button("✓");
         approveBtn.getStyleClass().add("success-button");
-        approveBtn.setOnAction(e -> handleApproveFromDialog(b, row, requestsBox));
+        approveBtn.setOnAction(e -> handleApproveFromDialog(m, row, requestsBox));
 
         Button rejectBtn = new Button("✗");
         rejectBtn.getStyleClass().add("danger-button");
-        rejectBtn.setOnAction(e -> handleRejectFromDialog(b, row, requestsBox));
+        rejectBtn.setOnAction(e -> handleRejectFromDialog(m, row, requestsBox));
 
         row.getChildren().addAll(info, spacer, approveBtn, rejectBtn);
         return row;
     }
 
-    private void handleApproveFromDialog(BookingBean b, HBox row, VBox requestsBox) {
+    private void handleApproveFromDialog(model.bean.MatchBean m, HBox row, VBox requestsBox) {
         try {
-            controller.approveBooking(b.getBookingId());
+            controller.approveMatch(m.getMatchId());
             requestsBox.getChildren().remove(row);
             loadData();
             showMessage("Request approved!", false);
@@ -251,9 +247,9 @@ public class GraphicFieldManagerView implements FieldManagerView {
         }
     }
 
-    private void handleRejectFromDialog(BookingBean b, HBox row, VBox requestsBox) {
+    private void handleRejectFromDialog(model.bean.MatchBean m, HBox row, VBox requestsBox) {
         try {
-            controller.rejectBooking(b.getBookingId());
+            controller.rejectMatch(m.getMatchId());
             requestsBox.getChildren().remove(row);
             loadData();
             showMessage("Request rejected", false);
@@ -264,14 +260,12 @@ public class GraphicFieldManagerView implements FieldManagerView {
 
     private void setupTable() {
         fieldNameColumn.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getFieldName()));
-        requesterColumn.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getRequesterUsername()));
-        typeColumn.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getType()));
+        requesterColumn.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getOrganizerName()));
+        typeColumn.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getSport().getDisplayName()));
         dateColumn.setCellValueFactory(
-                d -> new SimpleStringProperty(d.getValue().getBookingDate().format(DateTimeFormatter.ISO_LOCAL_DATE)));
+                d -> new SimpleStringProperty(d.getValue().getMatchDate().format(DateTimeFormatter.ISO_LOCAL_DATE)));
         timeColumn.setCellValueFactory(
-                d -> new SimpleStringProperty(d.getValue().getStartTime() + " - " + d.getValue().getEndTime()));
-        priceColumn.setCellValueFactory(
-                d -> new SimpleStringProperty(String.format("€%.2f", d.getValue().getTotalPrice())));
+                d -> new SimpleStringProperty(d.getValue().getMatchTime().toString()));
 
         bookingsTable.setItems(bookingsList);
 
@@ -297,15 +291,14 @@ public class GraphicFieldManagerView implements FieldManagerView {
     }
 
     @FXML
-    @SuppressWarnings("unused")
     private void handleApprove() {
-        BookingBean selected = bookingsTable.getSelectionModel().getSelectedItem();
+        model.bean.MatchBean selected = bookingsTable.getSelectionModel().getSelectedItem();
         if (selected == null)
             return;
 
         try {
-            controller.approveBooking(selected.getBookingId());
-            showMessage("Booking approved!", false);
+            controller.approveMatch(selected.getMatchId());
+            showMessage("Match approved!", false);
             loadData();
         } catch (Exception e) {
             showMessage("Approval failed: " + e.getMessage(), true);
@@ -313,15 +306,14 @@ public class GraphicFieldManagerView implements FieldManagerView {
     }
 
     @FXML
-    @SuppressWarnings("unused") // Called by FXML
     private void handleReject() {
-        BookingBean selected = bookingsTable.getSelectionModel().getSelectedItem();
+        model.bean.MatchBean selected = bookingsTable.getSelectionModel().getSelectedItem();
         if (selected == null)
             return;
 
         try {
-            controller.rejectBooking(selected.getBookingId());
-            showMessage("Booking rejected", false);
+            controller.rejectMatch(selected.getMatchId());
+            showMessage("Match rejected", false);
             loadData();
         } catch (Exception e) {
             showMessage("Rejection failed: " + e.getMessage(), true);
@@ -329,24 +321,19 @@ public class GraphicFieldManagerView implements FieldManagerView {
     }
 
     @FXML
-    @SuppressWarnings("unused") // Called by FXML
     private void handleRefresh() {
         loadData();
         showMessage("Dashboard refreshed", false);
     }
 
-    @FXML // Navigazione semplificata con null check inline
-    @SuppressWarnings("unused") // Called by FXML
+    @FXML
     private void handleManageFields() {
-        if (appController != null)
-            appController.navigateToMyFields(controller);
+        showMessage("Feature disabled", true);
     }
 
     @FXML
-    @SuppressWarnings("unused") // Called by FXML
     private void handleAddField() {
-        if (appController != null)
-            appController.navigateToAddField(controller);
+        showMessage("Feature disabled", true);
     }
 
     @FXML

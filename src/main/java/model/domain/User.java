@@ -1,26 +1,31 @@
 package model.domain;
 
 public class User {
+    private int id;
     private String username;
     private String password;
     private String name;
     private String surname;
-    private int role; // role code (e.g., 1=ATHLETE, 2=TRAINER, 3=ADMIN)
+    private Role role;
 
     public User() {
     }
 
-    public User(String username, String password) {
-        this.username = username;
-        this.password = password;
-    }
-
-    public User(String username, String password, String name, String surname, int role) {
+    public User(int id, String username, String password, String name, String surname, Role role) {
+        this.id = id;
         this.username = username;
         this.password = password;
         this.name = name;
         this.surname = surname;
         this.role = role;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getUsername() {
@@ -55,38 +60,24 @@ public class User {
         this.surname = surname;
     }
 
-    public int getRole() {
+    public Role getRole() {
         return role;
     }
 
-    public void setRole(int role) {
+    public void setRole(Role role) {
         this.role = role;
     }
 
-    // Behavioral methods - operations instead of just getters
+    // Helper methods for role checking
     public boolean isPlayer() {
-        return this.role == Role.PLAYER.getCode();
+        return role == Role.PLAYER;
     }
 
     public boolean isOrganizer() {
-        return this.role == Role.ORGANIZER.getCode();
+        return role == Role.ORGANIZER;
     }
 
     public boolean isFieldManager() {
-        return this.role == Role.FIELD_MANAGER.getCode();
-    }
-
-    public boolean matchesPassword(String passwordToCheck) {
-        return this.password != null && this.password.equals(passwordToCheck);
-    }
-
-    @Override
-    public String toString() {
-        return "User{" +
-                "username='" + username + '\'' +
-                ", name='" + name + '\'' +
-                ", surname='" + surname + '\'' +
-                ", role=" + role +
-                '}';
+        return role == Role.FIELD_MANAGER;
     }
 }

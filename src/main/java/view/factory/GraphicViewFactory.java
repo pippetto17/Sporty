@@ -1,18 +1,12 @@
 package view.factory;
 
 import controller.*;
-import view.addfieldview.AddFieldView;
-import view.addfieldview.GraphicAddFieldView;
 import view.bookfieldview.BookFieldView;
 import view.bookfieldview.GraphicBookFieldView;
 import view.homeview.GraphicHomeView;
 import view.homeview.HomeView;
-import view.joinmatchview.GraphicJoinMatchView;
-import view.joinmatchview.JoinMatchView;
 import view.loginview.GraphicLoginView;
 import view.loginview.LoginView;
-import view.myfieldsview.GraphicMyFieldsView;
-import view.myfieldsview.MyFieldsView;
 import view.organizematchview.GraphicOrganizeMatchView;
 import view.organizematchview.OrganizeMatchView;
 import view.paymentview.GraphicPaymentView;
@@ -52,18 +46,4 @@ public class GraphicViewFactory implements ViewFactory {
         return new view.fieldmanagerview.GraphicFieldManagerView(controller, controller.getFieldManager());
     }
 
-    @Override
-    public AddFieldView createAddFieldView(controller.FieldManagerController controller) {
-        return new GraphicAddFieldView(controller);
-    }
-
-    @Override
-    public MyFieldsView createMyFieldsView(controller.FieldManagerController controller) {
-        return new GraphicMyFieldsView(controller);
-    }
-
-    @Override
-    public JoinMatchView createJoinMatchView(JoinMatchController controller) {
-        return new GraphicJoinMatchView();
-    }
 }

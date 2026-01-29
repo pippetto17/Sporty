@@ -15,16 +15,11 @@ public class FieldConverter {
         }
 
         Field field = new Field();
-        field.setFieldId(fieldBean.getFieldId());
+        field.setId(fieldBean.getFieldId());
         field.setName(fieldBean.getName());
         field.setSport(fieldBean.getSport());
-        field.setAddress(fieldBean.getAddress());
         field.setCity(fieldBean.getCity());
-        field.setPricePerHour(fieldBean.getPricePerHour());
-        field.setIndoor(fieldBean.isIndoor());
         field.setManagerId(fieldBean.getManagerId());
-        field.setStructureName(fieldBean.getStructureName());
-        field.setAutoApprove(fieldBean.isAutoApprove());
 
         return field;
     }
@@ -35,16 +30,11 @@ public class FieldConverter {
         }
 
         FieldBean fieldBean = new FieldBean();
-        fieldBean.setFieldId(field.getFieldId());
+        fieldBean.setFieldId(field.getId());
         fieldBean.setName(field.getName());
         fieldBean.setSport(field.getSport());
-        fieldBean.setAddress(field.getAddress());
         fieldBean.setCity(field.getCity());
-        fieldBean.setPricePerHour(field.getPricePerHour());
-        fieldBean.setIndoor(field.isIndoor());
         fieldBean.setManagerId(field.getManagerId());
-        fieldBean.setStructureName(field.getStructureName());
-        fieldBean.setAutoApprove(field.getAutoApprove());
 
         return fieldBean;
     }

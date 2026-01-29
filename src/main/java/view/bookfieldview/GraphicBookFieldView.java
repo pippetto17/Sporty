@@ -78,11 +78,10 @@ public class GraphicBookFieldView implements BookFieldView {
                     searchFields();
                 }
 
-                // Initialize Sort ComboBox
+                // Initialize Sort ComboBox - Simplified
                 sortComboBox.getItems().addAll(
-                        "Distance (Coming Soon)",
-                        "Price: Low to High",
-                        "Price: High to Low");
+                        "Name: A-Z",
+                        "Distance (Coming Soon)");
                 sortComboBox.setOnAction(e -> handleSort());
             }
 
@@ -101,15 +100,11 @@ public class GraphicBookFieldView implements BookFieldView {
             return;
 
         switch (selected) {
-            case "Price: Low to High" -> controller.sortFieldsByPrice(true);
-            case "Price: High to Low" -> controller.sortFieldsByPrice(false);
             case "Distance (Coming Soon)" ->
                 showAlert("Info", "Distance sorting is coming soon!", Alert.AlertType.INFORMATION);
             default -> {
-                /* Do nothing for unknown values */ }
+                /* Do nothing */ }
         }
-        // Refresh view with sorted list
-        handleSearchResults(controller.getAvailableFields());
     }
 
     private void displayMatchInfo() {
@@ -122,7 +117,7 @@ public class GraphicBookFieldView implements BookFieldView {
                 match.getCity(),
                 match.getMatchDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
                 match.getMatchTime().format(DateTimeFormatter.ofPattern("HH:mm")),
-                match.getRequiredParticipants());
+                match.getSport().getRequiredPlayers());
 
         matchInfoLabel.setText("Match: " + info);
     }
@@ -172,11 +167,13 @@ public class GraphicBookFieldView implements BookFieldView {
                     !cityField.getText().trim().isEmpty() && datePicker.getValue() != null &&
                     timeCombo.getValue() != null) {
 
+                controller.updateMatchParameters(
+                        sportCombo.getValue(),
+                        cityField.getText().trim(),
+                        datePicker.getValue(),
+                        java.time.LocalTime.parse(timeCombo.getValue()));
+
                 MatchBean contextBean = controller.getCurrentMatchBean();
-                contextBean.setSport(sportCombo.getValue());
-                contextBean.setCity(cityField.getText().trim());
-                contextBean.setMatchDate(datePicker.getValue());
-                contextBean.setMatchTime(java.time.LocalTime.parse(timeCombo.getValue()));
 
                 matchInfoLabel.setText(String.format("Booking: %s - %s - %s %s",
                         contextBean.getSport().getDisplayName(),
@@ -215,7 +212,7 @@ public class GraphicBookFieldView implements BookFieldView {
                 });
     }
 
-    // --- LOGICA DI RICERCA (Async Clean) ---
+    // --- SEARCH LOGIC ---
 
     private void searchFields() {
         resultsLabel.setText("Searching available fields...");
@@ -242,30 +239,28 @@ public class GraphicBookFieldView implements BookFieldView {
         }
     }
 
-    // --- UI FACTORY (Creazione Card) ---
+    // --- UI FACTORY (Card Creation) ---
 
     private VBox createFieldCard(FieldBean field) {
         VBox card = new VBox(10);
         card.getStyleClass().addAll("card", "elevated-1");
         card.setPadding(new Insets(20));
 
-        // 1. Header (Nome + Badge Indoor/Outdoor)
+        // 1. Header
         HBox header = new HBox(10);
         header.setAlignment(Pos.CENTER_LEFT);
         header.getChildren().addAll(
-                createLabel(field.getName(), "title-4"),
-                createBadge(field.isIndoor()));
+                createLabel(field.getName(), "title-4"));
 
         // 2. Info Body
         Label sportLabel = createLabel("⚽ " + field.getSport().getDisplayName(), "text-bold");
-        Label addressLabel = createLabel("📍 " + field.getAddress() + ", " + field.getCity(), "text-small");
+        Label cityLabel = createLabel("📍 " + field.getCity(), "text-small");
 
-        // 3. Footer (Prezzo + Bottone)
         HBox footer = createCardFooter(field, card);
 
-        card.getChildren().addAll(header, sportLabel, addressLabel, footer);
+        card.getChildren().addAll(header, sportLabel, cityLabel, footer);
 
-        // Interazione
+        // Interaction
         card.setOnMouseClicked(e -> selectField(field, card));
         return card;
     }
@@ -274,15 +269,6 @@ public class GraphicBookFieldView implements BookFieldView {
         HBox footer = new HBox(15);
         footer.setAlignment(Pos.CENTER_LEFT);
 
-        VBox prices = new VBox(2);
-        Label perHour = new Label(String.format("€%.2f/hour", field.getPricePerHour()));
-        perHour.getStyleClass().add("text-caption");
-
-        Label perPerson = new Label(String.format("€%.2f per person", field.getPricePerPerson()));
-        perPerson.getStyleClass().addAll("text-bold", Constants.CSS_ACCENT);
-
-        prices.getChildren().addAll(perHour, perPerson);
-
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
@@ -290,7 +276,7 @@ public class GraphicBookFieldView implements BookFieldView {
         selectBtn.getStyleClass().add("button-outlined");
         selectBtn.setOnAction(e -> selectField(field, card));
 
-        footer.getChildren().addAll(prices, spacer, selectBtn);
+        footer.getChildren().addAll(spacer, selectBtn);
         return footer;
     }
 
@@ -302,21 +288,8 @@ public class GraphicBookFieldView implements BookFieldView {
         return l;
     }
 
-    private Label createBadge(boolean isIndoor) {
-        Label l = new Label(isIndoor ? "In" : "Out");
-        l.getStyleClass().addAll("text-small", "pill");
-        if (isIndoor) {
-            l.getStyleClass().add("success"); // Greenish
-        } else {
-            l.getStyleClass().add("warning"); // Orangeish
-        }
-        return l;
-    }
-
-    // --- LOGICA DI SELEZIONE ---
-
     private void selectField(FieldBean field, VBox card) {
-        // Deseleziona visivamente tutti
+        // Deselect visually all
         fieldsContainer.getChildren().stream()
                 .filter(VBox.class::isInstance)
                 .forEach(n -> {
@@ -324,7 +297,7 @@ public class GraphicBookFieldView implements BookFieldView {
                     n.setStyle("");
                 });
 
-        // Seleziona nuovo
+        // Select new
         card.getStyleClass().add(Constants.CSS_ACCENT);
         card.setStyle(
                 "-fx-border-color: -color-accent-emphasis; -fx-border-width: 2px; -fx-background-color: -color-bg-subtle;");
@@ -333,7 +306,7 @@ public class GraphicBookFieldView implements BookFieldView {
         controller.setSelectedField(field);
 
         selectedFieldLabel
-                .setText(String.format("Selected: %s - €%.2f/person", field.getName(), field.getPricePerPerson()));
+                .setText(String.format("Selected: %s", field.getName()));
         confirmButton.setDisable(false);
     }
 
@@ -343,8 +316,7 @@ public class GraphicBookFieldView implements BookFieldView {
             return;
 
         Alert confirm = createStyledAlert(Alert.AlertType.CONFIRMATION, "Confirm Booking",
-                "Book " + selectedField.getName() + "?\n\nTotal per person: "
-                        + String.format("€%.2f", selectedField.getPricePerPerson()));
+                "Book " + selectedField.getName() + "?");
 
         confirm.showAndWait().ifPresent(response -> {
             if (response == ButtonType.OK) {
@@ -391,7 +363,7 @@ public class GraphicBookFieldView implements BookFieldView {
         if (stage != null)
             Platform.runLater(stage::close);
     }
-    // --- IMPLEMENTAZIONE INTERFACCIA BookFieldView ---
+    // --- IMPLEMENTATION OF BookFieldView INTERFACE ---
 
     @Override
     public void displayAvailableFields() {
@@ -405,9 +377,6 @@ public class GraphicBookFieldView implements BookFieldView {
 
     private static final String ERROR_TITLE = "Error";
 
-    /**
-     * Creates a styled Alert dialog that matches the application's dark theme.
-     */
     private Alert createStyledAlert(Alert.AlertType type, String title, String content) {
         Alert alert = new Alert(type);
         alert.setTitle(title);

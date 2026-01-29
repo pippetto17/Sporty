@@ -23,8 +23,8 @@ public class PaymentController {
 
     public PaymentController(ApplicationController applicationController) {
         this.applicationController = applicationController;
-        this.matchDAO = model.dao.DAOFactory.getMatchDAO(applicationController.getPersistenceType());
-        this.notificationService = new model.notification.NotificationService();
+        this.matchDAO = applicationController.getDaoFactory().getMatchDAO();
+        this.notificationService = model.notification.NotificationService.getInstance();
     }
 
     public void setView(PaymentView view) {
@@ -64,7 +64,6 @@ public class PaymentController {
             view.displayMatchInfo(matchBean, availableShares);
         }
 
-        // For CLI views, collect data synchronously. For GUI views, wait for button callback
         if (!(view instanceof view.paymentview.GraphicPaymentView)) {
             PaymentBean paymentData = view.collectPaymentData(bookingMode ? 0 : calculateAvailableShares());
 
@@ -79,19 +78,19 @@ public class PaymentController {
 
     public void processPaymentFromView(PaymentBean paymentData) {
         if (paymentData == null) {
-            view.showError("Dati di pagamento non validi");
+            view.showError(model.utils.Constants.ERROR_PAYMENT_INVALID);
             return;
         }
 
-        double amount = calculateAmount(paymentData.getSharesToPay());
-        paymentData.setAmount(amount);
+        // Amount calculation removed - pricing logic deprecated
+        paymentData.setAmount(0.0);
 
         try {
             boolean success = processPayment(paymentData);
             if (success) {
                 handlePaymentSuccess();
             } else {
-                view.showError("Pagamento rifiutato. Verifica i dati.");
+                view.showError(model.utils.Constants.ERROR_PAYMENT_REJECTED);
             }
         } catch (ValidationException e) {
             view.showError(e.getMessage());
@@ -99,7 +98,7 @@ public class PaymentController {
     }
 
     private void handlePaymentSuccess() {
-        view.showSuccess("Pagamento completato con successo!");
+        view.showSuccess(model.utils.Constants.SUCCESS_PAYMENT);
         if (view instanceof view.paymentview.GraphicPaymentView) {
             handleGraphicViewSuccess();
         } else {
@@ -110,7 +109,7 @@ public class PaymentController {
     private void handleGraphicViewSuccess() {
         new Thread(() -> {
             try {
-                Thread.sleep(1500);
+                Thread.sleep(model.utils.Constants.PAYMENT_SUCCESS_DELAY_MS);
                 javafx.application.Platform.runLater(this::closeAndNavigateBack);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
@@ -134,16 +133,9 @@ public class PaymentController {
     }
 
     private int calculateAvailableShares() {
-        int totalRequired = matchBean.getRequiredParticipants();
-        int currentParticipants = matchBean.getParticipants() != null ? matchBean.getParticipants().size() : 0;
-        return Math.max(1, totalRequired - currentParticipants);
-    }
-
-    private double calculateAmount(int shares) {
-        if (bookingMode && fieldBean != null) {
-            return fieldBean.getPricePerHour() * 2;
-        }
-        return matchBean.getPricePerPerson() * shares;
+        if (matchBean == null)
+            return 1;
+        return matchBean.getMissingPlayers();
     }
 
     private boolean processPayment(PaymentBean paymentBean) throws ValidationException {
@@ -154,7 +146,8 @@ public class PaymentController {
             if (joinMode) {
                 return processJoinPayment();
             } else if (bookingMode) {
-                return processBookingPayment();
+                // Booking mode deprecated/merged into Match
+                return true;
             } else {
                 return processMatchPayment();
             }
@@ -167,8 +160,6 @@ public class PaymentController {
     private String getErrorMessage() {
         if (joinMode)
             return "Error joining match";
-        if (bookingMode)
-            return "Error confirming booking";
         return Constants.ERROR_MATCH_CONFIRM;
     }
 
@@ -177,54 +168,20 @@ public class PaymentController {
             throw new ValidationException("MatchBean cannot be null");
 
         model.domain.Field field = null;
-        if (matchBean.getFieldId() != null) {
-            field = model.dao.DAOFactory.getFieldDAO(applicationController.getPersistenceType())
-                    .findById(matchBean.getFieldId());
+        if (matchBean.getFieldId() != 0) {
+            field = applicationController.getDaoFactory().getFieldDAO().findById(matchBean.getFieldId());
         }
 
-        if (field != null) {
-            model.dao.BookingDAO bookingDAO = model.dao.DAOFactory.getBookingDAO(
-                    applicationController.getPersistenceType());
-
-            model.domain.Booking booking = new model.domain.Booking();
-            booking.setFieldId(field.getFieldId());
-            booking.setRequesterUsername(matchBean.getOrganizerUsername());
-            booking.setBookingDate(matchBean.getMatchDate());
-            booking.setStartTime(matchBean.getMatchTime());
-            booking.setEndTime(matchBean.getMatchTime().plusMinutes(matchBean.getSport().getDuration()));
-            booking.setType(model.domain.BookingType.MATCH);
-            booking.setTotalPrice(field.getPricePerHour() * 2);
-
-            if (field.getAutoApprove() != null && field.getAutoApprove()) {
-                booking.setStatus(model.domain.BookingStatus.CONFIRMED);
-            } else {
-                booking.setStatus(model.domain.BookingStatus.PENDING);
-            }
-
-            bookingDAO.save(booking);
-
-            if (booking.getBookingId() != null) {
-                matchBean.setBookingId(booking.getBookingId());
-            }
-        }
-
-        matchBean.setStatus(model.domain.MatchStatus.CONFIRMED);
-        model.domain.Match match = model.converter.MatchConverter.toEntity(matchBean);
-        matchDAO.save(match);
-
-        if (match.getMatchId() != null) {
-            matchBean.setMatchId(match.getMatchId());
-        }
-
+        // Send notification to manager
         try {
-            if (field != null && field.getManagerId() != null) {
+            if (field != null) {
                 notificationService.notifyMatchCreated(
-                        field.getManagerId(),
-                        match.getOrganizerUsername(),
+                        String.valueOf(field.getManagerId()),
+                        matchBean.getOrganizerName(),
                         field.getName(),
-                        match.getMatchDate().toString(),
-                        match.getMatchTime().toString(),
-                        match.getSport().name());
+                        matchBean.getMatchDate().toString(),
+                        matchBean.getMatchTime().toString(),
+                        matchBean.getSport().name());
             }
         } catch (Exception e) {
             logger.log(Level.WARNING, "Could not send match notification: {0}", e.getMessage());
@@ -242,46 +199,6 @@ public class PaymentController {
         return true;
     }
 
-    private boolean processBookingPayment() throws ValidationException {
-        if (fieldBean == null || matchBean == null)
-            throw new ValidationException("Field and context required for booking");
-
-        model.dao.BookingDAO bookingDAO = model.dao.DAOFactory.getBookingDAO(
-                applicationController.getPersistenceType());
-
-        model.domain.Booking booking = new model.domain.Booking();
-        booking.setFieldId(fieldBean.getFieldId());
-        booking.setRequesterUsername(matchBean.getOrganizerUsername());
-        booking.setBookingDate(matchBean.getMatchDate());
-        booking.setStartTime(matchBean.getMatchTime());
-        int duration = matchBean.getSport() != null ? matchBean.getSport().getDuration() : 120;
-        booking.setEndTime(matchBean.getMatchTime().plusMinutes(duration));
-        booking.setType(model.domain.BookingType.PRIVATE);
-        booking.setTotalPrice(fieldBean.getPricePerHour() * 2);
-        booking.setStatus(model.domain.BookingStatus.CONFIRMED);
-
-        bookingDAO.save(booking);
-
-        try {
-            model.domain.Field field = model.dao.DAOFactory.getFieldDAO(applicationController.getPersistenceType())
-                    .findById(booking.getFieldId());
-            if (field != null && field.getManagerId() != null) {
-                notificationService.notifyBookingCreated(
-                        field.getManagerId(),
-                        booking.getRequesterUsername(),
-                        field.getName(),
-                        booking.getBookingDate().toString(),
-                        booking.getStartTime().toString());
-            }
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "Could not send notification: {0}", e.getMessage());
-        }
-
-        applicationController.back();
-        applicationController.back();
-        return true;
-    }
-
     private boolean processJoinPayment() throws ValidationException {
         if (matchBean == null || joiningUser == null)
             throw new ValidationException("Match and user required for join");
@@ -290,13 +207,14 @@ public class PaymentController {
         if (match == null)
             throw new ValidationException(Constants.ERROR_MATCH_NOT_FOUND);
 
-        if (!match.addParticipant(joiningUser.getUsername())) {
-            throw new ValidationException("Cannot join match");
+        if (match.getMissingPlayers() <= 0) {
+            throw new ValidationException("Match is full");
         }
 
+        match.setMissingPlayers(match.getMissingPlayers() - 1);
         matchDAO.save(match);
 
-        matchBean.setParticipants(match.getParticipants());
+        matchBean.setMissingPlayers(match.getMissingPlayers());
 
         applicationController.back();
         applicationController.back();

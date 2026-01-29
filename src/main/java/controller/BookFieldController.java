@@ -5,7 +5,6 @@ import model.bean.FieldBean;
 import model.bean.MatchBean;
 import model.utils.Constants;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class BookFieldController {
@@ -18,7 +17,7 @@ public class BookFieldController {
 
     public BookFieldController(ApplicationController applicationController) {
         this.applicationController = applicationController;
-        this.fieldDAO = model.dao.DAOFactory.getFieldDAO(applicationController.getPersistenceType());
+        this.fieldDAO = applicationController.getDaoFactory().getFieldDAO();
     }
 
     public void setMatchBean(MatchBean matchBean) {
@@ -47,7 +46,6 @@ public class BookFieldController {
             return;
         }
         currentMatchBean.setFieldId(field.getFieldId());
-        currentMatchBean.setPricePerPerson(field.getPricePerPerson());
     }
 
     public List<FieldBean> searchAvailableFields() {
@@ -56,8 +54,8 @@ public class BookFieldController {
         }
 
         var fields = fieldDAO.findAvailableFields(
-                currentMatchBean.getSport(),
                 currentMatchBean.getCity(),
+                currentMatchBean.getSport(),
                 currentMatchBean.getMatchDate(),
                 currentMatchBean.getMatchTime());
 
@@ -67,34 +65,9 @@ public class BookFieldController {
 
     public List<FieldBean> searchFieldsForDirectBooking(model.domain.Sport sport, String city, java.time.LocalDate date,
             java.time.LocalTime time) {
-        var fields = fieldDAO.findAvailableFields(sport, city, date, time);
+        var fields = fieldDAO.findAvailableFields(city, sport, date, time);
         this.availableFields = convertToFieldBeans(fields);
         return availableFields;
-    }
-
-    public void sortFieldsByPrice(boolean ascending) {
-        if (availableFields == null || availableFields.isEmpty()) {
-            return;
-        }
-
-        var sorted = new ArrayList<>(availableFields);
-        sorted.sort((f1, f2) -> {
-            int result = Double.compare(f1.getPricePerPerson(), f2.getPricePerPerson());
-            return ascending ? result : -result;
-        });
-        this.availableFields = sorted;
-    }
-
-    public List<FieldBean> filterByPriceRange(double minPrice, double maxPrice) {
-        return getAvailableFields().stream()
-                .filter(f -> f.getPricePerPerson() >= minPrice && f.getPricePerPerson() <= maxPrice)
-                .toList();
-    }
-
-    public List<FieldBean> filterByIndoor(boolean indoor) {
-        return getAvailableFields().stream()
-                .filter(f -> f.isIndoor() == indoor)
-                .toList();
     }
 
     public void proceedToPayment() throws ValidationException {
@@ -102,14 +75,6 @@ public class BookFieldController {
             throw new ValidationException(Constants.ERROR_NO_FIELD_SELECTED);
         }
 
-        if (standaloneMode) {
-            applicationController.navigateToPaymentForBooking(selectedField, currentMatchBean);
-            return;
-        }
-
-        if (currentMatchBean.getPricePerPerson() == null) {
-            currentMatchBean.setPricePerPerson(selectedField.getPricePerPerson());
-        }
         applicationController.navigateToPayment(currentMatchBean);
     }
 
@@ -125,5 +90,16 @@ public class BookFieldController {
         return fields.stream()
                 .map(model.converter.FieldConverter::toBean)
                 .toList();
+    }
+
+    public void updateMatchParameters(model.domain.Sport sport, String city, java.time.LocalDate date,
+            java.time.LocalTime time) {
+        if (currentMatchBean == null) {
+            currentMatchBean = new MatchBean();
+        }
+        currentMatchBean.setSport(sport);
+        currentMatchBean.setCity(city);
+        currentMatchBean.setMatchDate(date);
+        currentMatchBean.setMatchTime(time);
     }
 }

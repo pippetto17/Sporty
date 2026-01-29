@@ -121,17 +121,7 @@ public class GraphicOrganizeMatchView implements OrganizeMatchView {
 
         // Initialize sport combo box from controller
         sportComboBox.getItems().addAll(organizeMatchController.getAvailableSports());
-        sportComboBox.setConverter(new StringConverter<Sport>() {
-            @Override
-            public String toString(Sport sport) {
-                return sport != null ? sport.getDisplayName() : "";
-            }
-
-            @Override
-            public Sport fromString(String string) {
-                return null;
-            }
-        });
+        sportComboBox.setConverter(new SportStringConverter());
 
         // Listen to sport selection to update participants info
         sportComboBox.setOnAction(e -> updateParticipantsInfo());
@@ -159,26 +149,42 @@ public class GraphicOrganizeMatchView implements OrganizeMatchView {
             times.add(LocalTime.of(h, 30));
         }
         timeComboBox.getItems().addAll(times);
-        timeComboBox.setConverter(new StringConverter<LocalTime>() {
-            @Override
-            public String toString(LocalTime time) {
-                return time != null ? time.format(DateTimeFormatter.ofPattern("HH:mm")) : "";
-            }
-
-            @Override
-            public LocalTime fromString(String string) {
-                return LocalTime.parse(string);
-            }
-        });
+        timeComboBox.setConverter(new TimeStringConverter());
 
         // Set date picker to today as minimum
-        datePicker.setDayCellFactory(picker -> new DateCell() {
-            @Override
-            public void updateItem(LocalDate date, boolean empty) {
-                super.updateItem(date, empty);
-                setDisable(empty || date.isBefore(LocalDate.now()));
-            }
-        });
+        datePicker.setDayCellFactory(picker -> new FutureDateCell());
+    }
+
+    private static class SportStringConverter extends StringConverter<Sport> {
+        @Override
+        public String toString(Sport sport) {
+            return sport != null ? sport.getDisplayName() : "";
+        }
+
+        @Override
+        public Sport fromString(String string) {
+            return null;
+        }
+    }
+
+    private static class TimeStringConverter extends StringConverter<LocalTime> {
+        @Override
+        public String toString(LocalTime time) {
+            return time != null ? time.format(DateTimeFormatter.ofPattern("HH:mm")) : "";
+        }
+
+        @Override
+        public LocalTime fromString(String string) {
+            return LocalTime.parse(string);
+        }
+    }
+
+    private static class FutureDateCell extends DateCell {
+        @Override
+        public void updateItem(LocalDate date, boolean empty) {
+            super.updateItem(date, empty);
+            setDisable(empty || date.isBefore(LocalDate.now()));
+        }
     }
 
     private void setupCityAutocomplete() {
@@ -193,7 +199,7 @@ public class GraphicOrganizeMatchView implements OrganizeMatchView {
                 if (newValue == null || newValue.isEmpty()) {
                     cityComboBox.hide();
                 } else {
-                    List<String> filtered = organizeMatchController.searchCitiesByPrefix(newValue);
+                    List<String> filtered = model.utils.Utils.searchCitiesByPrefix(newValue);
 
                     // Aggiorna solo se ci sono risultati diversi
                     if (!filtered.equals(cityComboBox.getItems())) {
@@ -252,8 +258,10 @@ public class GraphicOrganizeMatchView implements OrganizeMatchView {
         int participants = participantsSpinner.getValue();
 
         // Validate with controller
-        if (!organizeMatchController.validateMatchDetails(sport, date, time, city, participants)) {
-            showError(Constants.ERROR_INVALID_MATCH_DETAILS);
+        try {
+            organizeMatchController.validateMatchDetails(sport, date, time, city, participants);
+        } catch (exception.ValidationException e) {
+            showError(e.getMessage());
             return;
         }
 

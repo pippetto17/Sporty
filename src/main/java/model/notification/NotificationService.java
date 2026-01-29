@@ -1,7 +1,6 @@
 package model.notification;
 
 import model.dao.NotificationDAO;
-import model.dao.filesystem.NotificationDAOFileSystem;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -13,8 +12,17 @@ public class NotificationService {
     private final List<NotificationObserver> observers = new CopyOnWriteArrayList<>();
     private final NotificationDAO dao;
 
-    public NotificationService() {
-        this.dao = new NotificationDAOFileSystem();
+    private static NotificationService instance;
+
+    private NotificationService() {
+        this.dao = new model.dao.memory.MemoryDAOFactory().getNotificationDAO();
+    }
+
+    public static synchronized NotificationService getInstance() {
+        if (instance == null) {
+            instance = new NotificationService();
+        }
+        return instance;
     }
 
     public void subscribe(NotificationObserver observer) {
@@ -27,32 +35,30 @@ public class NotificationService {
 
     public void notifyBookingCreated(String fieldManagerUsername, String organizerUsername,
             String fieldName, String date, String time) {
-        String message = String.format("%s ha prenotato il campo '%s' per il %s alle %s",
+        String message = String.format("%s has booked the field '%s' for %s at %s",
                 organizerUsername, fieldName, date, time);
 
         NotificationEvent event = new NotificationEvent(
                 NotificationEvent.Type.BOOKING_CREATED,
                 fieldManagerUsername,
                 organizerUsername,
-                "Nuova prenotazione!",
-                message
-        );
+                "New booking!",
+                message);
 
         notifyObservers(event);
     }
 
     public void notifyMatchCreated(String fieldManagerUsername, String organizerUsername,
             String fieldName, String date, String time, String sport) {
-        String message = String.format("%s ha organizzato una partita di %s al campo '%s' per il %s alle %s",
+        String message = String.format("%s has organized a %s match at field '%s' for %s at %s",
                 organizerUsername, sport, fieldName, date, time);
 
         NotificationEvent event = new NotificationEvent(
                 NotificationEvent.Type.MATCH_CREATED,
                 fieldManagerUsername,
                 organizerUsername,
-                "Nuova partita organizzata!",
-                message
-        );
+                "New match organized!",
+                message);
 
         notifyObservers(event);
     }

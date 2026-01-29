@@ -2,6 +2,9 @@ package controller;
 
 import model.bean.MatchBean;
 import model.dao.DAOFactory;
+import model.dao.dbms.DbmsDAOFactory;
+import model.dao.filesystem.FileSystemDAOFactory;
+import model.dao.memory.MemoryDAOFactory;
 import model.domain.Role;
 import model.domain.User;
 import view.View;
@@ -22,7 +25,7 @@ public class ApplicationController {
 
     private final Deque<View> viewStack = new ArrayDeque<>();
     private ViewFactory viewFactory;
-    private DAOFactory.PersistenceType persistenceType;
+    private DAOFactory daoFactory;
 
     public void start() {
         setupConfiguration();
@@ -42,7 +45,7 @@ public class ApplicationController {
         boolean isDemo = scanner.nextLine().trim().equals("1");
 
         if (isDemo) {
-            this.persistenceType = DAOFactory.PersistenceType.MEMORY;
+            this.daoFactory = new MemoryDAOFactory();
             logger.info(() -> "App started in DEMO mode");
             return;
         }
@@ -51,8 +54,13 @@ public class ApplicationController {
         System.out.print("> ");
         boolean isDbms = scanner.nextLine().trim().equals("2");
 
-        this.persistenceType = isDbms ? DAOFactory.PersistenceType.DBMS : DAOFactory.PersistenceType.FILESYSTEM;
-        logger.info(() -> String.format("App started with persistence: %s", persistenceType));
+        if (isDbms) {
+            this.daoFactory = new DbmsDAOFactory();
+            logger.info("App started with persistence: DBMS");
+        } else {
+            this.daoFactory = new FileSystemDAOFactory();
+            logger.info("App started with persistence: FILESYSTEM");
+        }
     }
 
     @SuppressWarnings("resource")
@@ -67,15 +75,29 @@ public class ApplicationController {
 
     // --- NAVIGATION ROUTING ---
 
+    // --- NAVIGATION ROUTING ---
+
     public void navigateToLogin() {
-        var controller = new LoginController(persistenceType);
+        var controller = new LoginController(daoFactory);
         var view = viewFactory.createLoginView(controller);
         view.setApplicationController(this);
         pushView(view);
     }
 
+    public void navigateToHome(model.bean.UserBean userBean) throws ValidationException {
+        // Convert Bean to Entity for internal Controller usage
+        User user = new User(
+                userBean.getId(),
+                userBean.getUsername(),
+                userBean.getPassword(),
+                userBean.getName(),
+                userBean.getSurname(),
+                Role.fromCode(userBean.getRole()));
+        navigateToHome(user);
+    }
+
     public void navigateToHome(User user) throws ValidationException {
-        if (user.getRole() == Role.FIELD_MANAGER.getCode()) {
+        if (user.getRole() == Role.FIELD_MANAGER) {
             navigateToFieldManagerDashboard(user);
         } else {
             navigateToPlayerHome(user);
@@ -83,15 +105,14 @@ public class ApplicationController {
     }
 
     private void navigateToPlayerHome(User user) {
-        var matchDAO = DAOFactory.getMatchDAO(persistenceType);
-        var controller = new HomeController(user, this, matchDAO);
+        var controller = new HomeController(user, this, daoFactory);
         var view = viewFactory.createHomeView(controller);
         view.setApplicationController(this);
         pushView(view);
     }
 
     public void navigateToFieldManagerDashboard(User manager) throws ValidationException {
-        var controller = new FieldManagerController(manager, persistenceType);
+        var controller = new FieldManagerController(manager, daoFactory);
         var view = viewFactory.createFieldManagerView(controller);
         view.setApplicationController(this);
         pushView(view);
@@ -112,19 +133,6 @@ public class ApplicationController {
         pushView(view);
     }
 
-    public void navigateToBookFieldStandalone(User user) {
-        var controller = new BookFieldController(this);
-        controller.setStandaloneMode(true);
-
-        var contextBean = new MatchBean();
-        contextBean.setOrganizerUsername(user.getUsername());
-        controller.setMatchBean(contextBean);
-
-        var view = viewFactory.createBookFieldView(controller);
-        view.setApplicationController(this);
-        pushView(view);
-    }
-
     public void navigateToPayment(MatchBean matchBean) {
         var controller = new PaymentController(this);
         controller.setMatchBean(matchBean);
@@ -133,47 +141,6 @@ public class ApplicationController {
         controller.setView(view);
         pushView(view);
         controller.start();
-    }
-
-    public void navigateToPaymentForBooking(model.bean.FieldBean fieldBean, MatchBean contextBean) {
-        var controller = new PaymentController(this);
-        controller.setBookingMode(fieldBean, contextBean);
-        var view = viewFactory.createPaymentView(controller);
-        view.setApplicationController(this);
-        controller.setView(view);
-        pushView(view);
-        controller.start();
-    }
-
-    public void navigateToPaymentForJoin(MatchBean matchBean, User user) {
-        var controller = new PaymentController(this);
-        controller.setJoinMode(matchBean, user);
-        var view = viewFactory.createPaymentView(controller);
-        view.setApplicationController(this);
-        controller.setView(view);
-        pushView(view);
-        controller.start();
-    }
-
-    public void navigateToJoinMatch(MatchBean matchBean, User user) {
-        var controller = new JoinMatchController(user, this);
-        controller.setMatch(matchBean);
-        var view = viewFactory.createJoinMatchView(controller);
-        view.setApplicationController(this);
-        controller.setView(view);
-        pushView(view);
-        controller.start();
-    }
-
-    public void navigateToAddField(FieldManagerController controller) {
-        var view = viewFactory.createAddFieldView(controller);
-        pushView(view);
-    }
-
-    public void navigateToMyFields(FieldManagerController controller) {
-        var view = viewFactory.createMyFieldsView(controller);
-        view.setApplicationController(this);
-        pushView(view);
     }
 
     // --- STACK MANAGEMENT ---
@@ -212,13 +179,17 @@ public class ApplicationController {
 
     // --- GETTERS ---
 
-    public DAOFactory.PersistenceType getPersistenceType() {
-        return persistenceType;
+    public DAOFactory getDaoFactory() {
+        return daoFactory;
     }
 
     public String getConfigurationInfo() {
-        return persistenceType == DAOFactory.PersistenceType.MEMORY
-                ? "Running DEMO version (data will not be persisted)"
-                : "Running FULL version with " + persistenceType + " persistence";
+        if (daoFactory instanceof MemoryDAOFactory) {
+            return "Running DEMO version (data will not be persisted)";
+        } else if (daoFactory instanceof DbmsDAOFactory) {
+            return "Running FULL version with DBMS persistence";
+        } else {
+            return "Running FULL version with FILESYSTEM persistence";
+        }
     }
 }

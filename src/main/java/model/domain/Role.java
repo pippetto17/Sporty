@@ -3,7 +3,7 @@ package model.domain;
 public enum Role {
     PLAYER(1),
     ORGANIZER(2),
-    FIELD_MANAGER(3); // Field manager who owns and manages fields
+    FIELD_MANAGER(3);
 
     private final int code;
 

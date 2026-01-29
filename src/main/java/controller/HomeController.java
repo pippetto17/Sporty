@@ -2,11 +2,9 @@ package controller;
 
 import exception.ValidationException;
 import model.bean.MatchBean;
-import model.dao.MatchDAO;
 import model.domain.Role;
 import model.domain.Sport;
 import model.domain.User;
-import model.utils.Constants;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -14,17 +12,18 @@ import java.util.List;
 public class HomeController {
     private final User currentUser;
     private final ApplicationController applicationController;
-    private final MatchDAO matchDAO;
+    private final model.dao.UserDAO userDAO;
+    private final model.dao.FieldDAO fieldDAO;
+    private final model.dao.MatchDAO matchDAO;
     private boolean viewAsPlayer;
     private view.homeview.HomeView homeView;
 
-    private final model.dao.FieldDAO fieldDAO;
-
-    public HomeController(User user, ApplicationController applicationController, MatchDAO matchDAO) {
+    public HomeController(User user, ApplicationController applicationController, model.dao.DAOFactory daoFactory) {
         this.currentUser = user;
         this.applicationController = applicationController;
-        this.matchDAO = matchDAO;
-        this.fieldDAO = model.dao.DAOFactory.getFieldDAO(applicationController.getPersistenceType());
+        this.matchDAO = daoFactory.getMatchDAO();
+        this.fieldDAO = daoFactory.getFieldDAO();
+        this.userDAO = daoFactory.getUserDAO();
         this.viewAsPlayer = user.isPlayer();
     }
 
@@ -37,7 +36,7 @@ public class HomeController {
     }
 
     public Role getUserRole() {
-        return Role.fromCode(currentUser.getRole());
+        return currentUser.getRole();
     }
 
     public boolean isViewingAsPlayer() {
@@ -51,29 +50,51 @@ public class HomeController {
     }
 
     public List<MatchBean> getMatches() {
-        List<MatchBean> matches;
-        if (viewAsPlayer) {
-            matches = matchDAO.findAllAvailable().stream()
+        try {
+            List<MatchBean> matches;
+
+            List<model.domain.Match> matchEntities;
+            if (viewAsPlayer) {
+                matchEntities = matchDAO.findApprovedMatches();
+            } else {
+                matchEntities = matchDAO.findByOrganizer(currentUser.getId());
+            }
+
+            matches = matchEntities.stream()
                     .map(model.converter.MatchConverter::toBean)
                     .toList();
-        } else {
-            matches = matchDAO.findByOrganizer(currentUser.getUsername()).stream()
-                    .map(model.converter.MatchConverter::toBean)
-                    .toList();
+
+            for (MatchBean match : matches) {
+                enrichMatchBean(match);
+            }
+
+            return matches;
+        } catch (exception.DataAccessException e) {
+            throw new exception.DataAccessException("Error loading matches: " + e.getMessage(), e);
+        }
+    }
+
+    public MatchBean getMatchById(int matchId) {
+        model.domain.Match matchEntity = matchDAO.findById(matchId);
+        if (matchEntity == null) {
+            return null;
+        }
+        MatchBean matchBean = model.converter.MatchConverter.toBean(matchEntity);
+        enrichMatchBean(matchBean);
+        return matchBean;
+    }
+
+    private void enrichMatchBean(MatchBean match) {
+        model.domain.Field field = fieldDAO.findById(match.getFieldId());
+        if (field != null) {
+            match.setCity(field.getCity());
+            match.setSport(field.getSport());
         }
 
-        // Enrich with Field Price
-        for (MatchBean match : matches) {
-            if (match.getFieldId() != null) {
-                model.domain.Field field = fieldDAO.findById(match.getFieldId());
-                if (field != null) {
-                    model.bean.FieldBean fieldBean = model.converter.FieldConverter.toBean(field);
-                    // This uses the smart calculator we added earlier
-                    match.setPricePerPerson(fieldBean.getPricePerPerson());
-                }
-            }
+        model.domain.User organizer = userDAO.findById(match.getOrganizerId());
+        if (organizer != null) {
+            match.setOrganizerName(organizer.getName() + " " + organizer.getSurname());
         }
-        return matches;
     }
 
     public List<MatchBean> filterMatches(Sport sport, String city, LocalDate date) {
@@ -92,114 +113,22 @@ public class HomeController {
         applicationController.navigateToOrganizeMatch(currentUser);
     }
 
-    public void bookFieldStandalone() {
-        applicationController.navigateToBookFieldStandalone(currentUser);
-    }
-
     public void joinMatch(int matchId) throws ValidationException {
-        var matchBean = getMatches().stream()
-                .filter(m -> m.getMatchId() == matchId)
-                .findFirst()
-                .orElseThrow(() -> new ValidationException("Match not found with ID: " + matchId));
-
-        applicationController.navigateToJoinMatch(matchBean, currentUser);
+        throw new ValidationException("Join Match feature is currently disabled.");
     }
 
     private boolean matchesCity(MatchBean match, String city) {
+        if (match.getCity() == null)
+            return false;
         return match.getCity().equalsIgnoreCase(city.trim());
     }
 
-    // --- UI State Management Methods ---
-
-    public String getSportStyleClass(Sport sport) {
-        if (sport == null)
-            return "sport-default";
-        String name = sport.name().toUpperCase();
-
-        if (name.contains(Constants.FOOTBALL))
-            return "sport-soccer";
-        if (name.contains(Constants.BASKET))
-            return "sport-basket";
-        if (name.contains(Constants.TENNIS) || name.contains(Constants.PADEL))
-            return "sport-tennis";
-
-        return "sport-default";
-    }
-
-    public String getSportImagePath(Sport sport) {
-        if (sport == null)
-            return model.utils.Constants.IMAGE_MEDAL_PATH;
-        String name = sport.name().toUpperCase();
-
-        if (name.contains("FOOTBALL"))
-            return model.utils.Constants.IMAGE_FOOTBALL_PATH;
-        if (name.contains("BASKET"))
-            return model.utils.Constants.IMAGE_BASKETBALL_PATH;
-        if (name.contains("TENNIS"))
-            return model.utils.Constants.IMAGE_TENNIS_PATH;
-        if (name.contains("PADEL"))
-            return model.utils.Constants.IMAGE_PADEL_PATH;
-
-        return model.utils.Constants.IMAGE_MEDAL_PATH;
-    }
-
-    public String getSportEmoji(Sport sport) {
-        if (sport == null)
-            return model.utils.Constants.ICON_EXTRAS_MEDAL;
-        String name = sport.name().toUpperCase();
-        if (name.contains("FOOTBALL"))
-            return model.utils.Constants.ICON_FOOTBALL;
-        if (name.contains("BASKET"))
-            return model.utils.Constants.ICON_BASKETBALL;
-        if (name.contains("TENNIS"))
-            return model.utils.Constants.ICON_TENNIS;
-        if (name.contains("PADEL"))
-            return model.utils.Constants.ICON_PADEL;
-        return model.utils.Constants.ICON_EXTRAS_MEDAL;
-    }
-
-    public boolean shouldShowPriceBadge() {
-        return viewAsPlayer;
-    }
-
-    public boolean shouldShowJoinButton(MatchBean match) {
-        return viewAsPlayer && !isMatchFull(match);
-    }
-
-    public boolean shouldShowOrganizerActions() {
-        return !viewAsPlayer;
-    }
-
-    public String getMatchesTitle() {
-        return viewAsPlayer ? model.utils.Constants.LABEL_EXPLORE_MATCHES
-                : model.utils.Constants.LABEL_YOUR_MATCHES;
-    }
-
-    public int getAvailableSlots(MatchBean match) {
-        if (match == null) {
-            return 0;
-        }
-        int current = getCurrentParticipants(match);
-        return match.getRequiredParticipants() - current;
-    }
-
-    public int getCurrentParticipants(MatchBean match) {
-        return match.getParticipants() != null ? match.getParticipants().size() : 0;
-    }
-
-    public double getCapacityBarProgress(MatchBean match) {
-        if (match == null) {
-            return 0.0;
-        }
-        int current = getCurrentParticipants(match);
-        int max = match.getRequiredParticipants();
-        return max > 0 ? (double) current / max : 0.0;
-    }
+    // --- Business Logic Helpers ---
 
     public boolean isMatchFull(MatchBean match) {
         if (match == null) {
             return true;
         }
-        return getCurrentParticipants(match) >= match.getRequiredParticipants();
+        return match.getMissingPlayers() <= 0;
     }
 }

@@ -1,12 +1,8 @@
 package model.utils;
 
-/**
- * Application-wide constants to avoid string literal duplication.
- */
 public final class Constants {
 
     private Constants() {
-        // Private constructor to prevent instantiation
         throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
     }
 
@@ -82,6 +78,28 @@ public final class Constants {
     public static final String SUCCESS_MATCH_DETAILS_SAVED = "Match details saved successfully!";
     public static final String SUCCESS_REGISTRATION = "Registration successful!";
     public static final String SUCCESS_MATCH_DETAILS_FIELD_SELECTION = "Match details saved! Proceeding to field selection...";
+    public static final String SUCCESS_PAYMENT = "Pagamento completato con successo!";
+
+    // Error messages - Field Manager
+    public static final String ERROR_NOT_FIELD_OWNER = "Manager does not own field: ";
+    public static final String ERROR_NOT_FIELD_MANAGER = "User must be a field manager";
+
+    // Error messages - Payment
+    public static final String ERROR_PAYMENT_INVALID = "Dati di pagamento non validi";
+    public static final String ERROR_PAYMENT_REJECTED = "Pagamento rifiutato. Verifica i dati.";
+
+    // Error messages - Organize Match
+    public static final String ERROR_SPORT_REQUIRED = "Sport must be selected.";
+    public static final String ERROR_DATE_REQUIRED = "Date must be selected.";
+    public static final String ERROR_TIME_REQUIRED = "Time must be selected.";
+    public static final String ERROR_CITY_REQUIRED = "City is required.";
+    public static final String ERROR_CITY_INVALID = "Selected city is not valid.";
+    public static final String ERROR_DATE_IN_PAST = "Date cannot be in the past.";
+    public static final String ERROR_TIME_IN_PAST = "Time cannot be in the past.";
+    public static final String ERROR_INVALID_PARTICIPANTS = "Invalid number of participants for ";
+
+    // Magic numbers
+    public static final int PAYMENT_SUCCESS_DELAY_MS = 1500;
 
     // Info messages
     public static final String INFO_INVITE_COMING_SOON = "Invite players feature coming soon!";

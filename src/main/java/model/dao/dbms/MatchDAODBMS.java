@@ -1,14 +1,15 @@
 package model.dao.dbms;
 
-import exception.DataAccessException;
 import model.dao.MatchDAO;
 import model.domain.Match;
 import model.domain.MatchStatus;
-import model.domain.Sport;
-import model.utils.Constants;
-
-import java.sql.*;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
+
+import java.sql.Connection;
 import java.util.List;
 
 public class MatchDAODBMS implements MatchDAO {
@@ -20,225 +21,129 @@ public class MatchDAODBMS implements MatchDAO {
 
     @Override
     public void save(Match match) {
-        String sql = """
-                INSERT INTO matches (organizer_username, sport, match_date, match_time, city,
-                                    required_participants, field_id, status, participants, booking_id)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                ON DUPLICATE KEY UPDATE
-                    sport = VALUES(sport),
-                    match_date = VALUES(match_date),
-                    match_time = VALUES(match_time),
-                    city = VALUES(city),
-                    required_participants = VALUES(required_participants),
-                    field_id = VALUES(field_id),
-                    status = VALUES(status),
-                    participants = VALUES(participants),
-                    booking_id = VALUES(booking_id)
-                """;
+        String query = "INSERT INTO matches (organizer_id, field_id, date, time, missing_players, status) VALUES (?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement stmt = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
+            stmt.setInt(1, match.getOrganizerId());
+            stmt.setInt(2, match.getFieldId());
+            stmt.setDate(3, java.sql.Date.valueOf(match.getDate()));
+            stmt.setTime(4, java.sql.Time.valueOf(match.getTime()));
+            stmt.setInt(5, match.getMissingPlayers());
+            stmt.setInt(6, match.getStatus().getCode());
 
-        try (PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            stmt.setString(1, match.getOrganizerUsername());
-            stmt.setInt(2, match.getSport().ordinal());
-            stmt.setDate(3, Date.valueOf(match.getMatchDate()));
-            stmt.setTime(4, Time.valueOf(match.getMatchTime()));
-            stmt.setString(5, match.getCity());
-            stmt.setInt(6, match.getRequiredParticipants());
-
-            if (match.getFieldId() != null && !match.getFieldId().isEmpty()) {
-                stmt.setString(7, match.getFieldId());
-            } else {
-                stmt.setNull(7, Types.VARCHAR);
-            }
-
-            stmt.setInt(8, match.getStatus().getCode());
-
-            String participantsJson = serializeParticipantsToJson(match.getParticipants());
-            stmt.setString(9, participantsJson);
-
-            if (match.getBookingId() != null) {
-                stmt.setInt(10, match.getBookingId());
-            } else {
-                stmt.setNull(10, Types.INTEGER);
-            }
-
-            stmt.executeUpdate();
-
-            if (match.getMatchId() == null) {
-                try (ResultSet rs = stmt.getGeneratedKeys()) {
-                    if (rs.next()) {
-                        match.setMatchId(rs.getInt(1));
+            int affectedRows = stmt.executeUpdate();
+            if (affectedRows > 0) {
+                try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        match.setId(generatedKeys.getInt(1));
                     }
                 }
             }
         } catch (SQLException e) {
-            throw new DataAccessException(Constants.ERROR_SAVING_MATCH + e.getMessage(), e);
+            throw new exception.DataAccessException("Error saving match", e);
         }
     }
 
     @Override
-    public Match findById(int matchId) {
-        String sql = """
-                SELECT match_id, organizer_username, sport, match_date, match_time,
-                       city, required_participants, field_id, status, participants, booking_id
-                FROM matches
-                WHERE match_id = ?
-                """;
-
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, matchId);
+    public Match findById(int id) {
+        String query = "SELECT * FROM matches WHERE id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setInt(1, id);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    return extractMatchFromResultSet(rs);
+                    return mapRowToMatch(rs);
                 }
             }
         } catch (SQLException e) {
-            throw new DataAccessException(Constants.ERROR_FINDING_MATCH_BY_ID + e.getMessage(), e);
+            throw new exception.DataAccessException("Error finding match by id: " + id, e);
         }
         return null;
     }
 
     @Override
-    public List<Match> findByOrganizer(String organizerUsername) {
-        String sql = "SELECT match_id, organizer_username, sport, match_date, match_time, " +
-                "city, required_participants, field_id, status, participants, booking_id FROM matches " +
-                "WHERE organizer_username = ? ORDER BY match_date DESC, match_time DESC";
+    public List<Match> findByOrganizer(int organizerId) {
         List<Match> matches = new ArrayList<>();
-
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setString(1, organizerUsername);
-            ResultSet rs = stmt.executeQuery();
-
-            while (rs.next()) {
-                matches.add(extractMatchFromResultSet(rs));
+        String query = "SELECT * FROM matches WHERE organizer_id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setInt(1, organizerId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    matches.add(mapRowToMatch(rs));
+                }
             }
         } catch (SQLException e) {
-            throw new DataAccessException(Constants.ERROR_FINDING_MATCHES_BY_ORGANIZER + e.getMessage(), e);
+            throw new exception.DataAccessException("Error finding matches by organizer: " + organizerId, e);
         }
         return matches;
     }
 
     @Override
-    public List<Match> findAllAvailable() {
-        String sql = "SELECT match_id, organizer_username, sport, match_date, match_time, " +
-                "city, required_participants, field_id, status, participants, booking_id FROM matches " +
-                "WHERE status = ? AND match_date >= CURDATE() ORDER BY match_date, match_time";
+    public List<Match> findPendingForManager(int managerId) {
         List<Match> matches = new ArrayList<>();
-
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, MatchStatus.CONFIRMED.getCode());
-            ResultSet rs = stmt.executeQuery();
-
-            while (rs.next()) {
-                matches.add(extractMatchFromResultSet(rs));
+        String query = "SELECT m.* FROM matches m " +
+                "JOIN field f ON m.field_id = f.id " +
+                "WHERE f.manager_id = ? AND m.status = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setInt(1, managerId);
+            stmt.setInt(2, model.domain.MatchStatus.PENDING.getCode());
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    matches.add(mapRowToMatch(rs));
+                }
             }
         } catch (SQLException e) {
-            throw new DataAccessException(Constants.ERROR_FINDING_AVAILABLE_MATCHES + e.getMessage(), e);
+            throw new exception.DataAccessException("Error finding pending matches for manager: " + managerId, e);
         }
         return matches;
     }
 
     @Override
-    public void delete(int matchId) {
-        String sql = "DELETE FROM matches WHERE match_id = ?";
-
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, matchId);
+    public void updateStatus(int matchId, MatchStatus status) {
+        String query = "UPDATE matches SET status = ? WHERE id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setInt(1, status.getCode());
+            stmt.setInt(2, matchId);
             stmt.executeUpdate();
         } catch (SQLException e) {
-            throw new DataAccessException(Constants.ERROR_DELETING_MATCH + e.getMessage(), e);
+            throw new exception.DataAccessException("Error updating match status for match id: " + matchId, e);
         }
     }
 
-    private Match extractMatchFromResultSet(ResultSet rs) throws SQLException {
-        Match match = new Match();
-        match.setMatchId(rs.getInt("match_id"));
-        match.setOrganizerUsername(rs.getString("organizer_username"));
-        match.setSport(Sport.values()[rs.getInt("sport")]);
-
-        Date sqlDate = rs.getDate("match_date");
-        match.setMatchDate(sqlDate != null ? sqlDate.toLocalDate() : null);
-
-        Time sqlTime = rs.getTime("match_time");
-        match.setMatchTime(sqlTime != null ? sqlTime.toLocalTime() : null);
-
-        match.setCity(rs.getString("city"));
-        match.setRequiredParticipants(rs.getInt("required_participants"));
-
-        String fieldId = rs.getString("field_id");
-        match.setFieldId(fieldId);
-
-        match.setStatus(MatchStatus.fromCode(rs.getInt("status")));
-
-        String participantsJson = rs.getString("participants");
-        List<String> participants = deserializeParticipantsFromJson(participantsJson);
-        match.setParticipants(participants);
-
-        int bookingId = rs.getInt("booking_id");
-        if (!rs.wasNull()) {
-            match.setBookingId(bookingId);
-        }
-
-        return match;
-    }
-
-    /**
-     * Serialize a list of participants to JSON array format.
-     * Example: ["user1", "user2", "user3"]
-     */
-    private String serializeParticipantsToJson(List<String> participants) {
-        if (participants == null || participants.isEmpty()) {
-            return "[]";
-        }
-
-        StringBuilder json = new StringBuilder("[");
-        for (int i = 0; i < participants.size(); i++) {
-            if (i > 0) {
-                json.append(",");
+    @Override
+    public List<Match> findApprovedMatches() {
+        List<Match> matches = new ArrayList<>();
+        String query = "SELECT * FROM matches WHERE status = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setInt(1, model.domain.MatchStatus.APPROVED.getCode());
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    matches.add(mapRowToMatch(rs));
+                }
             }
-            json.append("\"").append(escapeJson(participants.get(i))).append("\"");
+        } catch (SQLException e) {
+            throw new exception.DataAccessException("Error finding approved matches", e);
         }
-        json.append("]");
-        return json.toString();
+        return matches;
     }
 
-    /**
-     * Deserialize JSON array to list of participants.
-     * Example: ["user1", "user2"] -> List.of("user1", "user2")
-     */
-    private List<String> deserializeParticipantsFromJson(String json) {
-        if (json == null || json.trim().isEmpty() || "[]".equals(json.trim())) {
-            return new ArrayList<>();
+    @Override
+    public void delete(int id) {
+        String query = "DELETE FROM matches WHERE id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setInt(1, id);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new exception.DataAccessException("Error deleting match with id: " + id, e);
         }
-
-        List<String> participants = new ArrayList<>();
-        // Remove brackets and split by comma
-        String content = json.trim().substring(1, json.trim().length() - 1);
-        if (content.isEmpty()) {
-            return participants;
-        }
-
-        String[] parts = content.split(",");
-        for (String part : parts) {
-            // Remove quotes and whitespace
-            String username = part.trim().replaceAll("(^\")|(\"$)", "");
-            if (!username.isEmpty()) {
-                participants.add(username);
-            }
-        }
-        return participants;
     }
 
-    /**
-     * Escape special JSON characters in a string.
-     */
-    private String escapeJson(String str) {
-        if (str == null) {
-            return "";
-        }
-        return str.replace("\\", "\\\\")
-                .replace("\"", "\\\"")
-                .replace("\n", "\\n")
-                .replace("\r", "\\r")
-                .replace("\t", "\\t");
+    private Match mapRowToMatch(ResultSet rs) throws SQLException {
+        return new Match(
+                rs.getInt("id"),
+                rs.getInt("organizer_id"),
+                rs.getInt("field_id"),
+                rs.getDate("date").toLocalDate(),
+                rs.getTime("time").toLocalTime(),
+                rs.getInt("missing_players"),
+                model.domain.MatchStatus.fromCode(rs.getInt("status")));
     }
 }

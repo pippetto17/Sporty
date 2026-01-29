@@ -93,15 +93,15 @@ public class GraphicPaymentView implements PaymentView {
     public void displayMatchInfo(MatchBean match, int availableShares) {
         Platform.runLater(() -> {
             matchInfoLabel.setText(String.format("Payment for: %s - %s @ %s",
-                    match.getSport(), match.getCity(), match.getMatchTime()));
+                    match.getSport().getDisplayName(), match.getCity(), match.getMatchTime()));
 
             maxAvailableShares = availableShares;
             sharesComboBox.setItems(FXCollections.observableArrayList(
                     IntStream.rangeClosed(1, availableShares).boxed().toList()));
             sharesComboBox.setValue(1);
-            sharesComboBox.getSelectionModel().selectedItemProperty()
-                    .addListener((obs, oldVal, newVal) -> updateAmount(match.getPricePerPerson()));
-            updateAmount(match.getPricePerPerson());
+
+            // Price removed, update simplified
+            amountLabel.setText("Total: Check with Organizer");
         });
     }
 
@@ -112,7 +112,7 @@ public class GraphicPaymentView implements PaymentView {
                     field.getName(), field.getCity(), context.getMatchDate(), context.getMatchTime()));
 
             sharesComboBox.setVisible(false);
-            amountLabel.setText(String.format("Total Amount: €%.2f (2h slot)", field.getPricePerHour() * 2));
+            amountLabel.setText("Total Amount: See Field Rate");
             maxAvailableShares = 0; // No shares for booking mode
         });
     }
@@ -144,11 +144,6 @@ public class GraphicPaymentView implements PaymentView {
         // The amount will be set by the controller based on the shares and price
         // This view only collects the payment details and shares
         return paymentBean;
-    }
-
-    private void updateAmount(double pricePerPerson) {
-        double total = pricePerPerson * sharesComboBox.getValue();
-        amountLabel.setText(String.format("Total: € %.2f", total));
     }
 
     @FXML

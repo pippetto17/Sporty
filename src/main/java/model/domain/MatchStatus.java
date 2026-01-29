@@ -1,9 +1,9 @@
 package model.domain;
 
 public enum MatchStatus {
-    DRAFT(0, "Draft"),
-    CONFIRMED(1, "Confirmed"),
-    CANCELLED(2, "Cancelled");
+    PENDING(0, "Pending"),
+    APPROVED(1, "Approved"),
+    REJECTED(2, "Rejected");
 
     private final int code;
     private final String displayName;
@@ -35,4 +35,3 @@ public enum MatchStatus {
         return displayName;
     }
 }
-

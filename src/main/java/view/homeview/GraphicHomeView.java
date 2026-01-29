@@ -20,7 +20,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-@SuppressWarnings("unused")
 public class GraphicHomeView implements HomeView {
     private final HomeController homeController;
     private ApplicationController applicationController;
@@ -248,11 +247,11 @@ public class GraphicHomeView implements HomeView {
 
         // 1. HEADER
         StackPane imageHeader = new StackPane();
-        String sportClass = homeController.getSportStyleClass(match.getSport());
+        String sportClass = view.ViewUtils.getSportStyleClass(match.getSport());
         imageHeader.getStyleClass().addAll("card-image-area", sportClass);
 
         // Icona specifica (Immagine)
-        String imagePath = homeController.getSportImagePath(match.getSport());
+        String imagePath = view.ViewUtils.getSportImagePath(match.getSport());
         javafx.scene.image.ImageView sportIcon = new javafx.scene.image.ImageView();
         try {
             javafx.scene.image.Image img = new javafx.scene.image.Image(
@@ -269,16 +268,8 @@ public class GraphicHomeView implements HomeView {
         }
         imageHeader.getChildren().add(sportIcon);
 
-        // PRICE BADGE - Show ONLY if viewing as Player
-        if (homeController.shouldShowPriceBadge()) {
-            Label priceBadge = new Label(
-                    match.getPricePerPerson() != null ? String.format("€%.0f", match.getPricePerPerson())
-                            : model.utils.Constants.MATCH_DETAIL_FREE);
-            priceBadge.getStyleClass().add(model.utils.Constants.CSS_CARD_PRICE_BADGE);
-            StackPane.setAlignment(priceBadge, Pos.TOP_RIGHT);
-            StackPane.setMargin(priceBadge, new Insets(10));
-            imageHeader.getChildren().add(priceBadge);
-        }
+        // PRICE BADGE - Removed as price is no longer in MatchBean
+        // Match price is determined at a later stage or considered shared.
 
         // 2. CONTENT
         VBox content = new VBox(5);
@@ -293,9 +284,9 @@ public class GraphicHomeView implements HomeView {
                 + model.utils.Constants.ICON_CLOCK + match.getMatchTime());
         dateLabel.getStyleClass().add(model.utils.Constants.CSS_CARD_SUBTITLE);
 
-        int current = homeController.getCurrentParticipants(match);
-        int max = match.getRequiredParticipants();
-        ProgressBar capacityBar = new ProgressBar(homeController.getCapacityBarProgress(match));
+        int current = view.ViewUtils.getCurrentParticipants(match);
+        int max = match.getSport().getRequiredPlayers();
+        ProgressBar capacityBar = new ProgressBar(view.ViewUtils.getCapacityBarProgress(match));
         capacityBar.getStyleClass().addAll(model.utils.Constants.CSS_CARD_PROGRESS_BAR, sportClass + "-bar");
         capacityBar.setPrefWidth(Double.MAX_VALUE);
 
@@ -307,7 +298,7 @@ public class GraphicHomeView implements HomeView {
         content.getChildren().addAll(locationTitle, dateLabel, new Region(), playersBox, capacityBar);
 
         // Add join button if appropriate
-        if (homeController.shouldShowJoinButton(match)) {
+        if (homeController.isViewingAsPlayer() && !homeController.isMatchFull(match)) {
             Button joinButton = new Button(model.utils.Constants.BTN_JOIN_MATCH);
             joinButton.getStyleClass().addAll(model.utils.Constants.CSS_SUCCESS, model.utils.Constants.CSS_SMALL);
             joinButton.setOnAction(e -> {
@@ -409,10 +400,11 @@ public class GraphicHomeView implements HomeView {
     }
 
     private void updateViewMode() {
-        boolean showOrganizerActions = homeController.shouldShowOrganizerActions();
+        boolean showOrganizerActions = !homeController.isViewingAsPlayer();
         organizerActionsBox.setVisible(showOrganizerActions);
         organizerActionsBox.setManaged(showOrganizerActions);
-        matchesTitle.setText(homeController.getMatchesTitle());
+        matchesTitle.setText(homeController.isViewingAsPlayer() ? model.utils.Constants.LABEL_EXPLORE_MATCHES
+                : model.utils.Constants.LABEL_YOUR_MATCHES);
     }
 
     @Override
@@ -422,11 +414,8 @@ public class GraphicHomeView implements HomeView {
 
     @Override
     public void showMatchDetails(int matchId) {
-        // Find match from current matches list
-        model.bean.MatchBean match = homeController.getMatches().stream()
-                .filter(m -> m.getMatchId() == matchId)
-                .findFirst()
-                .orElse(null);
+        // Find match from controller
+        model.bean.MatchBean match = homeController.getMatchById(matchId);
 
         if (match == null) {
             displayError("Match not found!");
@@ -444,19 +433,16 @@ public class GraphicHomeView implements HomeView {
         // Common Info
         content.getChildren().add(new Label("Date: " + match.getMatchDate()));
         content.getChildren().add(new Label("Time: " + match.getMatchTime()));
-        content.getChildren().add(new Label("Field: " + (match.getFieldId() != null ? match.getFieldId() : "TBD")));
+        content.getChildren().add(new Label("Field: " + (match.getFieldName() != null ? match.getFieldName() : "TBD")));
+        content.getChildren().add(new Label("Organizer: " + match.getOrganizerName()));
 
         // Role Specific Info
-        double pricePerHead = (match.getPricePerPerson() != null) ? match.getPricePerPerson() : 0.0;
-        int totalPlayers = match.getRequiredParticipants();
+        int totalPlayers = match.getSport().getRequiredPlayers();
 
         if (homeController.isViewingAsPlayer()) {
             // PLAYER VIEW
-            double totalPrice = pricePerHead * totalPlayers;
-            int joined = (match.getParticipants() != null) ? match.getParticipants().size() : 0;
+            int joined = view.ViewUtils.getCurrentParticipants(match);
 
-            content.getChildren().add(new Label(String.format("Price to Pay: €%.2f", pricePerHead)));
-            content.getChildren().add(new Label(String.format("Total Match Cost: €%.2f", totalPrice)));
             content.getChildren().add(new Label(String.format("Players Joined: %d/%d", joined, totalPlayers)));
 
             ButtonType joinBtn = new ButtonType("Join Match", ButtonBar.ButtonData.OK_DONE);
@@ -472,10 +458,7 @@ public class GraphicHomeView implements HomeView {
 
         } else {
             // ORGANIZER VIEW
-            double totalPrice = pricePerHead * totalPlayers;
-
-            content.getChildren().add(new Label(String.format("Total Match Cost: €%.2f", totalPrice)));
-            content.getChildren().add(new Label(String.format("My Cost: €%.2f", pricePerHead))); // Assuming 1 share
+            content.getChildren().add(new Label(String.format("Required Players: %d", totalPlayers)));
 
             ButtonType inviteBtn = new ButtonType("Invite Player", ButtonBar.ButtonData.OTHER);
             ButtonType cancelBtn = new ButtonType("Cancel Match", ButtonBar.ButtonData.FINISH);
@@ -512,7 +495,7 @@ public class GraphicHomeView implements HomeView {
 
     @FXML
     private void handleBookField() {
-        homeController.bookFieldStandalone();
+        displayError("Feature disabled");
     }
 
     @FXML

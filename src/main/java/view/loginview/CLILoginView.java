@@ -3,7 +3,6 @@ package view.loginview;
 import controller.ApplicationController;
 import controller.LoginController;
 import model.bean.UserBean;
-import model.domain.User;
 import model.utils.Constants;
 
 import java.util.Scanner;
@@ -74,20 +73,24 @@ public class CLILoginView implements LoginView {
         System.out.println("\n--- LOGIN ---");
         UserBean userBean = getUserCredentials();
 
-        User user = loginController.login(userBean);
-        if (user != null) {
-            displayLoginSuccess(user.getUsername());
-            System.out.println("Name: " + user.getName() + " " + user.getSurname());
-            System.out.println("Role: " + model.domain.Role.fromCode(user.getRole()));
+        try {
+            UserBean user = loginController.login(userBean);
+            if (user != null) {
+                displayLoginSuccess(user.getUsername());
+                System.out.println("Name: " + user.getName() + " " + user.getSurname());
+                System.out.println("Role: " + user.getRole());
 
-            running = false;
-            try {
-                applicationController.navigateToHome(user);
-            } catch (exception.ValidationException e) {
-                displayLoginError(e.getMessage());
+                running = false;
+                try {
+                    applicationController.navigateToHome(user);
+                } catch (exception.ValidationException e) {
+                    displayLoginError(e.getMessage());
+                }
+            } else {
+                displayLoginError(Constants.ERROR_INVALID_CREDENTIALS);
             }
-        } else {
-            displayLoginError(Constants.ERROR_INVALID_CREDENTIALS);
+        } catch (exception.ValidationException e) {
+            displayLoginError(e.getMessage());
         }
     }
 

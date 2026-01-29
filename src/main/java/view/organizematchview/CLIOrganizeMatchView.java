@@ -101,16 +101,17 @@ public class CLIOrganizeMatchView implements OrganizeMatchView {
         }
 
         // Validate and save match details
-        if (organizeMatchController.validateMatchDetails(selectedSport, selectedDate, selectedTime, city,
-                participants)) {
+        try {
+            organizeMatchController.validateMatchDetails(selectedSport, selectedDate, selectedTime, city, participants);
+
             organizeMatchController.setMatchDetails(selectedSport, selectedDate, selectedTime, city, participants);
             displaySuccess("Match details saved successfully!");
             displayMatchSummary();
 
             System.out.println("\nProceeding to field selection...");
             organizeMatchController.proceedToFieldSelection();
-        } else {
-            displayError("Invalid match details. Please check your inputs.");
+        } catch (exception.ValidationException e) {
+            displayError(e.getMessage());
         }
     }
 
@@ -174,7 +175,7 @@ public class CLIOrganizeMatchView implements OrganizeMatchView {
         if (date == null)
             return null;
 
-        if (date.isBefore(java.time.LocalDate.now())) {
+        if (!organizeMatchController.isDateValid(date)) {
             displayError("Date cannot be in the past.");
             return null;
         }
@@ -205,12 +206,12 @@ public class CLIOrganizeMatchView implements OrganizeMatchView {
         System.out.println("Total players needed: " + sport.getRequiredPlayers());
         System.out.println("You (organizer) count as the first player.");
 
-        int maxAdditional = sport.getAdditionalParticipantsNeeded();
+        int maxAdditional = sport.getRequiredPlayers() - 1;
         System.out.print("Enter number of additional participants needed (1-" + maxAdditional + "): ");
 
         try {
             int participants = Integer.parseInt(scanner.nextLine().trim());
-            if (sport.isValidAdditionalParticipants(participants)) {
+            if (participants >= 1 && participants <= maxAdditional) {
                 return participants;
             }
         } catch (NumberFormatException e) {
@@ -227,7 +228,8 @@ public class CLIOrganizeMatchView implements OrganizeMatchView {
         System.out.println("Date: " + organizeMatchController.getCurrentMatchBean().getMatchDate());
         System.out.println("Time: " + organizeMatchController.getCurrentMatchBean().getMatchTime());
         System.out.println("City: " + organizeMatchController.getCurrentMatchBean().getCity());
-        System.out.println("Participants: " + organizeMatchController.getCurrentMatchBean().getRequiredParticipants());
+        System.out.println(
+                "Participants: " + organizeMatchController.getCurrentMatchBean().getSport().getRequiredPlayers());
         System.out.println(Constants.SEPARATOR);
     }
 
@@ -249,15 +251,11 @@ public class CLIOrganizeMatchView implements OrganizeMatchView {
         System.out.println("  Time:         " + (matchBean.getMatchTime() != null ? matchBean.getMatchTime() : "N/A"));
         System.out.println("  Location:     " + (matchBean.getCity() != null ? matchBean.getCity() : "N/A"));
         System.out.println("  Organizer:    "
-                + (matchBean.getOrganizerUsername() != null ? matchBean.getOrganizerUsername() : "N/A"));
-        System.out.println("  Players:      0/" + matchBean.getRequiredParticipants());
+                + (matchBean.getOrganizerName() != null ? matchBean.getOrganizerName() : "N/A"));
+        System.out.println("  Players:      0/" + matchBean.getSport().getRequiredPlayers());
 
-        if (matchBean.getFieldId() != null) {
+        if (matchBean.getFieldId() != 0) {
             System.out.println("  Field:        " + matchBean.getFieldId());
-        }
-
-        if (matchBean.getPricePerPerson() != null) {
-            System.out.println("  Price/Person: €" + String.format("%.2f", matchBean.getPricePerPerson()));
         }
 
         System.out.println("  Status:       " + (matchBean.getStatus() != null ? matchBean.getStatus() : "CONFIRMED"));

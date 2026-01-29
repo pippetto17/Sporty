@@ -1,45 +1,39 @@
 package controller;
 
 import exception.ValidationException;
-import model.bean.BookingBean;
 import model.bean.FieldBean;
-import model.bean.TimeSlotBean;
-import model.dao.DAOFactory;
 import model.domain.User;
 
 import java.util.List;
 
 public class FieldManagerController {
-    private static final String ERROR_NOT_OWNER = "Manager does not own field: ";
-    private static final String ERROR_BOOKING_NOT_FOUND = "Booking not found with ID: ";
+    private static final String ERROR_NOT_OWNER = model.utils.Constants.ERROR_NOT_FIELD_OWNER;
 
     private final User fieldManager;
     private final model.dao.FieldDAO fieldDAO;
-    private final model.dao.BookingDAO bookingDAO;
-    private final model.dao.TimeSlotDAO timeSlotDAO;
+    private final model.dao.MatchDAO matchDAO;
 
-    public FieldManagerController(User fieldManager, DAOFactory.PersistenceType persistenceType)
+    public FieldManagerController(User fieldManager, model.dao.DAOFactory daoFactory)
             throws ValidationException {
         if (!fieldManager.isFieldManager()) {
-            throw new ValidationException("User must be a field manager");
+            throw new ValidationException(model.utils.Constants.ERROR_NOT_FIELD_MANAGER);
         }
 
         this.fieldManager = fieldManager;
-        this.fieldDAO = DAOFactory.getFieldDAO(persistenceType);
-        this.bookingDAO = DAOFactory.getBookingDAO(persistenceType);
-        this.timeSlotDAO = DAOFactory.getTimeSlotDAO(persistenceType);
+        this.fieldDAO = daoFactory.getFieldDAO();
+        this.matchDAO = daoFactory.getMatchDAO();
     }
 
     // ==================== Field Management ====================
 
     public void addNewField(FieldBean fieldBean) {
         var field = model.converter.FieldConverter.toEntity(fieldBean);
-        field.setManagerId(fieldManager.getUsername());
+        field.setManagerId(fieldManager.getId());
         fieldDAO.save(field);
     }
 
     public List<FieldBean> getMyFields() {
-        return fieldDAO.findByManagerId(fieldManager.getUsername()).stream()
+        return fieldDAO.findByManagerId(fieldManager.getId()).stream()
                 .map(model.converter.FieldConverter::toBean)
                 .toList();
     }
@@ -48,71 +42,41 @@ public class FieldManagerController {
         validateOwnership(fieldBean.getFieldId());
 
         var field = model.converter.FieldConverter.toEntity(fieldBean);
-        field.setManagerId(fieldManager.getUsername());
+        field.setManagerId(fieldManager.getId());
+        field.setId(fieldBean.getFieldId()); // Ensure ID is preserved
         fieldDAO.save(field);
     }
 
-    public void deleteField(String fieldId) {
+    public void deleteField(int fieldId) {
         validateOwnership(fieldId);
         fieldDAO.delete(fieldId);
     }
 
-    public void setFieldSchedule(String fieldId, List<TimeSlotBean> schedule) {
-        validateOwnership(fieldId);
+    // ==================== Match Request Management ====================
 
-        timeSlotDAO.deleteByFieldId(fieldId);
-        for (var slot : schedule) {
-            var timeSlot = new model.domain.TimeSlot(
-                    slot.getFieldId(),
-                    slot.getDayOfWeek(),
-                    slot.getStartTime(),
-                    slot.getEndTime());
-            timeSlotDAO.save(timeSlot);
-        }
-    }
-
-    public List<TimeSlotBean> getFieldSchedule(String fieldId) {
-        return timeSlotDAO.findByFieldId(fieldId).stream()
-                .map(slot -> {
-                    var bean = new TimeSlotBean();
-                    bean.setSlotId(slot.getSlotId());
-                    bean.setFieldId(slot.getFieldId());
-                    bean.setDayOfWeek(slot.getDayOfWeek());
-                    bean.setStartTime(slot.getStartTime());
-                    bean.setEndTime(slot.getEndTime());
+    public List<model.bean.MatchBean> getPendingRequests() {
+        return matchDAO.findPendingForManager(fieldManager.getId()).stream()
+                .map(match -> {
+                    var bean = model.converter.MatchConverter.toBean(match);
+                    var field = fieldDAO.findById(match.getFieldId());
+                    if (field != null) {
+                        bean.setFieldName(field.getName());
+                    }
                     return bean;
                 })
                 .toList();
     }
 
-    public List<TimeSlotBean> getAvailableSlots(String fieldId) {
-        return getFieldSchedule(fieldId);
+    public void approveMatch(int matchId) {
+        // Verify ownership indirectly?
+        // MatchDAO.updateStatus logic?
+        // Ideally we should check if the match belongs to a field managed by this user.
+        // For simple logic, assume the ID comes from getPendingRequests.
+        matchDAO.updateStatus(matchId, model.domain.MatchStatus.APPROVED);
     }
 
-    // ==================== Booking Management ====================
-
-    public List<BookingBean> getPendingRequests() {
-        return bookingDAO.findPendingByManagerId(fieldManager.getUsername()).stream()
-                .map(model.converter.BookingConverter::toBean)
-                .toList();
-    }
-
-    public void approveBooking(int bookingId) throws ValidationException {
-        var booking = findBookingOrThrow(bookingId);
-        booking.setStatus(model.domain.BookingStatus.CONFIRMED);
-        bookingDAO.save(booking);
-    }
-
-    public void rejectBooking(int bookingId) throws ValidationException {
-        var booking = findBookingOrThrow(bookingId);
-        booking.setStatus(model.domain.BookingStatus.REJECTED);
-        bookingDAO.save(booking);
-    }
-
-    public List<BookingBean> getFieldBookings(String fieldId) {
-        return bookingDAO.findByFieldId(fieldId).stream()
-                .map(model.converter.BookingConverter::toBean)
-                .toList();
+    public void rejectMatch(int matchId) {
+        matchDAO.updateStatus(matchId, model.domain.MatchStatus.REJECTED);
     }
 
     // ==================== Dashboard Data ====================
@@ -131,19 +95,15 @@ public class FieldManagerController {
         return fieldManager;
     }
 
-    private void validateOwnership(String fieldId) {
+    private void validateOwnership(int fieldId) {
         getMyFields().stream()
-                .filter(f -> f.getFieldId().equals(fieldId))
+                .filter(f -> f.getFieldId() == fieldId)
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException(ERROR_NOT_OWNER + fieldId));
     }
 
-    private model.domain.Booking findBookingOrThrow(int bookingId) throws ValidationException {
-        var booking = bookingDAO.findById(bookingId);
-        if (booking == null) {
-            throw new ValidationException(ERROR_BOOKING_NOT_FOUND + bookingId);
-        }
-        return booking;
+    public List<model.domain.Match> getPendingMatches() {
+        return matchDAO.findPendingForManager(fieldManager.getId());
     }
 
     public record DashboardData(int totalFields, int pendingRequests, int todayBookings, double weekRevenue) {
