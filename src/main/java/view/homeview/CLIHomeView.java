@@ -109,22 +109,7 @@ public class CLIHomeView implements HomeView {
                 java.util.List<model.bean.MatchBean> matches = homeController.getMatches();
                 displayMatches(matches);
             }
-            case "2" -> {
-                java.util.List<model.bean.MatchBean> matches = homeController.getMatches();
-                displayMatches(matches);
-                if (matches != null && !matches.isEmpty()) {
-                    System.out.print("\nEnter match number to join (0 to cancel): ");
-                    try {
-                        int matchNum = Integer.parseInt(scanner.nextLine().trim());
-                        if (matchNum > 0 && matchNum <= matches.size()) {
-                            model.bean.MatchBean selectedMatch = matches.get(matchNum - 1);
-                            attemptJoinMatch(selectedMatch);
-                        }
-                    } catch (NumberFormatException e) {
-                        System.out.println("Invalid input");
-                    }
-                }
-            }
+            case "2" -> handleJoinMatchInteraction();
             case "3" -> {
                 if (homeController.getCurrentUser().isOrganizer()) {
                     homeController.switchRole();
@@ -147,6 +132,23 @@ public class CLIHomeView implements HomeView {
         return true;
     }
 
+    private void handleJoinMatchInteraction() {
+        java.util.List<model.bean.MatchBean> matches = homeController.getMatches();
+        displayMatches(matches);
+        if (matches != null && !matches.isEmpty()) {
+            System.out.print("\nEnter match number to join (0 to cancel): ");
+            try {
+                int matchNum = Integer.parseInt(scanner.nextLine().trim());
+                if (matchNum > 0 && matchNum <= matches.size()) {
+                    model.bean.MatchBean selectedMatch = matches.get(matchNum - 1);
+                    attemptJoinMatch(selectedMatch);
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input");
+            }
+        }
+    }
+
     private boolean handleOrganizerChoice(String choice) {
         switch (choice) {
             case "1" -> {
@@ -157,9 +159,7 @@ public class CLIHomeView implements HomeView {
                 System.out.println("\n--- ORGANIZE MATCH ---");
                 homeController.organizeMatch();
             }
-            case "3" -> {
-                System.out.println("Feature disabled in this version.");
-            }
+            case "3" -> System.out.println("Feature disabled in this version.");
             case "4" -> {
                 homeController.switchRole();
                 displaySuccess("Switched to Player View");
