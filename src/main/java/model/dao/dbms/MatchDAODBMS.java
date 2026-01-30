@@ -45,7 +45,7 @@ public class MatchDAODBMS implements MatchDAO {
 
     @Override
     public Match findById(int id) {
-        String query = "SELECT * FROM matches WHERE id = ?";
+        String query = "SELECT id, organizer_id, field_id, date, time, missing_players, status FROM matches WHERE id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setInt(1, id);
             try (ResultSet rs = stmt.executeQuery()) {
@@ -62,7 +62,7 @@ public class MatchDAODBMS implements MatchDAO {
     @Override
     public List<Match> findByOrganizer(int organizerId) {
         List<Match> matches = new ArrayList<>();
-        String query = "SELECT * FROM matches WHERE organizer_id = ?";
+        String query = "SELECT id, organizer_id, field_id, date, time, missing_players, status FROM matches WHERE organizer_id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setInt(1, organizerId);
             try (ResultSet rs = stmt.executeQuery()) {
@@ -79,7 +79,7 @@ public class MatchDAODBMS implements MatchDAO {
     @Override
     public List<Match> findPendingForManager(int managerId) {
         List<Match> matches = new ArrayList<>();
-        String query = "SELECT m.* FROM matches m " +
+        String query = "SELECT m.id, m.organizer_id, m.field_id, m.date, m.time, m.missing_players, m.status FROM matches m " +
                 "JOIN field f ON m.field_id = f.id " +
                 "WHERE f.manager_id = ? AND m.status = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
@@ -111,7 +111,7 @@ public class MatchDAODBMS implements MatchDAO {
     @Override
     public List<Match> findApprovedMatches() {
         List<Match> matches = new ArrayList<>();
-        String query = "SELECT * FROM matches WHERE status = ?";
+        String query = "SELECT id, organizer_id, field_id, date, time, missing_players, status FROM matches WHERE status = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setInt(1, model.domain.MatchStatus.APPROVED.getCode());
             try (ResultSet rs = stmt.executeQuery()) {

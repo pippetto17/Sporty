@@ -25,7 +25,7 @@ public class FieldDAODBMS implements FieldDAO {
     @Override
     public List<Field> findAll() {
         List<Field> fields = new ArrayList<>();
-        String query = "SELECT * FROM field";
+        String query = "SELECT id, name, city, sport, manager_id FROM field";
         try (PreparedStatement stmt = connection.prepareStatement(query);
                 ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
@@ -39,7 +39,7 @@ public class FieldDAODBMS implements FieldDAO {
 
     @Override
     public Field findById(int id) {
-        String query = "SELECT * FROM field WHERE id = ?";
+        String query = "SELECT id, name, city, sport, manager_id FROM field WHERE id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setInt(1, id);
             try (ResultSet rs = stmt.executeQuery()) {
@@ -56,7 +56,7 @@ public class FieldDAODBMS implements FieldDAO {
     @Override
     public List<Field> findByCity(String city) {
         List<Field> fields = new ArrayList<>();
-        String query = "SELECT * FROM field WHERE city = ?";
+        String query = "SELECT id, name, city, sport, manager_id FROM field WHERE city = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, city);
             try (ResultSet rs = stmt.executeQuery()) {
@@ -73,7 +73,7 @@ public class FieldDAODBMS implements FieldDAO {
     @Override
     public List<Field> findAvailableFields(String city, Sport sport, LocalDate date, LocalTime time) {
         List<Field> fields = new ArrayList<>();
-        String query = "SELECT * FROM field f WHERE f.city = ? AND f.sport = ? " +
+        String query = "SELECT f.id, f.name, f.city, f.sport, f.manager_id FROM field f WHERE f.city = ? AND f.sport = ? " +
                 "AND NOT EXISTS (SELECT 1 FROM matches m WHERE m.field_id = f.id " +
                 "AND m.date = ? AND m.time = ? AND m.status = ?)";
 
@@ -98,7 +98,7 @@ public class FieldDAODBMS implements FieldDAO {
     @Override
     public List<Field> findByManagerId(int managerId) {
         List<Field> fields = new ArrayList<>();
-        String query = "SELECT * FROM field WHERE manager_id = ?";
+        String query = "SELECT id, name, city, sport, manager_id FROM field WHERE manager_id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setInt(1, managerId);
             try (ResultSet rs = stmt.executeQuery()) {

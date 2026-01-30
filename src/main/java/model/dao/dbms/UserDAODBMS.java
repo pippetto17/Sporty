@@ -18,7 +18,7 @@ public class UserDAODBMS implements UserDAO {
 
     @Override
     public User authenticate(String username, String password) {
-        String query = "SELECT * FROM user WHERE username = ? AND password = ?";
+        String query = "SELECT id, username, password, name, surname, role FROM user WHERE username = ? AND password = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, username);
             stmt.setString(2, password);
@@ -35,7 +35,7 @@ public class UserDAODBMS implements UserDAO {
 
     @Override
     public User findById(int id) {
-        String query = "SELECT * FROM user WHERE id = ?";
+        String query = "SELECT id, username, password, name, surname, role FROM user WHERE id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setInt(1, id);
             try (ResultSet rs = stmt.executeQuery()) {
@@ -51,7 +51,7 @@ public class UserDAODBMS implements UserDAO {
 
     @Override
     public User findByUsername(String username) {
-        String query = "SELECT * FROM user WHERE username = ?";
+        String query = "SELECT id, username, password, name, surname, role FROM user WHERE username = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, username);
             try (ResultSet rs = stmt.executeQuery()) {

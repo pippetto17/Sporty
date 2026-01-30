@@ -24,7 +24,7 @@ public class PaymentController {
     public PaymentController(ApplicationController applicationController) {
         this.applicationController = applicationController;
         this.matchDAO = applicationController.getDaoFactory().getMatchDAO();
-        this.notificationService = model.notification.NotificationService.getInstance();
+        this.notificationService = applicationController.getNotificationService();
     }
 
     public void setView(PaymentView view) {

@@ -6,11 +6,9 @@ import model.domain.Sport;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class FieldDAOMemory implements FieldDAO {
     private static final Map<Integer, Field> fields = new HashMap<>();
@@ -23,9 +21,13 @@ public class FieldDAOMemory implements FieldDAO {
     }
 
     private static void createAndAddField(String name, Sport sport, String city, int managerId) {
-        int id = idCounter++;
+        int id = nextId();
         Field field = new Field(id, name, city, sport, managerId);
         fields.put(id, field);
+    }
+
+    private static synchronized int nextId() {
+        return idCounter++;
     }
 
     private static void initializeDemoFields() {
@@ -59,7 +61,7 @@ public class FieldDAOMemory implements FieldDAO {
 
     @Override
     public List<Field> findAll() {
-        return new ArrayList<>(fields.values());
+        return List.copyOf(fields.values());
     }
 
     @Override
@@ -71,7 +73,8 @@ public class FieldDAOMemory implements FieldDAO {
     public List<Field> findByCity(String city) {
         return fields.values().stream()
                 .filter(field -> field.getCity().equalsIgnoreCase(city))
-                .collect(Collectors.toList());
+                .filter(field -> field.getCity() != null)
+                .toList();
     }
 
     @Override
@@ -79,20 +82,20 @@ public class FieldDAOMemory implements FieldDAO {
         return fields.values().stream()
                 .filter(field -> field.getCity().equalsIgnoreCase(city))
                 .filter(field -> field.getSport() == sport)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
     public List<Field> findByManagerId(int managerId) {
         return fields.values().stream()
                 .filter(field -> field.getManagerId() == managerId)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
     public void save(Field field) {
         if (field.getId() == 0) {
-            field.setId(idCounter++);
+            field.setId(nextId());
         }
         fields.put(field.getId(), field);
     }

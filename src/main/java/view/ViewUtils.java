@@ -3,6 +3,7 @@ package view;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.DialogPane;
+import model.utils.Constants;
 
 public class ViewUtils {
 
@@ -46,11 +47,11 @@ public class ViewUtils {
         if (sport == null)
             return "sport-default";
         String name = sport.name().toUpperCase();
-        if (name.contains("FOOTBALL"))
+        if (name.contains(Constants.FOOTBALL))
             return "sport-soccer";
-        if (name.contains("BASKET"))
+        if (name.contains(Constants.BASKET))
             return "sport-basket";
-        if (name.contains("TENNIS") || name.contains("PADEL"))
+        if (name.contains(Constants.TENNIS) || name.contains(Constants.PADEL))
             return "sport-tennis";
         return "sport-default";
     }
@@ -59,13 +60,13 @@ public class ViewUtils {
         if (sport == null)
             return model.utils.Constants.IMAGE_MEDAL_PATH;
         String name = sport.name().toUpperCase();
-        if (name.contains("FOOTBALL"))
+        if (name.contains(Constants.FOOTBALL))
             return model.utils.Constants.IMAGE_FOOTBALL_PATH;
-        if (name.contains("BASKET"))
+        if (name.contains(Constants.BASKET))
             return model.utils.Constants.IMAGE_BASKETBALL_PATH;
-        if (name.contains("TENNIS"))
+        if (name.contains(Constants.TENNIS))
             return model.utils.Constants.IMAGE_TENNIS_PATH;
-        if (name.contains("PADEL"))
+        if (name.contains(Constants.PADEL))
             return model.utils.Constants.IMAGE_PADEL_PATH;
         return model.utils.Constants.IMAGE_MEDAL_PATH;
     }
@@ -74,13 +75,13 @@ public class ViewUtils {
         if (sport == null)
             return model.utils.Constants.ICON_EXTRAS_MEDAL;
         String name = sport.name().toUpperCase();
-        if (name.contains("FOOTBALL"))
+        if (name.contains(Constants.FOOTBALL))
             return model.utils.Constants.ICON_FOOTBALL;
-        if (name.contains("BASKET"))
+        if (name.contains(Constants.BASKET))
             return model.utils.Constants.ICON_BASKETBALL;
-        if (name.contains("TENNIS"))
+        if (name.contains(Constants.TENNIS))
             return model.utils.Constants.ICON_TENNIS;
-        if (name.contains("PADEL"))
+        if (name.contains(Constants.PADEL))
             return model.utils.Constants.ICON_PADEL;
         return model.utils.Constants.ICON_EXTRAS_MEDAL;
     }

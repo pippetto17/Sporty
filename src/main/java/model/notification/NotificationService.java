@@ -12,17 +12,8 @@ public class NotificationService {
     private final List<NotificationObserver> observers = new CopyOnWriteArrayList<>();
     private final NotificationDAO dao;
 
-    private static NotificationService instance;
-
-    private NotificationService() {
-        this.dao = new model.dao.memory.MemoryDAOFactory().getNotificationDAO();
-    }
-
-    public static synchronized NotificationService getInstance() {
-        if (instance == null) {
-            instance = new NotificationService();
-        }
-        return instance;
+    public NotificationService(NotificationDAO dao) {
+        this.dao = dao;
     }
 
     public void subscribe(NotificationObserver observer) {

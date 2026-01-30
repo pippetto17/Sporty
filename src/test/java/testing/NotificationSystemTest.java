@@ -1,5 +1,6 @@
 package testing;
 
+import model.dao.memory.NotificationDAOMemory;
 import model.notification.NotificationEvent;
 import model.notification.NotificationObserver;
 import model.notification.NotificationService;
@@ -21,7 +22,7 @@ class NotificationSystemTest {
 
     @BeforeEach
     void setUp() {
-        notificationService = NotificationService.getInstance();
+        notificationService = new NotificationService(new NotificationDAOMemory());
         notificationService.markAllAsRead("manager1");
         notificationService.markAllAsRead("manager2");
         notificationService.markAllAsRead("manager3");

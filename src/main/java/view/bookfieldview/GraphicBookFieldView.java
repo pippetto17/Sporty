@@ -96,14 +96,10 @@ public class GraphicBookFieldView implements BookFieldView {
 
     private void handleSort() {
         String selected = sortComboBox.getValue();
-        if (selected == null)
-            return;
+        if (selected == null) return;
 
-        switch (selected) {
-            case "Distance (Coming Soon)" ->
-                showAlert("Info", "Distance sorting is coming soon!", Alert.AlertType.INFORMATION);
-            default -> {
-                /* Do nothing */ }
+        if (selected.equals("Distance (Coming Soon)")) {
+            showAlert("Info", "Distance sorting is coming soon!", Alert.AlertType.INFORMATION);
         }
     }
 

@@ -19,6 +19,7 @@ public class MatchBean {
     private MatchStatus status;
 
     public MatchBean() {
+        /* Intentionally empty */
     }
 
     // Getters and Setters

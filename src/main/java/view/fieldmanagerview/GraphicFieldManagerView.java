@@ -69,7 +69,7 @@ public class GraphicFieldManagerView implements FieldManagerView {
     @Override
     public void setApplicationController(ApplicationController appController) {
         this.appController = appController;
-        this.notificationService = model.notification.NotificationService.getInstance();
+        this.notificationService = appController.getNotificationService();
         this.notificationService.subscribe(new model.notification.FieldManagerNotificationObserver());
     }
 

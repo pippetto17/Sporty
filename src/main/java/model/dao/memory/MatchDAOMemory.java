@@ -9,16 +9,19 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class MatchDAOMemory implements MatchDAO {
     private static final Map<Integer, Match> matches = new HashMap<>();
     private static int nextId = 1;
 
+    private static synchronized int nextId() {
+        return nextId++;
+    }
+
     @Override
     public void save(Match match) {
         if (match.getId() == 0) {
-            match.setId(nextId++);
+            match.setId(nextId());
         }
         matches.put(match.getId(), match);
     }
@@ -32,7 +35,7 @@ public class MatchDAOMemory implements MatchDAO {
     public List<Match> findByOrganizer(int organizerId) {
         return matches.values().stream()
                 .filter(match -> match.getOrganizerId() == organizerId)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
@@ -48,7 +51,7 @@ public class MatchDAOMemory implements MatchDAO {
                 }
             }
         }
-        return pendingMatches;
+        return List.copyOf(pendingMatches);
     }
 
     @Override
@@ -59,7 +62,7 @@ public class MatchDAOMemory implements MatchDAO {
                 approvedMatches.add(match);
             }
         }
-        return approvedMatches;
+        return List.copyOf(approvedMatches);
     }
 
     @Override

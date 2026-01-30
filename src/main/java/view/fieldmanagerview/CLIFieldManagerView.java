@@ -13,6 +13,7 @@ public class CLIFieldManagerView implements FieldManagerView {
     private final FieldManagerController controller;
     private final User manager;
     private final Scanner scanner;
+    private model.notification.NotificationService notificationService;
 
     public CLIFieldManagerView(FieldManagerController controller, User manager) {
         this.controller = controller;
@@ -22,12 +23,13 @@ public class CLIFieldManagerView implements FieldManagerView {
 
     @Override
     public void setApplicationController(ApplicationController appController) {
-        // Se la CLI non naviga (non cambia scene), questo metodo può rimanere vuoto o
-        // rimosso
+        this.notificationService = appController.getNotificationService();
+        this.notificationService.subscribe(new model.notification.FieldManagerNotificationObserver());
     }
 
     @Override
     public void display() {
+        showUnreadNotifications();
         boolean running = true;
         while (running) {
             printHeader();
@@ -39,6 +41,7 @@ public class CLIFieldManagerView implements FieldManagerView {
                 case "1" -> listPendingRequests();
                 case "2" -> handleApprove();
                 case "3" -> handleReject();
+                case "4" -> showUnreadNotifications();
                 case "0" -> running = false;
                 default -> System.out.println("⚠ Invalid choice, try again.");
             }
@@ -72,6 +75,7 @@ public class CLIFieldManagerView implements FieldManagerView {
         System.out.println("\n1) List Pending Requests");
         System.out.println("2) Approve Match");
         System.out.println("3) Reject Match");
+        System.out.println("4) View Notifications");
         System.out.println("0) Logout");
         System.out.print("> ");
     }
@@ -131,6 +135,20 @@ public class CLIFieldManagerView implements FieldManagerView {
         }
     }
 
+    private void showUnreadNotifications() {
+        if (notificationService == null)
+            return;
+
+        List<String> unread = notificationService.getUnreadNotifications(manager.getUsername());
+        if (unread.isEmpty())
+            return;
+
+        System.out.println("\n🔔 YOU HAVE " + unread.size() + " NEW NOTIFICATION(S):");
+        unread.forEach(msg -> System.out.println("  • " + msg));
+
+        notificationService.markAllAsRead(manager.getUsername());
+    }
+
     // --- UTILS ---
 
     // Legge un intero gestendo l'errore di formato
@@ -139,7 +157,7 @@ public class CLIFieldManagerView implements FieldManagerView {
         try {
             return Integer.parseInt(scanner.nextLine().trim());
         } catch (NumberFormatException e) {
-            System.out.println("⚠ Invalid number format.");
+            System.out.println("⚠️ Invalid number format.");
             return -1;
         }
     }

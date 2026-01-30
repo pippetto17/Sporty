@@ -18,7 +18,7 @@ public class NotificationDAOMemory implements NotificationDAO {
 
     @Override
     public List<String> getUnreadNotifications(String username) {
-        return inbox.getOrDefault(username, new ArrayList<>());
+        return List.copyOf(inbox.getOrDefault(username, List.of()));
     }
 
     @Override

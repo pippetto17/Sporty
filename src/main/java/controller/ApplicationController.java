@@ -26,9 +26,20 @@ public class ApplicationController {
     private final Deque<View> viewStack = new ArrayDeque<>();
     private ViewFactory viewFactory;
     private DAOFactory daoFactory;
+    private model.notification.NotificationService notificationService;
+
+    public ApplicationController() {
+        // DAOFactory and NotificationService will be initialized in start()
+    }
+
+    public ApplicationController(model.dao.DAOFactory daoFactory) {
+        this.daoFactory = daoFactory;
+        this.notificationService = new model.notification.NotificationService(daoFactory.getNotificationDAO());
+    }
 
     public void start() {
         setupConfiguration();
+        this.notificationService = new model.notification.NotificationService(daoFactory.getNotificationDAO());
         setupInterface();
         navigateToLogin();
     }
@@ -181,6 +192,10 @@ public class ApplicationController {
 
     public DAOFactory getDaoFactory() {
         return daoFactory;
+    }
+
+    public model.notification.NotificationService getNotificationService() {
+        return notificationService;
     }
 
     public String getConfigurationInfo() {

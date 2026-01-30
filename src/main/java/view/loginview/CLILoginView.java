@@ -81,11 +81,7 @@ public class CLILoginView implements LoginView {
                 System.out.println("Role: " + user.getRole());
 
                 running = false;
-                try {
-                    applicationController.navigateToHome(user);
-                } catch (exception.ValidationException e) {
-                    displayLoginError(e.getMessage());
-                }
+                navigateToHomeView(user);
             } else {
                 displayLoginError(Constants.ERROR_INVALID_CREDENTIALS);
             }
@@ -120,6 +116,14 @@ public class CLILoginView implements LoginView {
         try {
             loginController.register(userBean, name, surname, role);
             System.out.println("✓ Registration successful! You can now login.");
+        } catch (exception.ValidationException e) {
+            displayLoginError(e.getMessage());
+        }
+    }
+
+    private void navigateToHomeView(UserBean user) {
+        try {
+            applicationController.navigateToHome(user);
         } catch (exception.ValidationException e) {
             displayLoginError(e.getMessage());
         }
