@@ -2,7 +2,6 @@ package model.dao.dbms;
 
 import model.dao.UserDAO;
 import model.domain.User;
-
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -74,7 +73,6 @@ public class UserDAODBMS implements UserDAO {
             stmt.setString(3, user.getName());
             stmt.setString(4, user.getSurname());
             stmt.setInt(5, user.getRole().getCode());
-
             int affectedRows = stmt.executeUpdate();
             if (affectedRows > 0) {
                 try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {

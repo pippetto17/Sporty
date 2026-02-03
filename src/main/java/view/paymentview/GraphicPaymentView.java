@@ -17,20 +17,19 @@ import model.bean.FieldBean;
 import model.bean.MatchBean;
 import model.bean.PaymentBean;
 import view.ViewUtils;
-
 import java.io.IOException;
 import java.util.logging.Logger;
 import java.util.stream.IntStream;
 
 public class GraphicPaymentView implements PaymentView {
     private static final Logger logger = Logger.getLogger(GraphicPaymentView.class.getName());
-
     private Stage stage;
     private PaymentBean collectedPaymentData;
     private int maxAvailableShares;
     private PaymentController controller;
     private ApplicationController applicationController;
-
+    private double currentPricePerHour;
+    private int currentTotalPlayers;
     @FXML
     private Label matchInfoLabel;
     @FXML
@@ -51,7 +50,6 @@ public class GraphicPaymentView implements PaymentView {
     private Label errorLabel;
 
     public GraphicPaymentView() {
-        // Constructor
     }
 
     public void setController(PaymentController controller) {
@@ -70,17 +68,13 @@ public class GraphicPaymentView implements PaymentView {
                 if (stage == null) {
                     stage = new Stage();
                     stage.setTitle("Sporty - Payment");
-
                     FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/payment.fxml"));
                     loader.setController(this);
                     Parent root = loader.load();
-
                     Scene scene = new Scene(root, 600, 550);
                     ViewUtils.applyStylesheets(scene);
-
                     stage.setScene(scene);
                 }
-
                 stage.show();
                 stage.toFront();
             } catch (IOException e) {
@@ -94,26 +88,40 @@ public class GraphicPaymentView implements PaymentView {
         Platform.runLater(() -> {
             matchInfoLabel.setText(String.format("Payment for: %s - %s @ %s",
                     match.getSport().getDisplayName(), match.getCity(), match.getMatchTime()));
-
             maxAvailableShares = availableShares;
+            currentPricePerHour = match.getPricePerHour();
+            currentTotalPlayers = match.getSport().getRequiredPlayers();
             sharesComboBox.setItems(FXCollections.observableArrayList(
                     IntStream.rangeClosed(1, availableShares).boxed().toList()));
             sharesComboBox.setValue(1);
-
-            // Price removed, update simplified
-            amountLabel.setText("Total: Check with Organizer");
+            sharesComboBox.setOnAction(e -> updateAmountLabel());
+            updateAmountLabel();
         });
+    }
+
+    private void updateAmountLabel() {
+        int shares = sharesComboBox.getValue() != null ? sharesComboBox.getValue() : 1;
+        double costPerPerson = model.service.PricingService.calculateCostPerPerson(currentPricePerHour,
+                currentTotalPlayers);
+        double totalAmount = model.service.PricingService.calculateTotalToPay(shares, currentPricePerHour,
+                currentTotalPlayers);
+        amountLabel.setText(String.format("Cost per person: €%.2f | Total (%d shares): €%.2f",
+                costPerPerson, shares, totalAmount));
     }
 
     @Override
     public void displayBookingInfo(FieldBean field, MatchBean context) {
         Platform.runLater(() -> {
-            matchInfoLabel.setText(String.format("Booking: %s - %s on %s @ %s",
-                    field.getName(), field.getCity(), context.getMatchDate(), context.getMatchTime()));
-
+            String addressInfo = (field.getAddress() != null && !field.getAddress().isEmpty())
+                    ? " - " + field.getAddress()
+                    : "";
+            matchInfoLabel.setText(String.format("Booking: %s%s on %s @ %s",
+                    field.getName(), addressInfo, context.getMatchDate(), context.getMatchTime()));
             sharesComboBox.setVisible(false);
-            amountLabel.setText("Total Amount: See Field Rate");
-            maxAvailableShares = 0; // No shares for booking mode
+            double costPerPerson = field.getPricePerPerson();
+            amountLabel.setText(String.format("Field: €%.2f/hour | Per person: €%.2f",
+                    field.getPricePerHour(), costPerPerson));
+            maxAvailableShares = 0;
         });
     }
 
@@ -133,16 +141,12 @@ public class GraphicPaymentView implements PaymentView {
                 cardHolderField.getText().trim().isEmpty()) {
             return null;
         }
-
         PaymentBean paymentBean = new PaymentBean();
         paymentBean.setCardNumber(cardNumberField.getText().trim());
         paymentBean.setExpiryDate(expiryField.getText().trim());
         paymentBean.setCvv(cvvField.getText().trim());
         paymentBean.setCardHolder(cardHolderField.getText().trim());
         paymentBean.setSharesToPay(sharesComboBox.getValue() != null ? sharesComboBox.getValue() : 1);
-
-        // The amount will be set by the controller based on the shares and price
-        // This view only collects the payment details and shares
         return paymentBean;
     }
 
@@ -150,13 +154,11 @@ public class GraphicPaymentView implements PaymentView {
     private void handlePay() {
         errorLabel.setText("");
         errorLabel.setStyle("");
-
         PaymentBean data = collectPaymentData(maxAvailableShares);
         if (data == null) {
             showError("Please fill all payment fields.");
             return;
         }
-
         if (controller != null) {
             controller.processPaymentFromView(data);
         } else {

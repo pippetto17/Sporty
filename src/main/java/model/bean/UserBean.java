@@ -3,7 +3,6 @@ package model.bean;
 public class UserBean {
     private String username;
     private String password;
-
     private int id;
     private String name;
     private String surname;

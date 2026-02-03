@@ -4,7 +4,6 @@ import controller.ApplicationController;
 import controller.LoginController;
 import model.bean.UserBean;
 import model.utils.Constants;
-
 import java.util.Scanner;
 
 public class CLILoginView implements LoginView {
@@ -28,12 +27,9 @@ public class CLILoginView implements LoginView {
     public void display() {
         running = true;
         displayHeader();
-
         while (running) {
             displayMainMenu();
-
             String choice = scanner.nextLine();
-
             switch (choice) {
                 case "1" -> handleLogin();
                 case "2" -> handleRegister();
@@ -72,14 +68,12 @@ public class CLILoginView implements LoginView {
     private void handleLogin() {
         System.out.println("\n--- LOGIN ---");
         UserBean userBean = getUserCredentials();
-
         try {
             UserBean user = loginController.login(userBean);
             if (user != null) {
                 displayLoginSuccess(user.getUsername());
                 System.out.println("Name: " + user.getName() + " " + user.getSurname());
                 System.out.println("Role: " + user.getRole());
-
                 running = false;
                 navigateToHomeView(user);
             } else {
@@ -93,13 +87,10 @@ public class CLILoginView implements LoginView {
     private void handleRegister() {
         System.out.println("\n--- REGISTER ---");
         UserBean userBean = getUserCredentials();
-
         System.out.print("Name: ");
         String name = scanner.nextLine();
-
         System.out.print("Surname: ");
         String surname = scanner.nextLine();
-
         System.out.print("Role (1=PLAYER, 2=ORGANIZER): ");
         int role;
         try {
@@ -112,7 +103,6 @@ public class CLILoginView implements LoginView {
             displayLoginError("Invalid role. Please enter a number.");
             return;
         }
-
         try {
             loginController.register(userBean, name, surname, role);
             System.out.println("✓ Registration successful! You can now login.");
@@ -133,10 +123,8 @@ public class CLILoginView implements LoginView {
     public UserBean getUserCredentials() {
         System.out.print("Username: ");
         String username = scanner.nextLine();
-
         System.out.print("Password: ");
         String password = scanner.nextLine();
-
         return new UserBean(username, password);
     }
 

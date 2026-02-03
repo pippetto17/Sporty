@@ -3,16 +3,11 @@ package model.dao.filesystem;
 import model.dao.FieldDAO;
 import model.domain.Field;
 import model.domain.Sport;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.logging.Logger;
 
-/**
- * Stub implementation of FieldDAO for FileSystem persistence.
- * Created to satisfy Abstract Factory pattern requirements.
- */
 public class FieldDAOFileSystem implements FieldDAO {
     private static final Logger logger = Logger.getLogger(FieldDAOFileSystem.class.getName());
 

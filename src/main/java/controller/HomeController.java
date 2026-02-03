@@ -5,7 +5,6 @@ import model.bean.MatchBean;
 import model.domain.Role;
 import model.domain.Sport;
 import model.domain.User;
-
 import java.time.LocalDate;
 import java.util.List;
 
@@ -25,6 +24,7 @@ public class HomeController {
         this.fieldDAO = daoFactory.getFieldDAO();
         this.userDAO = daoFactory.getUserDAO();
         this.viewAsPlayer = user.isPlayer();
+        matchDAO.deleteExpiredMatches();
     }
 
     public void setHomeView(view.homeview.HomeView homeView) {
@@ -52,22 +52,21 @@ public class HomeController {
     public List<MatchBean> getMatches() {
         try {
             List<MatchBean> matches;
-
             List<model.domain.Match> matchEntities;
             if (viewAsPlayer) {
                 matchEntities = matchDAO.findApprovedMatches();
+                matchEntities = matchEntities.stream()
+                        .filter(m -> m.getOrganizerId() != currentUser.getId())
+                        .toList();
             } else {
                 matchEntities = matchDAO.findByOrganizer(currentUser.getId());
             }
-
             matches = matchEntities.stream()
                     .map(model.converter.MatchConverter::toBean)
                     .toList();
-
             for (MatchBean match : matches) {
                 enrichMatchBean(match);
             }
-
             return matches;
         } catch (exception.DataAccessException e) {
             throw new exception.DataAccessException("Error loading matches: " + e.getMessage(), e);
@@ -89,8 +88,10 @@ public class HomeController {
         if (field != null) {
             match.setCity(field.getCity());
             match.setSport(field.getSport());
+            match.setFieldName(field.getName());
+            match.setFieldAddress(field.getAddress());
+            match.setPricePerHour(field.getPricePerHour());
         }
-
         model.domain.User organizer = userDAO.findById(match.getOrganizerId());
         if (organizer != null) {
             match.setOrganizerName(organizer.getName() + " " + organizer.getSurname());
@@ -122,8 +123,6 @@ public class HomeController {
             return false;
         return match.getCity().equalsIgnoreCase(city.trim());
     }
-
-    // --- Business Logic Helpers ---
 
     public boolean isMatchFull(MatchBean match) {
         if (match == null) {

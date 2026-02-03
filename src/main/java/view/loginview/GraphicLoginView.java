@@ -13,22 +13,16 @@ import javafx.stage.Stage;
 import model.bean.UserBean;
 import model.utils.Constants;
 import view.ViewUtils;
-
 import java.io.IOException;
 import java.util.logging.Logger;
 
 public class GraphicLoginView extends Application implements LoginView {
     private static final Logger logger = Logger.getLogger(GraphicLoginView.class.getName());
-
-    // Static fields per passare i controller all'istanza creata da launch()
     private static LoginController staticLoginController;
     private static ApplicationController staticApplicationController;
-
     private final LoginController loginController;
     private ApplicationController applicationController;
     private Stage primaryStage;
-
-    // FXML fields - Login
     @FXML
     private TextField usernameField;
     @FXML
@@ -39,8 +33,6 @@ public class GraphicLoginView extends Application implements LoginView {
     private Button loginButton;
     @FXML
     private Button registerButton;
-
-    // FXML fields - Register
     @FXML
     private TextField registerUsernameField;
     @FXML
@@ -59,7 +51,6 @@ public class GraphicLoginView extends Application implements LoginView {
     private Button cancelRegisterButton;
 
     public GraphicLoginView() {
-        // Constructor vuoto per JavaFX - recupera i controller dalle variabili statiche
         this.loginController = staticLoginController;
         this.applicationController = staticApplicationController;
     }
@@ -79,14 +70,11 @@ public class GraphicLoginView extends Application implements LoginView {
     @Override
     public void setApplicationController(ApplicationController applicationController) {
         this.applicationController = applicationController;
-        // Note: static fields are set only when needed by JavaFX launch
     }
 
     @Override
     public void display() {
-        // Controlla se JavaFX è già inizializzato
         try {
-            // Se Platform è già inizializzato, possiamo usare runLater direttamente
             Platform.runLater(() -> {
                 try {
                     Stage stage = new Stage();
@@ -97,7 +85,6 @@ public class GraphicLoginView extends Application implements LoginView {
                 }
             });
         } catch (IllegalStateException e) {
-            // Se JavaFX non è inizializzato, dobbiamo usare launch()
             setStaticLoginController(this.loginController);
             setStaticApplicationController(this.applicationController);
             new Thread(() -> Application.launch(GraphicLoginView.class)).start();
@@ -116,16 +103,12 @@ public class GraphicLoginView extends Application implements LoginView {
         Application.setUserAgentStylesheet(new atlantafx.base.theme.PrimerDark().getUserAgentStylesheet());
         this.primaryStage = primaryStage;
         primaryStage.setTitle("Sporty - Login");
-
         try {
-            // Load FXML
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/login.fxml"));
             loader.setController(this);
             Parent root = loader.load();
-
             Scene scene = new Scene(root, 450, 550);
             ViewUtils.applyStylesheets(scene);
-
             primaryStage.setScene(scene);
             primaryStage.setResizable(false);
             primaryStage.show();
@@ -141,7 +124,6 @@ public class GraphicLoginView extends Application implements LoginView {
             UserBean loggedInUser = loginController.login(userBean);
             if (loggedInUser != null) {
                 displayLoginSuccess(loggedInUser.getUsername());
-                // Navigate to home
                 Platform.runLater(() -> {
                     primaryStage.close();
                     try {
@@ -161,12 +143,9 @@ public class GraphicLoginView extends Application implements LoginView {
     @FXML
     private void handleRegister() {
         try {
-            // Load FXML per la registrazione
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/register.fxml"));
             loader.setController(this);
             Parent root = loader.load();
-
-            // Inizializza il ComboBox delle role dopo il caricamento
             if (roleComboBox != null && roleComboBox.getItems().isEmpty()) {
                 roleComboBox.getItems().addAll(
                         Constants.ROLE_PLAYER,
@@ -174,10 +153,8 @@ public class GraphicLoginView extends Application implements LoginView {
                         Constants.ROLE_FIELD_MANAGER);
                 roleComboBox.setValue(Constants.ROLE_PLAYER);
             }
-
             Scene scene = new Scene(root, 450, 650);
             ViewUtils.applyStylesheets(scene);
-
             primaryStage.setScene(scene);
             primaryStage.setTitle("Sporty - Register");
         } catch (IOException e) {
@@ -190,32 +167,22 @@ public class GraphicLoginView extends Application implements LoginView {
         registerMessageLabel.setText("");
         registerMessageLabel.setVisible(false);
         registerMessageLabel.getStyleClass().removeAll(Constants.CSS_ERROR, Constants.CSS_SUCCESS);
-
         try {
             String username = registerUsernameField.getText().trim();
             String password = registerPasswordField.getText();
             String name = nameField.getText().trim();
             String surname = surnameField.getText().trim();
             String selectedRole = roleComboBox.getValue();
-
-            // Validate inputs through controller
             String validationError = loginController.validateRegistrationInputs(
                     username, password, name, surname, selectedRole);
             if (validationError != null) {
                 showRegisterError(validationError);
                 return;
             }
-
-            // Get role code from controller (no longer static)
             int roleCode = loginController.getRoleCodeFromString(selectedRole);
-
             UserBean userBean = new UserBean(username, password);
-
             loginController.register(userBean, name, surname, roleCode);
-
             showRegisterSuccess(Constants.SUCCESS_REGISTRATION);
-
-            // Torna al login dopo 1.5 secondi
             new Thread(() -> {
                 try {
                     Thread.sleep(1500);
@@ -224,7 +191,6 @@ public class GraphicLoginView extends Application implements LoginView {
                     Thread.currentThread().interrupt();
                 }
             }).start();
-
         } catch (exception.ValidationException e) {
             showRegisterError(e.getMessage());
         }
@@ -233,14 +199,11 @@ public class GraphicLoginView extends Application implements LoginView {
     @FXML
     private void handleCancelRegister() {
         try {
-            // Ricarica la view del login
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/login.fxml"));
             loader.setController(this);
             Parent root = loader.load();
-
             Scene scene = new Scene(root, 450, 550);
             ViewUtils.applyStylesheets(scene);
-
             primaryStage.setScene(scene);
             primaryStage.setTitle("Sporty - Login");
         } catch (IOException e) {

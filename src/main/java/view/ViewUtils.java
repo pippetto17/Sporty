@@ -6,7 +6,6 @@ import javafx.scene.control.DialogPane;
 import model.utils.Constants;
 
 public class ViewUtils {
-
     private ViewUtils() {
     }
 
@@ -15,7 +14,6 @@ public class ViewUtils {
         if (styleResource != null) {
             scene.getStylesheets().add(styleResource.toExternalForm());
         }
-        // controls-dark.css removed in favor of AtlantaFX
     }
 
     public static void applyStylesheets(DialogPane dialogPane) {
@@ -24,7 +22,6 @@ public class ViewUtils {
         if (styleResource != null) {
             dialogPane.getStylesheets().add(styleResource.toExternalForm());
         }
-
     }
 
     public static void showError(String title, String message) {

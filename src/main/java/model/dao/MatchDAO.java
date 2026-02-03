@@ -1,7 +1,6 @@
 package model.dao;
 
 import model.domain.Match;
-
 import java.util.List;
 
 public interface MatchDAO {
@@ -18,4 +17,6 @@ public interface MatchDAO {
     void updateStatus(int matchId, model.domain.MatchStatus status);
 
     void delete(int id);
+
+    int deleteExpiredMatches();
 }

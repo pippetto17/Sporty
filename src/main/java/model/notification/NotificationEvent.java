@@ -3,7 +3,9 @@ package model.notification;
 import java.time.LocalDateTime;
 
 public class NotificationEvent {
-    public enum Type { BOOKING_CREATED, MATCH_CREATED }
+    public enum Type {
+        BOOKING_CREATED, MATCH_CREATED
+    }
 
     public final Type type;
     public final String recipient;
@@ -21,4 +23,3 @@ public class NotificationEvent {
         this.timestamp = LocalDateTime.now();
     }
 }
-

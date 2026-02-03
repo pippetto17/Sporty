@@ -13,7 +13,6 @@ import view.paymentview.GraphicPaymentView;
 import view.paymentview.PaymentView;
 
 public class GraphicViewFactory implements ViewFactory {
-
     @Override
     public LoginView createLoginView(LoginController loginController) {
         GraphicLoginView graphicView = new GraphicLoginView(loginController);
@@ -45,5 +44,4 @@ public class GraphicViewFactory implements ViewFactory {
     public view.fieldmanagerview.FieldManagerView createFieldManagerView(controller.FieldManagerController controller) {
         return new view.fieldmanagerview.GraphicFieldManagerView(controller, controller.getFieldManager());
     }
-
 }

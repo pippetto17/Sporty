@@ -5,4 +5,3 @@ public class InvalidCredentialsException extends ValidationException {
         super("error.invalid.credentials");
     }
 }
-

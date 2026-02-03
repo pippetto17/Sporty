@@ -8,7 +8,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-
 import java.sql.Connection;
 import java.util.List;
 
@@ -29,7 +28,6 @@ public class MatchDAODBMS implements MatchDAO {
             stmt.setTime(4, java.sql.Time.valueOf(match.getTime()));
             stmt.setInt(5, match.getMissingPlayers());
             stmt.setInt(6, match.getStatus().getCode());
-
             int affectedRows = stmt.executeUpdate();
             if (affectedRows > 0) {
                 try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
@@ -79,7 +77,8 @@ public class MatchDAODBMS implements MatchDAO {
     @Override
     public List<Match> findPendingForManager(int managerId) {
         List<Match> matches = new ArrayList<>();
-        String query = "SELECT m.id, m.organizer_id, m.field_id, m.date, m.time, m.missing_players, m.status FROM matches m " +
+        String query = "SELECT m.id, m.organizer_id, m.field_id, m.date, m.time, m.missing_players, m.status FROM matches m "
+                +
                 "JOIN field f ON m.field_id = f.id " +
                 "WHERE f.manager_id = ? AND m.status = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
@@ -133,6 +132,16 @@ public class MatchDAODBMS implements MatchDAO {
             stmt.executeUpdate();
         } catch (SQLException e) {
             throw new exception.DataAccessException("Error deleting match with id: " + id, e);
+        }
+    }
+
+    @Override
+    public int deleteExpiredMatches() {
+        String query = "DELETE FROM matches WHERE date < CURDATE()";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            return stmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new exception.DataAccessException("Error deleting expired matches", e);
         }
     }
 

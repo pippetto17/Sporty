@@ -7,10 +7,11 @@ public class FieldBean {
     private String name;
     private Sport sport;
     private String city;
+    private String address;
+    private double pricePerHour;
     private int managerId;
 
     public FieldBean() {
-        /* Intentionally empty */
     }
 
     public int getFieldId() {
@@ -43,6 +44,29 @@ public class FieldBean {
 
     public void setCity(String city) {
         this.city = city;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public double getPricePerHour() {
+        return pricePerHour;
+    }
+
+    public void setPricePerHour(double pricePerHour) {
+        this.pricePerHour = pricePerHour;
+    }
+
+    public double getPricePerPerson() {
+        if (sport == null || sport.getRequiredPlayers() <= 0) {
+            return 0.0;
+        }
+        return pricePerHour / sport.getRequiredPlayers();
     }
 
     public int getManagerId() {

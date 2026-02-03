@@ -16,20 +16,16 @@ public class LoginController {
     public UserBean login(UserBean userBean) throws ValidationException {
         validateNotEmpty(userBean.getUsername(), Constants.ERROR_USERNAME_EMPTY);
         validateNotEmpty(userBean.getPassword(), Constants.ERROR_PASSWORD_EMPTY);
-
         User user = userDAO.authenticate(userBean.getUsername(), userBean.getPassword());
-
         if (user == null) {
             return null;
         }
-
         UserBean resultBean = new UserBean();
         resultBean.setId(user.getId());
         resultBean.setUsername(user.getUsername());
         resultBean.setName(user.getName());
         resultBean.setSurname(user.getSurname());
         resultBean.setRole(user.getRole().getCode());
-
         return resultBean;
     }
 
@@ -38,12 +34,10 @@ public class LoginController {
         validateNotEmpty(userBean.getPassword(), Constants.ERROR_PASSWORD_EMPTY);
         validateNotEmpty(name, Constants.ERROR_NAME_EMPTY);
         validateNotEmpty(surname, Constants.ERROR_SURNAME_EMPTY);
-
         var existingUser = userDAO.findByUsername(userBean.getUsername());
         if (existingUser != null) {
             throw new ValidationException(Constants.ERROR_USERNAME_EXISTS);
         }
-
         var newUser = new User(0, userBean.getUsername(), userBean.getPassword(), name, surname,
                 model.domain.Role.fromCode(role));
         userDAO.save(newUser);
@@ -53,7 +47,6 @@ public class LoginController {
         if (roleString == null) {
             throw new ValidationException("Role cannot be null");
         }
-
         return switch (roleString) {
             case Constants.ROLE_PLAYER -> model.domain.Role.PLAYER.getCode();
             case Constants.ROLE_ORGANIZER -> model.domain.Role.ORGANIZER.getCode();

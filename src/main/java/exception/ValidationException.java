@@ -17,4 +17,3 @@ public class ValidationException extends Exception {
         return messageKey;
     }
 }
-

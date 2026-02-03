@@ -4,7 +4,6 @@ import javafx.application.Platform;
 import javafx.scene.control.Alert;
 
 public class FieldManagerNotificationObserver implements NotificationObserver {
-
     @Override
     public void onEvent(NotificationEvent event) {
         Platform.runLater(() -> {

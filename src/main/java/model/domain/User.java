@@ -68,7 +68,6 @@ public class User {
         this.role = role;
     }
 
-    // Helper methods for role checking
     public boolean isPlayer() {
         return role == Role.PLAYER;
     }

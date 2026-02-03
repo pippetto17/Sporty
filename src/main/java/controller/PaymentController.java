@@ -1,11 +1,11 @@
 package controller;
 
 import exception.ValidationException;
+import model.bean.FieldBean;
 import model.bean.MatchBean;
 import model.bean.PaymentBean;
 import model.utils.Constants;
 import view.paymentview.PaymentView;
-
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -40,7 +40,7 @@ public class PaymentController {
         this.joinMode = false;
     }
 
-    public void setBookingMode(model.bean.FieldBean fieldBean, MatchBean contextBean) {
+    public void setBookingMode(FieldBean fieldBean, MatchBean contextBean) {
         this.fieldBean = fieldBean;
         this.matchBean = contextBean;
         this.bookingMode = true;
@@ -56,22 +56,18 @@ public class PaymentController {
 
     public void start() {
         view.display();
-
         if (bookingMode) {
             view.displayBookingInfo(fieldBean, matchBean);
         } else {
             int availableShares = calculateAvailableShares();
             view.displayMatchInfo(matchBean, availableShares);
         }
-
         if (!(view instanceof view.paymentview.GraphicPaymentView)) {
             PaymentBean paymentData = view.collectPaymentData(bookingMode ? 0 : calculateAvailableShares());
-
             if (paymentData == null) {
                 applicationController.back();
                 return;
             }
-
             processPaymentFromView(paymentData);
         }
     }
@@ -81,10 +77,11 @@ public class PaymentController {
             view.showError(model.utils.Constants.ERROR_PAYMENT_INVALID);
             return;
         }
-
-        // Amount calculation removed - pricing logic deprecated
-        paymentData.setAmount(0.0);
-
+        double pricePerHour = getPricePerHour();
+        int totalPlayers = getTotalPlayers();
+        int shares = paymentData.getSharesToPay() > 0 ? paymentData.getSharesToPay() : 1;
+        double totalAmount = model.service.PricingService.calculateTotalToPay(shares, pricePerHour, totalPlayers);
+        paymentData.setAmount(totalAmount);
         try {
             boolean success = processPayment(paymentData);
             if (success) {
@@ -95,6 +92,26 @@ public class PaymentController {
         } catch (ValidationException e) {
             view.showError(e.getMessage());
         }
+    }
+
+    private double getPricePerHour() {
+        if (bookingMode && fieldBean != null) {
+            return fieldBean.getPricePerHour();
+        }
+        if (matchBean != null) {
+            return matchBean.getPricePerHour();
+        }
+        return 0.0;
+    }
+
+    private int getTotalPlayers() {
+        if (bookingMode && fieldBean != null && fieldBean.getSport() != null) {
+            return fieldBean.getSport().getRequiredPlayers();
+        }
+        if (matchBean != null && matchBean.getSport() != null) {
+            return matchBean.getSport().getRequiredPlayers();
+        }
+        return 1;
     }
 
     private void handlePaymentSuccess() {
@@ -141,12 +158,10 @@ public class PaymentController {
     private boolean processPayment(PaymentBean paymentBean) throws ValidationException {
         if (paymentBean == null || paymentBean.getCardNumber() == null || paymentBean.getCardNumber().isEmpty())
             return false;
-
         try {
             if (joinMode) {
                 return processJoinPayment();
             } else if (bookingMode) {
-                // Booking mode deprecated/merged into Match
                 return true;
             } else {
                 return processMatchPayment();
@@ -166,13 +181,10 @@ public class PaymentController {
     private boolean processMatchPayment() throws ValidationException {
         if (matchBean == null)
             throw new ValidationException("MatchBean cannot be null");
-
         model.domain.Field field = null;
         if (matchBean.getFieldId() != 0) {
             field = applicationController.getDaoFactory().getFieldDAO().findById(matchBean.getFieldId());
         }
-
-        // Send notification to manager
         try {
             if (field != null) {
                 notificationService.notifyMatchCreated(
@@ -186,36 +198,28 @@ public class PaymentController {
         } catch (Exception e) {
             logger.log(Level.WARNING, "Could not send match notification: {0}", e.getMessage());
         }
-
         applicationController.back();
         applicationController.back();
-
         view.organizematchview.OrganizeMatchView organizeView = (view.organizematchview.OrganizeMatchView) applicationController
                 .getCurrentView();
         if (organizeView != null) {
             organizeView.displayRecap(matchBean);
         }
-
         return true;
     }
 
     private boolean processJoinPayment() throws ValidationException {
         if (matchBean == null || joiningUser == null)
             throw new ValidationException("Match and user required for join");
-
         model.domain.Match match = matchDAO.findById(matchBean.getMatchId());
         if (match == null)
             throw new ValidationException(Constants.ERROR_MATCH_NOT_FOUND);
-
         if (match.getMissingPlayers() <= 0) {
             throw new ValidationException("Match is full");
         }
-
         match.setMissingPlayers(match.getMissingPlayers() - 1);
         matchDAO.save(match);
-
         matchBean.setMissingPlayers(match.getMissingPlayers());
-
         applicationController.back();
         applicationController.back();
         return true;

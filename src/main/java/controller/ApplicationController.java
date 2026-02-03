@@ -11,25 +11,20 @@ import view.View;
 import view.factory.CLIViewFactory;
 import view.factory.GraphicViewFactory;
 import view.factory.ViewFactory;
-
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Scanner;
 import java.util.logging.Logger;
-
 import exception.ValidationException;
 
 public class ApplicationController {
-
     private static final Logger logger = Logger.getLogger(ApplicationController.class.getName());
-
     private final Deque<View> viewStack = new ArrayDeque<>();
     private ViewFactory viewFactory;
     private DAOFactory daoFactory;
     private model.notification.NotificationService notificationService;
 
     public ApplicationController() {
-        // DAOFactory and NotificationService will be initialized in start()
     }
 
     public ApplicationController(model.dao.DAOFactory daoFactory) {
@@ -44,27 +39,21 @@ public class ApplicationController {
         navigateToLogin();
     }
 
-    // --- CONFIGURATION WIZARD ---
-
     @SuppressWarnings("resource")
     private void setupConfiguration() {
         var scanner = new Scanner(System.in);
         System.out.println("=== SPORTY CONFIGURATION ===");
         System.out.println("Select version:\n1. DEMO (No persistence)\n2. FULL (Persistence)");
         System.out.print("> ");
-
         boolean isDemo = scanner.nextLine().trim().equals("1");
-
         if (isDemo) {
             this.daoFactory = new MemoryDAOFactory();
             logger.info(() -> "App started in DEMO mode");
             return;
         }
-
         System.out.println("Select storage:\n1. FileSystem\n2. Database (DBMS)");
         System.out.print("> ");
         boolean isDbms = scanner.nextLine().trim().equals("2");
-
         if (isDbms) {
             this.daoFactory = new DbmsDAOFactory();
             logger.info("App started with persistence: DBMS");
@@ -79,14 +68,9 @@ public class ApplicationController {
         var scanner = new Scanner(System.in);
         System.out.println("Select Interface:\n1. Graphic (JavaFX)\n2. CLI (Console)");
         System.out.print("> ");
-
         String choice = scanner.nextLine().trim();
         this.viewFactory = choice.equals("1") ? new GraphicViewFactory() : new CLIViewFactory();
     }
-
-    // --- NAVIGATION ROUTING ---
-
-    // --- NAVIGATION ROUTING ---
 
     public void navigateToLogin() {
         var controller = new LoginController(daoFactory);
@@ -96,7 +80,6 @@ public class ApplicationController {
     }
 
     public void navigateToHome(model.bean.UserBean userBean) throws ValidationException {
-        // Convert Bean to Entity for internal Controller usage
         User user = new User(
                 userBean.getId(),
                 userBean.getUsername(),
@@ -154,8 +137,6 @@ public class ApplicationController {
         controller.start();
     }
 
-    // --- STACK MANAGEMENT ---
-
     private void pushView(View view) {
         if (!viewStack.isEmpty()) {
             viewStack.peek().close();
@@ -169,7 +150,6 @@ public class ApplicationController {
             logger.info("Cannot go back from initial screen.");
             return;
         }
-
         viewStack.pop().close();
         viewStack.peek().display();
     }
@@ -187,8 +167,6 @@ public class ApplicationController {
         }
         navigateToLogin();
     }
-
-    // --- GETTERS ---
 
     public DAOFactory getDaoFactory() {
         return daoFactory;

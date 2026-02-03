@@ -3,11 +3,9 @@ package view.bookfieldview;
 import controller.ApplicationController;
 import controller.BookFieldController;
 import model.bean.FieldBean;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
-
 import static model.utils.Constants.FOUND_PREFIX;
 import static model.utils.Constants.SEPARATOR;
 
@@ -24,16 +22,13 @@ public class CLIBookFieldView implements BookFieldView {
 
     @Override
     public void setApplicationController(ApplicationController applicationController) {
-        // Not needed for CLI version
     }
 
     @Override
     public void display() {
         running = true;
         displayHeader();
-
         List<FieldBean> fields;
-
         if (bookFieldController.isStandaloneMode()) {
             fields = promptStandaloneSearch();
             if (fields == null) {
@@ -44,19 +39,15 @@ public class CLIBookFieldView implements BookFieldView {
             System.out.println("\nSearching for available fields...");
             fields = bookFieldController.searchAvailableFields();
         }
-
         if (fields == null || fields.isEmpty()) {
             displayError("No fields available for the selected criteria.");
             bookFieldController.navigateBack();
             return;
         }
-
         displaySuccess(FOUND_PREFIX + fields.size() + " available fields!");
-
         while (running) {
             displayAvailableFields();
             displayMenu();
-
             String choice = scanner.nextLine().trim();
             handleMenuChoice(choice);
         }
@@ -64,7 +55,6 @@ public class CLIBookFieldView implements BookFieldView {
 
     private List<FieldBean> promptStandaloneSearch() {
         System.out.println("\n=== BOOK FIELD - SEARCH PARAMETERS ===");
-
         System.out.print("Select sport (");
         model.domain.Sport[] sports = model.domain.Sport.values();
         for (int i = 0; i < sports.length; i++) {
@@ -73,7 +63,6 @@ public class CLIBookFieldView implements BookFieldView {
                 System.out.print(", ");
         }
         System.out.print("): ");
-
         int sportChoice;
         try {
             sportChoice = Integer.parseInt(scanner.nextLine().trim());
@@ -85,14 +74,12 @@ public class CLIBookFieldView implements BookFieldView {
             displayError("Invalid input");
             return Collections.emptyList();
         }
-
         System.out.print("Enter city: ");
         String city = scanner.nextLine().trim();
         if (city.isEmpty()) {
             displayError("City cannot be empty");
             return Collections.emptyList();
         }
-
         System.out.print("Enter date (yyyy-mm-dd): ");
         String dateStr = scanner.nextLine().trim();
         try {
@@ -102,7 +89,6 @@ public class CLIBookFieldView implements BookFieldView {
             displayError("Invalid date format");
             return Collections.emptyList();
         }
-
         System.out.print("Enter time (HH:mm): ");
         String timeStr = scanner.nextLine().trim();
         try {
@@ -112,7 +98,6 @@ public class CLIBookFieldView implements BookFieldView {
             displayError("Invalid time format");
             return Collections.emptyList();
         }
-
         System.out.println("\nSearching for available fields...");
         return bookFieldController.searchFieldsForDirectBooking(
                 sports[sportChoice - 1],
@@ -131,14 +116,11 @@ public class CLIBookFieldView implements BookFieldView {
         System.out.println("\n" + SEPARATOR);
         System.out.println("    AVAILABLE FIELDS");
         System.out.println(SEPARATOR);
-
         List<FieldBean> fields = bookFieldController.getAvailableFields();
-
         if (fields == null || fields.isEmpty()) {
             System.out.println("No fields to display.");
             return;
         }
-
         for (int i = 0; i < fields.size(); i++) {
             FieldBean field = fields.get(i);
             System.out.printf("%n%d. %s%n", (i + 1), field.getName());
@@ -151,14 +133,11 @@ public class CLIBookFieldView implements BookFieldView {
     @Override
     public void displayFieldDetails(int fieldIndex) {
         List<FieldBean> fields = bookFieldController.getAvailableFields();
-
         if (fields == null || fieldIndex < 0 || fieldIndex >= fields.size()) {
             displayError("Invalid field selection.");
             return;
         }
-
         FieldBean field = fields.get(fieldIndex);
-
         System.out.println("\n" + SEPARATOR);
         System.out.println("    FIELD DETAILS");
         System.out.println(SEPARATOR);
@@ -234,24 +213,19 @@ public class CLIBookFieldView implements BookFieldView {
 
     private void selectField(int fieldIndex) {
         List<FieldBean> fields = bookFieldController.getAvailableFields();
-
         if (fields == null || fieldIndex < 0 || fieldIndex >= fields.size()) {
             displayError("Invalid field selection.");
             return;
         }
-
         FieldBean selectedField = fields.get(fieldIndex);
         bookFieldController.setSelectedField(selectedField);
-
         System.out.println("\n" + SEPARATOR);
         System.out.println("    FIELD SELECTED");
         System.out.println(SEPARATOR);
         System.out.println("Field: " + selectedField.getName());
         System.out.println(SEPARATOR);
-
         System.out.print("\nConfirm selection? (y/n): ");
         String confirm = scanner.nextLine().trim().toLowerCase();
-
         if (confirm.equals("y") || confirm.equals("yes")) {
             try {
                 displaySuccess("Field booked successfully!");
@@ -266,5 +240,4 @@ public class CLIBookFieldView implements BookFieldView {
             displaySuccess("Selection cancelled.");
         }
     }
-
 }

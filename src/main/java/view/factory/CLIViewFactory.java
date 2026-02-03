@@ -15,7 +15,6 @@ import view.paymentview.CLIPaymentView;
 import view.paymentview.PaymentView;
 
 public class CLIViewFactory implements ViewFactory {
-
     @Override
     public LoginView createLoginView(LoginController loginController) {
         return new CLILoginView(loginController);
@@ -45,5 +44,4 @@ public class CLIViewFactory implements ViewFactory {
     public FieldManagerView createFieldManagerView(FieldManagerController controller) {
         return new CLIFieldManagerView(controller, controller.getFieldManager());
     }
-
 }

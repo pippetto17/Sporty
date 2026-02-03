@@ -4,16 +4,13 @@ import model.bean.MatchBean;
 import model.domain.Match;
 
 public class MatchConverter {
-
     private MatchConverter() {
-        // Private constructor to prevent instantiation
     }
 
     public static Match toEntity(MatchBean matchBean) {
         if (matchBean == null) {
             return null;
         }
-
         Match match = new Match();
         match.setId(matchBean.getMatchId());
         match.setOrganizerId(matchBean.getOrganizerId());
@@ -22,7 +19,6 @@ public class MatchConverter {
         match.setTime(matchBean.getMatchTime());
         match.setMissingPlayers(matchBean.getMissingPlayers());
         match.setStatus(matchBean.getStatus());
-
         return match;
     }
 
@@ -30,7 +26,6 @@ public class MatchConverter {
         if (match == null) {
             return null;
         }
-
         MatchBean matchBean = new MatchBean();
         matchBean.setMatchId(match.getId());
         matchBean.setOrganizerId(match.getOrganizerId());
@@ -41,7 +36,6 @@ public class MatchConverter {
         matchBean.setStatus(match.getStatus());
         matchBean.setCity(null);
         matchBean.setSport(null);
-
         return matchBean;
     }
 }

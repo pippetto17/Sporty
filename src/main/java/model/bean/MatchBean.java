@@ -2,7 +2,6 @@ package model.bean;
 
 import model.domain.MatchStatus;
 import model.domain.Sport;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -16,13 +15,13 @@ public class MatchBean {
     private int organizerId;
     private String organizerName;
     private int fieldId;
+    private String fieldName;
+    private String fieldAddress;
+    private double pricePerHour;
     private MatchStatus status;
 
     public MatchBean() {
-        /* Intentionally empty */
     }
-
-    // Getters and Setters
 
     public int getMatchId() {
         return matchId;
@@ -104,13 +103,34 @@ public class MatchBean {
         this.status = status;
     }
 
-    private String fieldName;
-
     public void setFieldName(String fieldName) {
         this.fieldName = fieldName;
     }
 
     public String getFieldName() {
         return fieldName;
+    }
+
+    public String getFieldAddress() {
+        return fieldAddress;
+    }
+
+    public void setFieldAddress(String fieldAddress) {
+        this.fieldAddress = fieldAddress;
+    }
+
+    public double getPricePerHour() {
+        return pricePerHour;
+    }
+
+    public void setPricePerHour(double pricePerHour) {
+        this.pricePerHour = pricePerHour;
+    }
+
+    public double getCostPerPerson() {
+        if (sport == null || sport.getRequiredPlayers() <= 0) {
+            return 0.0;
+        }
+        return pricePerHour / sport.getRequiredPlayers();
     }
 }

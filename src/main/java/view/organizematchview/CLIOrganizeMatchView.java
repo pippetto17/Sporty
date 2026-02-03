@@ -5,7 +5,6 @@ import controller.OrganizeMatchController;
 import model.bean.MatchBean;
 import model.domain.Sport;
 import model.utils.Constants;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Scanner;
@@ -23,14 +22,12 @@ public class CLIOrganizeMatchView implements OrganizeMatchView {
 
     @Override
     public void setApplicationController(ApplicationController applicationController) {
-        // Not used in CLI view
     }
 
     @Override
     public void display() {
         running = true;
         displayHeader();
-
         while (running) {
             System.out.println("\n" + Constants.SEPARATOR);
             System.out.println("    ORGANIZE MATCH");
@@ -39,7 +36,6 @@ public class CLIOrganizeMatchView implements OrganizeMatchView {
             System.out.println("2. Create new match");
             System.out.println("3. Back to home");
             System.out.print("Choose an option: ");
-
             String choice = scanner.nextLine().trim();
             handleMenuChoice(choice);
         }
@@ -62,52 +58,37 @@ public class CLIOrganizeMatchView implements OrganizeMatchView {
         System.out.println("\n" + Constants.SEPARATOR);
         System.out.println("    CREATE NEW MATCH");
         System.out.println(Constants.SEPARATOR);
-
         organizeMatchController.startNewMatch();
-
-        // Step 1: Select Sport
         Sport selectedSport = selectSport();
         if (selectedSport == null) {
             displayError("Invalid sport selection. Operation cancelled.");
             return;
         }
-
-        // Step 2: Select Date
         LocalDate selectedDate = selectDate();
         if (selectedDate == null) {
             displayError("Invalid date. Operation cancelled.");
             return;
         }
-
-        // Step 3: Select Time
         LocalTime selectedTime = selectTime();
         if (selectedTime == null) {
             displayError("Invalid time. Operation cancelled.");
             return;
         }
-
-        // Step 4: Enter City
         String city = enterCity();
         if (city == null || city.trim().isEmpty()) {
             displayError("Invalid city. Operation cancelled.");
             return;
         }
-
-        // Step 5: Enter number of participants
         int participants = enterParticipants(selectedSport);
         if (participants == -1) {
             displayError("Invalid number of participants. Operation cancelled.");
             return;
         }
-
-        // Validate and save match details
         try {
             organizeMatchController.validateMatchDetails(selectedSport, selectedDate, selectedTime, city, participants);
-
             organizeMatchController.setMatchDetails(selectedSport, selectedDate, selectedTime, city, participants);
             displaySuccess("Match details saved successfully!");
             displayMatchSummary();
-
             System.out.println("\nProceeding to field selection...");
             organizeMatchController.proceedToFieldSelection();
         } catch (exception.ValidationException e) {
@@ -149,11 +130,9 @@ public class CLIOrganizeMatchView implements OrganizeMatchView {
     private Sport selectSport() {
         System.out.println("\n--- SELECT SPORT ---");
         Sport[] sports = organizeMatchController.getAvailableSports().toArray(new Sport[0]);
-
         for (int i = 0; i < sports.length; i++) {
             System.out.println((i + 1) + ". " + sports[i].toString());
         }
-
         System.out.print("\nSelect sport (1-" + sports.length + "): ");
         try {
             int choice = Integer.parseInt(scanner.nextLine().trim());
@@ -169,24 +148,20 @@ public class CLIOrganizeMatchView implements OrganizeMatchView {
     private LocalDate selectDate() {
         System.out.println("\n--- SELECT DATE ---");
         System.out.print("Enter match date (format: dd/MM/yyyy, e.g., 15/01/2026): ");
-
         String dateInput = scanner.nextLine().trim();
         LocalDate date = organizeMatchController.parseDate(dateInput);
         if (date == null)
             return null;
-
         if (!organizeMatchController.isDateValid(date)) {
             displayError("Date cannot be in the past.");
             return null;
         }
-
         return date;
     }
 
     private LocalTime selectTime() {
         System.out.println("\n--- SELECT TIME ---");
         System.out.print("Enter match time (format: HH:mm, e.g., 18:30): ");
-
         String timeInput = scanner.nextLine().trim();
         return organizeMatchController.parseTime(timeInput);
     }
@@ -205,10 +180,8 @@ public class CLIOrganizeMatchView implements OrganizeMatchView {
         System.out.println("Sport: " + sport.getDisplayName());
         System.out.println("Total players needed: " + sport.getRequiredPlayers());
         System.out.println("You (organizer) count as the first player.");
-
         int maxAdditional = sport.getRequiredPlayers() - 1;
         System.out.print("Enter number of additional participants needed (1-" + maxAdditional + "): ");
-
         try {
             int participants = Integer.parseInt(scanner.nextLine().trim());
             if (participants >= 1 && participants <= maxAdditional) {
@@ -239,7 +212,6 @@ public class CLIOrganizeMatchView implements OrganizeMatchView {
             displayError(Constants.ERROR_MATCHBEAN_NULL);
             return;
         }
-
         System.out.println("\n" + Constants.SEPARATOR);
         System.out.println("    MATCH CREATED SUCCESSFULLY!");
         System.out.println(Constants.SEPARATOR);
@@ -253,19 +225,15 @@ public class CLIOrganizeMatchView implements OrganizeMatchView {
         System.out.println("  Organizer:    "
                 + (matchBean.getOrganizerName() != null ? matchBean.getOrganizerName() : "N/A"));
         System.out.println("  Players:      0/" + matchBean.getSport().getRequiredPlayers());
-
         if (matchBean.getFieldId() != 0) {
             System.out.println("  Field:        " + matchBean.getFieldId());
         }
-
         System.out.println("  Status:       " + (matchBean.getStatus() != null ? matchBean.getStatus() : "CONFIRMED"));
         System.out.println(Constants.SEPARATOR);
-
         System.out.println("\nOptions:");
         System.out.println("1. Invite players (coming soon)");
         System.out.println("2. Back to Home");
         System.out.print(Constants.PROMPT_CHOOSE_OPTION);
-
         String choice = scanner.nextLine().trim();
         handleRecapChoice(choice);
     }
@@ -287,5 +255,4 @@ public class CLIOrganizeMatchView implements OrganizeMatchView {
             }
         }
     }
-
 }

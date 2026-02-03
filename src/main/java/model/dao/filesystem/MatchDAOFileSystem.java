@@ -3,13 +3,10 @@ package model.dao.filesystem;
 import model.dao.MatchDAO;
 import model.domain.Match;
 import model.domain.MatchStatus;
-
 import java.util.List;
 
 public class MatchDAOFileSystem implements MatchDAO {
-
     public MatchDAOFileSystem() {
-        // Constructor for initialization
     }
 
     @Override
@@ -44,6 +41,11 @@ public class MatchDAOFileSystem implements MatchDAO {
 
     @Override
     public void delete(int id) {
+        throw new UnsupportedOperationException("Not implemented yet - GSON Hybrid Strategy Candidate");
+    }
+
+    @Override
+    public int deleteExpiredMatches() {
         throw new UnsupportedOperationException("Not implemented yet - GSON Hybrid Strategy Candidate");
     }
 }

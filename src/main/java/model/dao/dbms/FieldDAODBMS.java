@@ -3,13 +3,11 @@ package model.dao.dbms;
 import model.dao.FieldDAO;
 import model.domain.Field;
 import model.domain.Sport;
-
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-
 import java.sql.Connection;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -25,7 +23,7 @@ public class FieldDAODBMS implements FieldDAO {
     @Override
     public List<Field> findAll() {
         List<Field> fields = new ArrayList<>();
-        String query = "SELECT id, name, city, sport, manager_id FROM field";
+        String query = "SELECT id, name, city, address, price_per_hour, sport, manager_id FROM field";
         try (PreparedStatement stmt = connection.prepareStatement(query);
                 ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
@@ -39,7 +37,7 @@ public class FieldDAODBMS implements FieldDAO {
 
     @Override
     public Field findById(int id) {
-        String query = "SELECT id, name, city, sport, manager_id FROM field WHERE id = ?";
+        String query = "SELECT id, name, city, address, price_per_hour, sport, manager_id FROM field WHERE id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setInt(1, id);
             try (ResultSet rs = stmt.executeQuery()) {
@@ -56,7 +54,7 @@ public class FieldDAODBMS implements FieldDAO {
     @Override
     public List<Field> findByCity(String city) {
         List<Field> fields = new ArrayList<>();
-        String query = "SELECT id, name, city, sport, manager_id FROM field WHERE city = ?";
+        String query = "SELECT id, name, city, address, price_per_hour, sport, manager_id FROM field WHERE city = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, city);
             try (ResultSet rs = stmt.executeQuery()) {
@@ -73,17 +71,16 @@ public class FieldDAODBMS implements FieldDAO {
     @Override
     public List<Field> findAvailableFields(String city, Sport sport, LocalDate date, LocalTime time) {
         List<Field> fields = new ArrayList<>();
-        String query = "SELECT f.id, f.name, f.city, f.sport, f.manager_id FROM field f WHERE f.city = ? AND f.sport = ? " +
+        String query = "SELECT f.id, f.name, f.city, f.address, f.price_per_hour, f.sport, f.manager_id FROM field f WHERE f.city = ? AND f.sport = ? "
+                +
                 "AND NOT EXISTS (SELECT 1 FROM matches m WHERE m.field_id = f.id " +
                 "AND m.date = ? AND m.time = ? AND m.status = ?)";
-
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, city);
             stmt.setInt(2, sport.getCode());
             stmt.setDate(3, java.sql.Date.valueOf(date));
             stmt.setTime(4, java.sql.Time.valueOf(time));
             stmt.setInt(5, model.domain.MatchStatus.APPROVED.getCode());
-
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     fields.add(mapRowToField(rs));
@@ -98,7 +95,7 @@ public class FieldDAODBMS implements FieldDAO {
     @Override
     public List<Field> findByManagerId(int managerId) {
         List<Field> fields = new ArrayList<>();
-        String query = "SELECT id, name, city, sport, manager_id FROM field WHERE manager_id = ?";
+        String query = "SELECT id, name, city, address, price_per_hour, sport, manager_id FROM field WHERE manager_id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setInt(1, managerId);
             try (ResultSet rs = stmt.executeQuery()) {
@@ -114,13 +111,14 @@ public class FieldDAODBMS implements FieldDAO {
 
     @Override
     public void save(Field field) {
-        String query = "INSERT INTO field (name, city, sport, manager_id) VALUES (?, ?, ?, ?)";
+        String query = "INSERT INTO field (name, city, address, price_per_hour, sport, manager_id) VALUES (?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, field.getName());
             stmt.setString(2, field.getCity());
-            stmt.setInt(3, field.getSport().getCode());
-            stmt.setInt(4, field.getManagerId());
-
+            stmt.setString(3, field.getAddress());
+            stmt.setDouble(4, field.getPricePerHour());
+            stmt.setInt(5, field.getSport().getCode());
+            stmt.setInt(6, field.getManagerId());
             int affectedRows = stmt.executeUpdate();
             if (affectedRows > 0) {
                 try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
@@ -150,6 +148,8 @@ public class FieldDAODBMS implements FieldDAO {
                 rs.getInt("id"),
                 rs.getString("name"),
                 rs.getString("city"),
+                rs.getString("address"),
+                rs.getDouble("price_per_hour"),
                 model.domain.Sport.fromCode(rs.getInt("sport")),
                 rs.getInt("manager_id"));
     }

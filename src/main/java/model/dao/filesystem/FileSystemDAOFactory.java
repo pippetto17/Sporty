@@ -3,7 +3,6 @@ package model.dao.filesystem;
 import model.dao.*;
 
 public class FileSystemDAOFactory implements DAOFactory {
-
     @Override
     public UserDAO getUserDAO() {
         return new UserDAOFileSystem();

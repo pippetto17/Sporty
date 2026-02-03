@@ -5,14 +5,12 @@ import exception.ValidationException;
 import model.bean.MatchBean;
 import model.domain.Sport;
 import model.domain.User;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
 import static model.utils.Utils.ITALIAN_CITIES;
 
 public class OrganizeMatchController {
@@ -21,7 +19,6 @@ public class OrganizeMatchController {
     private final model.dao.MatchDAO matchDAO;
     private final model.dao.FieldDAO fieldDAO;
     private MatchBean currentMatchBean;
-
     private List<Sport> availableSports;
     private List<String> availableCities;
     private String preferredCity;
@@ -50,14 +47,12 @@ public class OrganizeMatchController {
                     .stream()
                     .map(model.converter.MatchConverter::toBean)
                     .toList();
-
             for (MatchBean mb : previousMatches) {
                 model.domain.Field f = fieldDAO.findById(mb.getFieldId());
                 if (f != null) {
                     mb.setCity(f.getCity());
                 }
             }
-
             this.preferredCity = previousMatches.stream()
                     .filter(m -> m.getCity() != null)
                     .collect(Collectors.groupingBy(MatchBean::getCity, Collectors.counting()))
@@ -107,11 +102,9 @@ public class OrganizeMatchController {
             throw new ValidationException(model.utils.Constants.ERROR_DATE_IN_PAST);
         if (date.equals(LocalDate.now()) && time.isBefore(LocalTime.now()))
             throw new ValidationException(model.utils.Constants.ERROR_TIME_IN_PAST);
-
         if (!sport.isValidAdditionalParticipants(additionalParticipants)) {
             throw new ValidationException(model.utils.Constants.ERROR_INVALID_PARTICIPANTS + sport.getDisplayName());
         }
-
         return true;
     }
 
@@ -126,7 +119,6 @@ public class OrganizeMatchController {
             }
             model.domain.Field field = fieldDAO.findById(match.getFieldId());
             if (field != null) {
-                // IMPLEMENT NOTIFICATION TO MANAGER
             }
         } catch (exception.DataAccessException e) {
             throw new DataAccessException("Error saving match: " + e.getMessage(), e);
@@ -139,7 +131,8 @@ public class OrganizeMatchController {
         currentMatchBean.setMatchDate(date);
         currentMatchBean.setMatchTime(time);
         currentMatchBean.setCity(city);
-        currentMatchBean.setMissingPlayers(additionalParticipants);
+        int totalRequired = sport.getRequiredPlayers();
+        currentMatchBean.setMissingPlayers(totalRequired - 1);
     }
 
     public void proceedToFieldSelection() {
@@ -157,8 +150,6 @@ public class OrganizeMatchController {
     public void navigateBack() {
         applicationController.back();
     }
-
-    // --- Parsing Methods ---
 
     public LocalDate parseDate(String dateStr) {
         if (dateStr == null)

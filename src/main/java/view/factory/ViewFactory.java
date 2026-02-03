@@ -20,5 +20,4 @@ public interface ViewFactory {
     PaymentView createPaymentView(PaymentController paymentController);
 
     FieldManagerView createFieldManagerView(FieldManagerController controller);
-
 }

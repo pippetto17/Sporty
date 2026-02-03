@@ -12,26 +12,20 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
-
 import model.domain.User;
 import model.utils.Constants;
 import view.ViewUtils;
-
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.logging.Logger;
 
 public class GraphicFieldManagerView implements FieldManagerView {
-
-    // Dipendenze essenziali
     private final FieldManagerController controller;
-    private final User manager; // Rinominato da fieldManager per brevità
+    private final User manager;
     private ApplicationController appController;
     private model.notification.NotificationService notificationService;
     private Stage stage;
     private final Logger logger = Logger.getLogger(getClass().getName());
-
-    // UI Elements (Raggruppati per pulizia)
     @FXML
     private Label managerNameLabel;
     @FXML
@@ -58,7 +52,6 @@ public class GraphicFieldManagerView implements FieldManagerView {
     private Button approveButton;
     @FXML
     private Button rejectButton;
-
     private final ObservableList<model.bean.MatchBean> bookingsList = FXCollections.observableArrayList();
 
     public GraphicFieldManagerView(FieldManagerController controller, User manager) {
@@ -83,10 +76,8 @@ public class GraphicFieldManagerView implements FieldManagerView {
             stage = new Stage();
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/field_manager_dashboard.fxml"));
             loader.setController(this);
-
             Scene scene = new Scene(loader.load(), 1000, 700);
             ViewUtils.applyStylesheets(scene);
-
             stage.setTitle("Field Manager Dashboard - Sporty");
             stage.setScene(scene);
             stage.show();
@@ -107,20 +98,16 @@ public class GraphicFieldManagerView implements FieldManagerView {
     @FXML
     private void initialize() {
         managerNameLabel.setText("Manager: " + manager.getName() + " " + manager.getSurname());
-
-        // Load Manager Image
         try {
             javafx.scene.image.Image img = new javafx.scene.image.Image(
                     java.util.Objects.requireNonNull(getClass().getResourceAsStream("/image/manager.jpeg")),
                     120, 120, true, true);
             managerImageView.setImage(img);
-
             javafx.scene.shape.Circle clip = new javafx.scene.shape.Circle(30, 30, 30);
             managerImageView.setClip(clip);
         } catch (Exception e) {
             logger.warning("Manager image not found: " + e.getMessage());
         }
-
         setupTable();
         loadData();
         Platform.runLater(this::checkAndShowNotifications);
@@ -132,7 +119,6 @@ public class GraphicFieldManagerView implements FieldManagerView {
     private void checkAndShowNotifications() {
         if (notificationService == null)
             return;
-
         List<String> unread = notificationService.getUnreadNotifications(manager.getUsername());
         if (!unread.isEmpty()) {
             notificationButton.setStyle("-fx-text-fill: -color-danger-fg; -fx-border-color: -color-danger-emphasis;");
@@ -148,16 +134,12 @@ public class GraphicFieldManagerView implements FieldManagerView {
         Dialog<Void> dialog = new Dialog<>();
         dialog.setTitle("Notification Center");
         dialog.setHeaderText("Notifications & Requests");
-
         TabPane tabPane = new TabPane();
         tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
-
         tabPane.getTabs().addAll(createRequestsTab(), createAlertsTab());
-
         dialog.getDialogPane().setContent(tabPane);
         dialog.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
         ViewUtils.applyStylesheets(dialog.getDialogPane());
-
         dialog.showAndWait();
     }
 
@@ -165,10 +147,8 @@ public class GraphicFieldManagerView implements FieldManagerView {
         Tab alertsTab = new Tab("Alerts");
         VBox alertsBox = new VBox(10);
         alertsBox.setPadding(new javafx.geometry.Insets(10));
-
         List<String> unread = notificationService.getUnreadNotifications(manager.getUsername());
         populateAlertsBox(alertsBox, unread);
-
         alertsTab.setContent(new ScrollPane(alertsBox));
         return alertsTab;
     }
@@ -178,7 +158,6 @@ public class GraphicFieldManagerView implements FieldManagerView {
             alertsBox.getChildren().add(new Label("No new notifications."));
             return;
         }
-
         for (String note : unread) {
             Label l = new Label("🔔 " + note);
             l.setWrapText(true);
@@ -192,10 +171,8 @@ public class GraphicFieldManagerView implements FieldManagerView {
         Tab requestsTab = new Tab("Pending Requests");
         VBox requestsBox = new VBox(10);
         requestsBox.setPadding(new javafx.geometry.Insets(10));
-
         List<model.bean.MatchBean> pendingRequests = controller.getPendingRequests();
         populateRequestsBox(requestsBox, pendingRequests);
-
         requestsTab.setContent(new ScrollPane(requestsBox));
         return requestsTab;
     }
@@ -205,7 +182,6 @@ public class GraphicFieldManagerView implements FieldManagerView {
             requestsBox.getChildren().add(new Label("No pending requests."));
             return;
         }
-
         for (model.bean.MatchBean m : pendingRequests) {
             requestsBox.getChildren().add(createMatchRequestRow(m, requestsBox));
         }
@@ -214,24 +190,19 @@ public class GraphicFieldManagerView implements FieldManagerView {
     private HBox createMatchRequestRow(model.bean.MatchBean m, VBox requestsBox) {
         HBox row = new HBox(10);
         row.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
-
         VBox info = new VBox(2);
         Label title = new Label(m.getFieldName() + " - " + m.getMatchDate());
         title.setStyle("-fx-font-weight: bold");
         Label subtitle = new Label(m.getMatchTime() + " (" + m.getOrganizerName() + ")");
         info.getChildren().addAll(title, subtitle);
-
         Region spacer = new Region();
         HBox.setHgrow(spacer, javafx.scene.layout.Priority.ALWAYS);
-
         Button approveBtn = new Button("✓");
         approveBtn.getStyleClass().add("success-button");
         approveBtn.setOnAction(e -> handleApproveFromDialog(m, row, requestsBox));
-
         Button rejectBtn = new Button("✗");
         rejectBtn.getStyleClass().add("danger-button");
         rejectBtn.setOnAction(e -> handleRejectFromDialog(m, row, requestsBox));
-
         row.getChildren().addAll(info, spacer, approveBtn, rejectBtn);
         return row;
     }
@@ -266,10 +237,7 @@ public class GraphicFieldManagerView implements FieldManagerView {
                 d -> new SimpleStringProperty(d.getValue().getMatchDate().format(DateTimeFormatter.ISO_LOCAL_DATE)));
         timeColumn.setCellValueFactory(
                 d -> new SimpleStringProperty(d.getValue().getMatchTime().toString()));
-
         bookingsTable.setItems(bookingsList);
-
-        // Listener selezione riga
         bookingsTable.getSelectionModel().selectedItemProperty().addListener((obs, old, selected) -> {
             boolean active = selected != null;
             approveButton.setDisable(!active);
@@ -279,11 +247,10 @@ public class GraphicFieldManagerView implements FieldManagerView {
 
     private void loadData() {
         try {
-            var stats = controller.getDashboardData(); // 'var' rende il codice meno verboso (Java 10+)
+            var stats = controller.getDashboardData();
             totalFieldsLabel.setText(String.valueOf(stats.totalFields()));
             pendingRequestsLabel.setText(String.valueOf(stats.pendingRequests()));
             todayBookingsLabel.setText(String.valueOf(stats.todayBookings()));
-
             bookingsList.setAll(controller.getPendingRequests());
         } catch (Exception e) {
             showMessage(e.getMessage(), true);
@@ -295,7 +262,6 @@ public class GraphicFieldManagerView implements FieldManagerView {
         model.bean.MatchBean selected = bookingsTable.getSelectionModel().getSelectedItem();
         if (selected == null)
             return;
-
         try {
             controller.approveMatch(selected.getMatchId());
             showMessage("Match approved!", false);
@@ -310,7 +276,6 @@ public class GraphicFieldManagerView implements FieldManagerView {
         model.bean.MatchBean selected = bookingsTable.getSelectionModel().getSelectedItem();
         if (selected == null)
             return;
-
         try {
             controller.rejectMatch(selected.getMatchId());
             showMessage("Match rejected", false);
@@ -351,21 +316,15 @@ public class GraphicFieldManagerView implements FieldManagerView {
             appController.logout();
     }
 
-    /**
-     * Creates a styled Alert dialog that matches the application's dark theme.
-     */
     private Alert createStyledAlert(Alert.AlertType type, String title, String content) {
         Alert alert = new Alert(type);
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(content);
-
         ViewUtils.applyStylesheets(alert.getDialogPane());
-
         return alert;
     }
 
-    // Unificato ShowError/Success/Info in un unico metodo logico
     private void showMessage(String msg, boolean isError) {
         messageLabel.getStyleClass().removeAll(Constants.CSS_ERROR, Constants.CSS_SUCCESS, Constants.CSS_INFO);
         messageLabel.getStyleClass().add(isError ? Constants.CSS_ERROR : Constants.CSS_SUCCESS);

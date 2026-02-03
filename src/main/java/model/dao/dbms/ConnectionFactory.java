@@ -8,13 +8,10 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 public class ConnectionFactory {
-
     private ConnectionFactory() {
-        // Private constructor per impedire istanziazione
     }
 
     private static final Properties properties;
-
     static {
         try (InputStream input = ConnectionFactory.class.getResourceAsStream("/db.properties")) {
             properties = new Properties();
@@ -22,7 +19,6 @@ public class ConnectionFactory {
                 throw new IOException("File db.properties not found in resources.");
             }
             properties.load(input);
-
             String driver = properties.getProperty("db.driver");
             if (driver != null) {
                 Class.forName(driver);
@@ -31,7 +27,6 @@ public class ConnectionFactory {
             throw new ExceptionInInitializerError("Error loading database properties: " + e.getMessage());
         }
     }
-
     private static Connection connection;
 
     public static synchronized Connection getConnection() throws SQLException {
@@ -39,11 +34,9 @@ public class ConnectionFactory {
             String url = properties.getProperty("db.url");
             String user = properties.getProperty("db.user");
             String password = properties.getProperty("db.password");
-
             if (url == null || user == null || password == null) {
                 throw new SQLException("Database connection properties are not properly configured.");
             }
-
             connection = DriverManager.getConnection(url, user, password);
         }
         return connection;

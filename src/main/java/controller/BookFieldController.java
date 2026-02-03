@@ -4,7 +4,6 @@ import exception.ValidationException;
 import model.bean.FieldBean;
 import model.bean.MatchBean;
 import model.utils.Constants;
-
 import java.util.List;
 
 public class BookFieldController {
@@ -46,19 +45,20 @@ public class BookFieldController {
             return;
         }
         currentMatchBean.setFieldId(field.getFieldId());
+        currentMatchBean.setFieldName(field.getName());
+        currentMatchBean.setFieldAddress(field.getAddress());
+        currentMatchBean.setPricePerHour(field.getPricePerHour());
     }
 
     public List<FieldBean> searchAvailableFields() {
         if (currentMatchBean == null) {
             return List.of();
         }
-
         var fields = fieldDAO.findAvailableFields(
                 currentMatchBean.getCity(),
                 currentMatchBean.getSport(),
                 currentMatchBean.getMatchDate(),
                 currentMatchBean.getMatchTime());
-
         this.availableFields = convertToFieldBeans(fields);
         return availableFields;
     }
@@ -74,7 +74,6 @@ public class BookFieldController {
         if (selectedField == null) {
             throw new ValidationException(Constants.ERROR_NO_FIELD_SELECTED);
         }
-
         applicationController.navigateToPayment(currentMatchBean);
     }
 

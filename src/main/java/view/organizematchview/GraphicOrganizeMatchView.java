@@ -14,7 +14,6 @@ import javafx.util.StringConverter;
 import model.bean.MatchBean;
 import model.domain.Sport;
 import model.utils.Constants;
-
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -24,10 +23,8 @@ import java.util.logging.Logger;
 
 public class GraphicOrganizeMatchView implements OrganizeMatchView {
     private static final Logger logger = Logger.getLogger(GraphicOrganizeMatchView.class.getName());
-
     private final OrganizeMatchController organizeMatchController;
     private Stage stage;
-
     @FXML
     private Button backButton;
     @FXML
@@ -70,7 +67,6 @@ public class GraphicOrganizeMatchView implements OrganizeMatchView {
     private Label recapStatusLabel;
     @FXML
     private Button inviteButton;
-
     private boolean isUpdatingCityComboBox = false;
 
     public GraphicOrganizeMatchView(OrganizeMatchController organizeMatchController) {
@@ -79,7 +75,6 @@ public class GraphicOrganizeMatchView implements OrganizeMatchView {
 
     @Override
     public void setApplicationController(ApplicationController applicationController) {
-        // Not used in this view
     }
 
     @Override
@@ -89,20 +84,15 @@ public class GraphicOrganizeMatchView implements OrganizeMatchView {
                 if (stage == null) {
                     stage = new Stage();
                     stage.setTitle("Sporty - Organize Match");
-
                     FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/organize_match.fxml"));
                     loader.setController(this);
                     Parent root = loader.load();
-
                     Scene scene = new Scene(root, 700, 750);
                     scene.getStylesheets().add(getClass().getResource("/css/style.css").toExternalForm());
-
                     stage.setScene(scene);
                     stage.setResizable(true);
-
                     initialize();
                 }
-
                 stage.show();
                 stage.toFront();
             } catch (IOException e) {
@@ -116,33 +106,19 @@ public class GraphicOrganizeMatchView implements OrganizeMatchView {
     }
 
     private void initialize() {
-        // BCE Criterion 3: First interaction loads all required entities into memory
         organizeMatchController.initializeOrganizeMatch();
-
-        // Initialize sport combo box from controller
         sportComboBox.getItems().addAll(organizeMatchController.getAvailableSports());
         sportComboBox.setConverter(new SportStringConverter());
-
-        // Listen to sport selection to update participants info
         sportComboBox.setOnAction(e -> updateParticipantsInfo());
-
-        // Initialize city combo box
         cityComboBox.getItems().addAll(organizeMatchController.getAvailableCities());
         cityComboBox.setEditable(true);
         setupCityAutocomplete();
-
-        // Show preferred city suggestion if available
         String preferredCity = organizeMatchController.getPreferredCity();
         if (preferredCity != null) {
             cityComboBox.setPromptText("Suggerito: " + preferredCity);
         }
-
-        // Initialize participants spinner (default 1-20, will be updated by sport
-        // selection)
         SpinnerValueFactory<Integer> valueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 20, 1);
         participantsSpinner.setValueFactory(valueFactory);
-
-        // Initialize time combo box (every 30 minutes)
         List<LocalTime> times = new java.util.ArrayList<>();
         for (int h = 0; h < 24; h++) {
             times.add(LocalTime.of(h, 0));
@@ -150,8 +126,6 @@ public class GraphicOrganizeMatchView implements OrganizeMatchView {
         }
         timeComboBox.getItems().addAll(times);
         timeComboBox.setConverter(new TimeStringConverter());
-
-        // Set date picker to today as minimum
         datePicker.setDayCellFactory(picker -> new FutureDateCell());
     }
 
@@ -188,24 +162,19 @@ public class GraphicOrganizeMatchView implements OrganizeMatchView {
     }
 
     private void setupCityAutocomplete() {
-        // Filtro in tempo reale mentre l'utente digita
         cityComboBox.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
             if (isUpdatingCityComboBox) {
-                return; // Evita loop infinito
+                return;
             }
-
             isUpdatingCityComboBox = true;
             try {
                 if (newValue == null || newValue.isEmpty()) {
                     cityComboBox.hide();
                 } else {
                     List<String> filtered = model.utils.Utils.searchCitiesByPrefix(newValue);
-
-                    // Aggiorna solo se ci sono risultati diversi
                     if (!filtered.equals(cityComboBox.getItems())) {
                         cityComboBox.getItems().setAll(filtered);
                     }
-
                     if (!filtered.isEmpty() && !cityComboBox.isShowing()) {
                         cityComboBox.show();
                     }
@@ -214,8 +183,6 @@ public class GraphicOrganizeMatchView implements OrganizeMatchView {
                 isUpdatingCityComboBox = false;
             }
         });
-
-        // Auto-completa quando l'utente seleziona o esce dal campo
         cityComboBox.setOnAction(e -> {
             if (cityComboBox.getValue() != null) {
                 cityComboBox.hide();
@@ -226,10 +193,7 @@ public class GraphicOrganizeMatchView implements OrganizeMatchView {
     private void updateParticipantsInfo() {
         Sport selected = sportComboBox.getValue();
         if (selected != null) {
-            // Get info text from controller
             participantsInfoLabel.setText(organizeMatchController.getParticipantsInfoText(selected));
-
-            // Get max additional participants from controller
             int maxAdditional = organizeMatchController.getMaxAdditionalParticipants(selected);
             SpinnerValueFactory<Integer> valueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(1,
                     maxAdditional, maxAdditional);
@@ -241,40 +205,25 @@ public class GraphicOrganizeMatchView implements OrganizeMatchView {
 
     @FXML
     private void handleSearchFields() {
-        // Clear previous messages
         messageLabel.setText("");
         messageLabel.getStyleClass().removeAll(Constants.CSS_ERROR, Constants.CSS_SUCCESS);
-
-        // Validate inputs
         if (!validateInputs()) {
             return;
         }
-
-        // Get values
         Sport sport = sportComboBox.getValue();
         LocalDate date = datePicker.getValue();
         LocalTime time = timeComboBox.getValue();
         String city = cityComboBox.getValue();
         int participants = participantsSpinner.getValue();
-
-        // Validate with controller
         try {
             organizeMatchController.validateMatchDetails(sport, date, time, city, participants);
         } catch (exception.ValidationException e) {
             showError(e.getMessage());
             return;
         }
-
-        // Set match details
         organizeMatchController.setMatchDetails(sport, date, time, city, participants);
-
-        // Show summary
         showSummary(sport, date, time, city, participants);
-
-        // Show success message
         showSuccess(Constants.SUCCESS_MATCH_DETAILS_FIELD_SELECTION);
-
-        // Navigate to field selection after a short delay
         new Thread(() -> {
             try {
                 Thread.sleep(1500);
@@ -289,7 +238,6 @@ public class GraphicOrganizeMatchView implements OrganizeMatchView {
     }
 
     private boolean validateInputs() {
-        // Only basic UI validation - business validation is in controller
         if (sportComboBox.getValue() == null) {
             showError(Constants.ERROR_PLEASE_SELECT_SPORT);
             return false;
@@ -302,7 +250,6 @@ public class GraphicOrganizeMatchView implements OrganizeMatchView {
             showError(Constants.ERROR_PLEASE_ENTER_TIME);
             return false;
         }
-        // Removed manual text parsing check
         if (cityComboBox.getValue() == null || cityComboBox.getValue().trim().isEmpty()) {
             showError(Constants.ERROR_PLEASE_SELECT_CITY);
             return false;
@@ -313,7 +260,6 @@ public class GraphicOrganizeMatchView implements OrganizeMatchView {
     private void showSummary(Sport sport, LocalDate date, LocalTime time, String city, int participants) {
         summaryBox.setVisible(true);
         summaryBox.setManaged(true);
-
         summarySport.setText(sport.getDisplayName());
         summaryDateTime.setText(date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) +
                 " at " + time.format(DateTimeFormatter.ofPattern("HH:mm")));
@@ -350,12 +296,10 @@ public class GraphicOrganizeMatchView implements OrganizeMatchView {
 
     @Override
     public void displayMatchList() {
-        // Not used in graphic version - shown in Home
     }
 
     @Override
     public void displayNewMatchForm() {
-        // Already displayed
     }
 
     @Override
@@ -375,8 +319,6 @@ public class GraphicOrganizeMatchView implements OrganizeMatchView {
                 showError(Constants.ERROR_MATCHBEAN_NULL);
                 return;
             }
-
-            // Nascondi form e mostra recap
             sportComboBox.setVisible(false);
             sportComboBox.setManaged(false);
             datePicker.setVisible(false);
@@ -395,14 +337,11 @@ public class GraphicOrganizeMatchView implements OrganizeMatchView {
             searchFieldsButton.setManaged(false);
             messageLabel.setVisible(false);
             messageLabel.setManaged(false);
-
-            // Popolamento recap
             recapSportLabel.setText(matchBean.getSport() != null ? matchBean.getSport().getDisplayName() : "N/A");
             recapDateLabel.setText(matchBean.getMatchDate() != null ? matchBean.getMatchDate().toString() : "N/A");
             recapTimeLabel.setText(matchBean.getMatchTime() != null ? matchBean.getMatchTime().toString() : "N/A");
             recapCityLabel.setText(matchBean.getCity());
             recapStatusLabel.setText(matchBean.getStatus() != null ? matchBean.getStatus().toString() : "CONFIRMED");
-
             recapBox.setVisible(true);
             recapBox.setManaged(true);
         });

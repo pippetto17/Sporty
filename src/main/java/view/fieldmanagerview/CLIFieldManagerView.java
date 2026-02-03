@@ -4,12 +4,10 @@ import controller.ApplicationController;
 import controller.FieldManagerController;
 import model.bean.MatchBean;
 import model.domain.User;
-
 import java.util.List;
 import java.util.Scanner;
 
 public class CLIFieldManagerView implements FieldManagerView {
-
     private final FieldManagerController controller;
     private final User manager;
     private final Scanner scanner;
@@ -35,7 +33,6 @@ public class CLIFieldManagerView implements FieldManagerView {
             printHeader();
             printStats();
             printMenu();
-
             String choice = scanner.nextLine().trim();
             switch (choice) {
                 case "1" -> listPendingRequests();
@@ -50,10 +47,7 @@ public class CLIFieldManagerView implements FieldManagerView {
 
     @Override
     public void close() {
-        // No-op per CLI
     }
-
-    // --- DISPLAY HELPERS ---
 
     private void printHeader() {
         System.out.println("\n========================================");
@@ -80,8 +74,6 @@ public class CLIFieldManagerView implements FieldManagerView {
         System.out.print("> ");
     }
 
-    // --- ACTIONS ---
-
     private void listPendingRequests() {
         try {
             List<MatchBean> pending = controller.getPendingRequests();
@@ -89,12 +81,9 @@ public class CLIFieldManagerView implements FieldManagerView {
                 System.out.println("\n✓ No pending requests.");
                 return;
             }
-
             System.out.println("\n--- PENDING REQUESTS ---");
-            // Intestazione Tabella
             System.out.printf("%-8s %-15s %-15s %-15s %-12s %-12s%n", "ID", "FIELD", "ORGANIZER", "SPORT", "DATE",
                     "TIME");
-
             for (MatchBean m : pending) {
                 System.out.printf("[%-6d] %-15s %-15s %-15s %-12s %s%n",
                         m.getMatchId(),
@@ -113,7 +102,6 @@ public class CLIFieldManagerView implements FieldManagerView {
         int id = readInt("Enter Match ID to APPROVE: ");
         if (id == -1)
             return;
-
         try {
             controller.approveMatch(id);
             System.out.println("✓ Match " + id + " approved.");
@@ -126,7 +114,6 @@ public class CLIFieldManagerView implements FieldManagerView {
         int id = readInt("Enter Match ID to REJECT: ");
         if (id == -1)
             return;
-
         try {
             controller.rejectMatch(id);
             System.out.println("✓ Match " + id + " rejected.");
@@ -138,20 +125,14 @@ public class CLIFieldManagerView implements FieldManagerView {
     private void showUnreadNotifications() {
         if (notificationService == null)
             return;
-
         List<String> unread = notificationService.getUnreadNotifications(manager.getUsername());
         if (unread.isEmpty())
             return;
-
         System.out.println("\n🔔 YOU HAVE " + unread.size() + " NEW NOTIFICATION(S):");
         unread.forEach(msg -> System.out.println("  • " + msg));
-
         notificationService.markAllAsRead(manager.getUsername());
     }
 
-    // --- UTILS ---
-
-    // Legge un intero gestendo l'errore di formato
     private int readInt(String prompt) {
         System.out.print(prompt);
         try {
@@ -162,7 +143,6 @@ public class CLIFieldManagerView implements FieldManagerView {
         }
     }
 
-    // Taglia le stringhe troppo lunghe per non rompere la tabella
     private String truncate(String input, int length) {
         if (input == null)
             return "";

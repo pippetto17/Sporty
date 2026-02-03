@@ -3,12 +3,10 @@ package controller;
 import exception.ValidationException;
 import model.bean.FieldBean;
 import model.domain.User;
-
 import java.util.List;
 
 public class FieldManagerController {
     private static final String ERROR_NOT_OWNER = model.utils.Constants.ERROR_NOT_FIELD_OWNER;
-
     private final User fieldManager;
     private final model.dao.FieldDAO fieldDAO;
     private final model.dao.MatchDAO matchDAO;
@@ -18,13 +16,11 @@ public class FieldManagerController {
         if (!fieldManager.isFieldManager()) {
             throw new ValidationException(model.utils.Constants.ERROR_NOT_FIELD_MANAGER);
         }
-
         this.fieldManager = fieldManager;
         this.fieldDAO = daoFactory.getFieldDAO();
         this.matchDAO = daoFactory.getMatchDAO();
+        this.matchDAO.deleteExpiredMatches();
     }
-
-    // ==================== Field Management ====================
 
     public void addNewField(FieldBean fieldBean) {
         var field = model.converter.FieldConverter.toEntity(fieldBean);
@@ -40,10 +36,9 @@ public class FieldManagerController {
 
     public void updateField(FieldBean fieldBean) {
         validateOwnership(fieldBean.getFieldId());
-
         var field = model.converter.FieldConverter.toEntity(fieldBean);
         field.setManagerId(fieldManager.getId());
-        field.setId(fieldBean.getFieldId()); // Ensure ID is preserved
+        field.setId(fieldBean.getFieldId());
         fieldDAO.save(field);
     }
 
@@ -51,8 +46,6 @@ public class FieldManagerController {
         validateOwnership(fieldId);
         fieldDAO.delete(fieldId);
     }
-
-    // ==================== Match Request Management ====================
 
     public List<model.bean.MatchBean> getPendingRequests() {
         return matchDAO.findPendingForManager(fieldManager.getId()).stream()
@@ -68,10 +61,6 @@ public class FieldManagerController {
     }
 
     public void approveMatch(int matchId) {
-        // Verify ownership indirectly?
-        // MatchDAO.updateStatus logic?
-        // Ideally we should check if the match belongs to a field managed by this user.
-        // For simple logic, assume the ID comes from getPendingRequests.
         matchDAO.updateStatus(matchId, model.domain.MatchStatus.APPROVED);
     }
 
@@ -79,15 +68,11 @@ public class FieldManagerController {
         matchDAO.updateStatus(matchId, model.domain.MatchStatus.REJECTED);
     }
 
-    // ==================== Dashboard Data ====================
-
     public DashboardData getDashboardData() {
         var fields = getMyFields();
         var pendingRequests = getPendingRequests();
-
         int totalFields = fields.size();
         int pendingCount = pendingRequests.size();
-
         return new DashboardData(totalFields, pendingCount, 0, 0.0);
     }
 
