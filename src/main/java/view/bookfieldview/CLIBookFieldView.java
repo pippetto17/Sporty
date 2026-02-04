@@ -22,6 +22,7 @@ public class CLIBookFieldView implements BookFieldView {
 
     @Override
     public void setApplicationController(ApplicationController applicationController) {
+        // Intentionally empty
     }
 
     @Override

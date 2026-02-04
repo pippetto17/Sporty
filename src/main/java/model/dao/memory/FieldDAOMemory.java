@@ -21,7 +21,10 @@ public class FieldDAOMemory implements FieldDAO {
                         double pricePerHour,
                         int managerId) {
                 int id = nextId();
-                Field field = new Field(id, name, city, address, pricePerHour, sport, managerId);
+                // Create stub User for manager
+                model.domain.User manager = new model.domain.User();
+                manager.setId(managerId);
+                Field field = new Field(id, name, city, address, pricePerHour, sport, manager);
                 fields.put(id, field);
         }
 
@@ -91,7 +94,7 @@ public class FieldDAOMemory implements FieldDAO {
         @Override
         public List<Field> findByManagerId(int managerId) {
                 return fields.values().stream()
-                                .filter(field -> field.getManagerId() == managerId)
+                                .filter(field -> field.getManager() != null && field.getManager().getId() == managerId)
                                 .toList();
         }
 

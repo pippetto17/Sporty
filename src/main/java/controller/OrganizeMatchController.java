@@ -117,9 +117,7 @@ public class OrganizeMatchController {
             if (match.getId() != 0) {
                 currentMatchBean.setMatchId(match.getId());
             }
-            model.domain.Field field = fieldDAO.findById(match.getFieldId());
-            if (field != null) {
-            }
+
         } catch (exception.DataAccessException e) {
             throw new DataAccessException("Error saving match: " + e.getMessage(), e);
         }
@@ -132,7 +130,7 @@ public class OrganizeMatchController {
         currentMatchBean.setMatchTime(time);
         currentMatchBean.setCity(city);
         int totalRequired = sport.getRequiredPlayers();
-        currentMatchBean.setMissingPlayers(totalRequired - 1);
+        currentMatchBean.setMissingPlayers(totalRequired - 1 - additionalParticipants);
     }
 
     public void proceedToFieldSelection() {

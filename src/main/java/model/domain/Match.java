@@ -5,8 +5,8 @@ import java.time.LocalTime;
 
 public class Match {
     private int id;
-    private int organizerId;
-    private int fieldId;
+    private User organizer;
+    private Field field;
     private LocalDate date;
     private LocalTime time;
     private int missingPlayers;
@@ -16,11 +16,11 @@ public class Match {
         this.status = MatchStatus.PENDING;
     }
 
-    public Match(int id, int organizerId, int fieldId, LocalDate date, LocalTime time, int missingPlayers,
+    public Match(int id, User organizer, Field field, LocalDate date, LocalTime time, int missingPlayers,
             MatchStatus status) {
         this.id = id;
-        this.organizerId = organizerId;
-        this.fieldId = fieldId;
+        this.organizer = organizer;
+        this.field = field;
         this.date = date;
         this.time = time;
         this.missingPlayers = missingPlayers;
@@ -35,20 +35,20 @@ public class Match {
         this.id = id;
     }
 
-    public int getOrganizerId() {
-        return organizerId;
+    public User getOrganizer() {
+        return organizer;
     }
 
-    public void setOrganizerId(int organizerId) {
-        this.organizerId = organizerId;
+    public void setOrganizer(User organizer) {
+        this.organizer = organizer;
     }
 
-    public int getFieldId() {
-        return fieldId;
+    public Field getField() {
+        return field;
     }
 
-    public void setFieldId(int fieldId) {
-        this.fieldId = fieldId;
+    public void setField(Field field) {
+        this.field = field;
     }
 
     public LocalDate getDate() {

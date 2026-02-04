@@ -21,6 +21,7 @@ public class MatchBean {
     private MatchStatus status;
 
     public MatchBean() {
+        // Intentionally empty
     }
 
     public int getMatchId() {

@@ -50,6 +50,7 @@ public class GraphicPaymentView implements PaymentView {
     private Label errorLabel;
 
     public GraphicPaymentView() {
+        // Intentionally empty
     }
 
     public void setController(PaymentController controller) {

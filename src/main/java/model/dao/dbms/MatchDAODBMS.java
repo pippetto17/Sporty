@@ -22,8 +22,9 @@ public class MatchDAODBMS implements MatchDAO {
     public void save(Match match) {
         String query = "INSERT INTO matches (organizer_id, field_id, date, time, missing_players, status) VALUES (?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
-            stmt.setInt(1, match.getOrganizerId());
-            stmt.setInt(2, match.getFieldId());
+            // Extract IDs from entity objects
+            stmt.setInt(1, match.getOrganizer() != null ? match.getOrganizer().getId() : 0);
+            stmt.setInt(2, match.getField() != null ? match.getField().getId() : 0);
             stmt.setDate(3, java.sql.Date.valueOf(match.getDate()));
             stmt.setTime(4, java.sql.Time.valueOf(match.getTime()));
             stmt.setInt(5, match.getMissingPlayers());
@@ -146,10 +147,22 @@ public class MatchDAODBMS implements MatchDAO {
     }
 
     private Match mapRowToMatch(ResultSet rs) throws SQLException {
+        // Load foreign key IDs
+        int organizerId = rs.getInt("organizer_id");
+        int fieldId = rs.getInt("field_id");
+
+        // Create DAOs with shared connection to avoid circular dependencies
+        UserDAODBMS userDAO = new UserDAODBMS(connection);
+        FieldDAODBMS fieldDAO = new FieldDAODBMS(connection);
+
+        // Load complete entities instead of just IDs
+        model.domain.User organizer = userDAO.findById(organizerId);
+        model.domain.Field field = fieldDAO.findById(fieldId);
+
         return new Match(
                 rs.getInt("id"),
-                rs.getInt("organizer_id"),
-                rs.getInt("field_id"),
+                organizer, // Full entity instead of ID
+                field, // Full entity instead of ID
                 rs.getDate("date").toLocalDate(),
                 rs.getTime("time").toLocalTime(),
                 rs.getInt("missing_players"),

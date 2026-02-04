@@ -24,7 +24,7 @@ public class FieldManagerController {
 
     public void addNewField(FieldBean fieldBean) {
         var field = model.converter.FieldConverter.toEntity(fieldBean);
-        field.setManagerId(fieldManager.getId());
+        field.setManager(fieldManager);
         fieldDAO.save(field);
     }
 
@@ -37,7 +37,7 @@ public class FieldManagerController {
     public void updateField(FieldBean fieldBean) {
         validateOwnership(fieldBean.getFieldId());
         var field = model.converter.FieldConverter.toEntity(fieldBean);
-        field.setManagerId(fieldManager.getId());
+        field.setManager(fieldManager);
         field.setId(fieldBean.getFieldId());
         fieldDAO.save(field);
     }
@@ -51,7 +51,7 @@ public class FieldManagerController {
         return matchDAO.findPendingForManager(fieldManager.getId()).stream()
                 .map(match -> {
                     var bean = model.converter.MatchConverter.toBean(match);
-                    var field = fieldDAO.findById(match.getFieldId());
+                    var field = match.getField();
                     if (field != null) {
                         bean.setFieldName(field.getName());
                     }

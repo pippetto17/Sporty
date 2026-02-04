@@ -188,7 +188,7 @@ public class PaymentController {
         try {
             if (field != null) {
                 notificationService.notifyMatchCreated(
-                        String.valueOf(field.getManagerId()),
+                        String.valueOf(field.getManager() != null ? field.getManager().getId() : 0),
                         matchBean.getOrganizerName(),
                         field.getName(),
                         matchBean.getMatchDate().toString(),

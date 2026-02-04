@@ -13,8 +13,12 @@ public class MatchConverter {
         }
         Match match = new Match();
         match.setId(matchBean.getMatchId());
-        match.setOrganizerId(matchBean.getOrganizerId());
-        match.setFieldId(matchBean.getFieldId());
+        model.domain.User organizer = new model.domain.User();
+        organizer.setId(matchBean.getOrganizerId());
+        match.setOrganizer(organizer);
+        model.domain.Field field = new model.domain.Field();
+        field.setId(matchBean.getFieldId());
+        match.setField(field);
         match.setDate(matchBean.getMatchDate());
         match.setTime(matchBean.getMatchTime());
         match.setMissingPlayers(matchBean.getMissingPlayers());
@@ -28,8 +32,8 @@ public class MatchConverter {
         }
         MatchBean matchBean = new MatchBean();
         matchBean.setMatchId(match.getId());
-        matchBean.setOrganizerId(match.getOrganizerId());
-        matchBean.setFieldId(match.getFieldId());
+        matchBean.setOrganizerId(match.getOrganizer() != null ? match.getOrganizer().getId() : 0);
+        matchBean.setFieldId(match.getField() != null ? match.getField().getId() : 0);
         matchBean.setMatchDate(match.getDate());
         matchBean.setMatchTime(match.getTime());
         matchBean.setMissingPlayers(match.getMissingPlayers());

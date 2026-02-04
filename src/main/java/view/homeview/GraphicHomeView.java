@@ -384,6 +384,7 @@ public class GraphicHomeView implements HomeView {
 
     @Override
     public void displayMenu() {
+        // Intentionally empty
     }
 
     @FXML

@@ -118,7 +118,8 @@ public class FieldDAODBMS implements FieldDAO {
             stmt.setString(3, field.getAddress());
             stmt.setDouble(4, field.getPricePerHour());
             stmt.setInt(5, field.getSport().getCode());
-            stmt.setInt(6, field.getManagerId());
+            // Extract ID from manager entity
+            stmt.setInt(6, field.getManager() != null ? field.getManager().getId() : 0);
             int affectedRows = stmt.executeUpdate();
             if (affectedRows > 0) {
                 try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
@@ -144,6 +145,13 @@ public class FieldDAODBMS implements FieldDAO {
     }
 
     private Field mapRowToField(ResultSet rs) throws SQLException {
+        // Load manager ID
+        int managerId = rs.getInt("manager_id");
+
+        // Load complete User entity for manager
+        UserDAODBMS userDAO = new UserDAODBMS(connection);
+        model.domain.User manager = userDAO.findById(managerId);
+
         return new Field(
                 rs.getInt("id"),
                 rs.getString("name"),
@@ -151,6 +159,6 @@ public class FieldDAODBMS implements FieldDAO {
                 rs.getString("address"),
                 rs.getDouble("price_per_hour"),
                 model.domain.Sport.fromCode(rs.getInt("sport")),
-                rs.getInt("manager_id"));
+                manager); // Full entity instead of ID
     }
 }

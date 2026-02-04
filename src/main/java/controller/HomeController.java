@@ -56,7 +56,7 @@ public class HomeController {
             if (viewAsPlayer) {
                 matchEntities = matchDAO.findApprovedMatches();
                 matchEntities = matchEntities.stream()
-                        .filter(m -> m.getOrganizerId() != currentUser.getId())
+                        .filter(m -> (m.getOrganizer() != null ? m.getOrganizer().getId() : 0) != currentUser.getId())
                         .toList();
             } else {
                 matchEntities = matchDAO.findByOrganizer(currentUser.getId());

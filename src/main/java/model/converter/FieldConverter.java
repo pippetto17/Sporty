@@ -18,7 +18,9 @@ public class FieldConverter {
         field.setCity(fieldBean.getCity());
         field.setAddress(fieldBean.getAddress());
         field.setPricePerHour(fieldBean.getPricePerHour());
-        field.setManagerId(fieldBean.getManagerId());
+        model.domain.User manager = new model.domain.User();
+        manager.setId(fieldBean.getManagerId());
+        field.setManager(manager);
         return field;
     }
 
@@ -33,7 +35,7 @@ public class FieldConverter {
         fieldBean.setCity(field.getCity());
         fieldBean.setAddress(field.getAddress());
         fieldBean.setPricePerHour(field.getPricePerHour());
-        fieldBean.setManagerId(field.getManagerId());
+        fieldBean.setManagerId(field.getManager() != null ? field.getManager().getId() : 0);
         return fieldBean;
     }
 }

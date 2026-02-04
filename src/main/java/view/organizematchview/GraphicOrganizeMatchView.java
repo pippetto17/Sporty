@@ -75,6 +75,7 @@ public class GraphicOrganizeMatchView implements OrganizeMatchView {
 
     @Override
     public void setApplicationController(ApplicationController applicationController) {
+        // Intentionally empty
     }
 
     @Override
@@ -296,10 +297,12 @@ public class GraphicOrganizeMatchView implements OrganizeMatchView {
 
     @Override
     public void displayMatchList() {
+        // Intentionally empty
     }
 
     @Override
     public void displayNewMatchForm() {
+        // Intentionally empty
     }
 
     @Override

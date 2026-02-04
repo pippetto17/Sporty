@@ -15,6 +15,7 @@ public class CLIPaymentView implements PaymentView {
 
     @Override
     public void setApplicationController(ApplicationController applicationController) {
+        // Intentionally empty
     }
 
     @Override
@@ -91,5 +92,6 @@ public class CLIPaymentView implements PaymentView {
 
     @Override
     public void close() {
+        // Intentionally empty
     }
 }

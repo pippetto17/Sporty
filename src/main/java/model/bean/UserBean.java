@@ -9,6 +9,7 @@ public class UserBean {
     private int role;
 
     public UserBean() {
+        // Intentionally empty
     }
 
     public UserBean(String username, String password) {

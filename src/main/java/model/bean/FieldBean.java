@@ -12,6 +12,7 @@ public class FieldBean {
     private int managerId;
 
     public FieldBean() {
+        // Intentionally empty
     }
 
     public int getFieldId() {

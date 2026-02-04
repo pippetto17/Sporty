@@ -47,6 +47,7 @@ public class CLIFieldManagerView implements FieldManagerView {
 
     @Override
     public void close() {
+        // Intentionally empty
     }
 
     private void printHeader() {

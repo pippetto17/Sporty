@@ -7,23 +7,23 @@ public class Field {
     private String address;
     private double pricePerHour;
     private Sport sport;
-    private int managerId;
+    private User manager;
 
     public Field() {
     }
 
-    public Field(int id, String name, String city, Sport sport, int managerId) {
-        this(id, name, city, null, 0.0, sport, managerId);
+    public Field(int id, String name, String city, Sport sport, User manager) {
+        this(id, name, city, null, 0.0, sport, manager);
     }
 
-    public Field(int id, String name, String city, String address, double pricePerHour, Sport sport, int managerId) {
+    public Field(int id, String name, String city, String address, double pricePerHour, Sport sport, User manager) {
         this.id = id;
         this.name = name;
         this.city = city;
         this.address = address;
         this.pricePerHour = pricePerHour;
         this.sport = sport;
-        this.managerId = managerId;
+        this.manager = manager;
     }
 
     public int getId() {
@@ -74,12 +74,12 @@ public class Field {
         this.sport = sport;
     }
 
-    public int getManagerId() {
-        return managerId;
+    public User getManager() {
+        return manager;
     }
 
-    public void setManagerId(int managerId) {
-        this.managerId = managerId;
+    public void setManager(User manager) {
+        this.manager = manager;
     }
 
     public double getPricePerPerson() {

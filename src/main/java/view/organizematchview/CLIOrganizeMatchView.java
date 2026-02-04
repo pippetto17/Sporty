@@ -22,6 +22,7 @@ public class CLIOrganizeMatchView implements OrganizeMatchView {
 
     @Override
     public void setApplicationController(ApplicationController applicationController) {
+        // Intentionally empty
     }
 
     @Override

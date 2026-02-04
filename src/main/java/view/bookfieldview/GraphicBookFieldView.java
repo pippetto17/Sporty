@@ -48,6 +48,11 @@ public class GraphicBookFieldView implements BookFieldView {
     }
 
     @Override
+    public void setApplicationController(controller.ApplicationController app) {
+        // Intentionally empty
+    }
+
+    @Override
     public void display() {
         Platform.runLater(this::initStage);
     }
@@ -309,10 +314,6 @@ public class GraphicBookFieldView implements BookFieldView {
     }
 
     @Override
-    public void setApplicationController(controller.ApplicationController app) {
-    }
-
-    @Override
     public void close() {
         if (stage != null)
             Platform.runLater(stage::close);
@@ -325,6 +326,7 @@ public class GraphicBookFieldView implements BookFieldView {
 
     @Override
     public void displayFieldDetails(int fieldIndex) {
+        // Intentionally empty
     }
 
     private static final String ERROR_TITLE = "Error";
