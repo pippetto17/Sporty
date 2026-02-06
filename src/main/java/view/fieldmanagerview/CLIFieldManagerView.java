@@ -3,26 +3,25 @@ package view.fieldmanagerview;
 import controller.ApplicationController;
 import controller.FieldManagerController;
 import model.bean.MatchBean;
-import model.domain.User;
+
 import java.util.List;
 import java.util.Scanner;
 
 public class CLIFieldManagerView implements FieldManagerView {
     private final FieldManagerController controller;
-    private final User manager;
+
     private final Scanner scanner;
     private model.notification.NotificationService notificationService;
 
-    public CLIFieldManagerView(FieldManagerController controller, User manager) {
+    public CLIFieldManagerView(FieldManagerController controller) {
         this.controller = controller;
-        this.manager = manager;
         this.scanner = new Scanner(System.in);
     }
 
     @Override
     public void setApplicationController(ApplicationController appController) {
         this.notificationService = appController.getNotificationService();
-        this.notificationService.subscribe(new model.notification.FieldManagerNotificationObserver());
+        this.notificationService.subscribe(new model.notification.FieldManagerObserver());
     }
 
     @Override
@@ -36,9 +35,10 @@ public class CLIFieldManagerView implements FieldManagerView {
             String choice = scanner.nextLine().trim();
             switch (choice) {
                 case "1" -> listPendingRequests();
-                case "2" -> handleApprove();
-                case "3" -> handleReject();
-                case "4" -> showUnreadNotifications();
+                case "2" -> viewRequestDetails();
+                case "3" -> handleApprove();
+                case "4" -> handleReject();
+                case "5" -> showUnreadNotifications();
                 case "0" -> running = false;
                 default -> System.out.println("⚠ Invalid choice, try again.");
             }
@@ -52,7 +52,8 @@ public class CLIFieldManagerView implements FieldManagerView {
 
     private void printHeader() {
         System.out.println("\n========================================");
-        System.out.println("  FIELD MANAGER: " + manager.getName() + " " + manager.getSurname());
+        System.out.println("  FIELD MANAGER: " + controller.getFieldManager().getName() + " "
+                + controller.getFieldManager().getSurname());
         System.out.println("========================================");
     }
 
@@ -68,9 +69,10 @@ public class CLIFieldManagerView implements FieldManagerView {
 
     private void printMenu() {
         System.out.println("\n1) List Pending Requests");
-        System.out.println("2) Approve Match");
-        System.out.println("3) Reject Match");
-        System.out.println("4) View Notifications");
+        System.out.println("2) View Request Details");
+        System.out.println("3) Approve Match");
+        System.out.println("4) Reject Match");
+        System.out.println("5) View Notifications");
         System.out.println("0) Logout");
         System.out.print("> ");
     }
@@ -99,13 +101,41 @@ public class CLIFieldManagerView implements FieldManagerView {
         }
     }
 
+    private void viewRequestDetails() {
+        int id = readInt("Enter Match ID to view details: ");
+        if (id == -1)
+            return;
+        try {
+            MatchBean match = controller.getRequestDetails(id);
+            System.out.println("\n========== MATCH REQUEST DETAILS ==========");
+            System.out.printf("Match ID:       %d%n", match.getMatchId());
+            System.out.printf("Field:          %s%n", match.getFieldName());
+            System.out.printf("Organizer:      %s%n", match.getOrganizerName());
+            System.out.printf("Sport:          %s%n", match.getSport().getDisplayName());
+            System.out.printf("Date:           %s%n", match.getMatchDate());
+            System.out.printf("Time:           %s%n", match.getMatchTime());
+            System.out.printf("Missing Players:%d%n", match.getMissingPlayers());
+            System.out.printf("Status:         %s%n", match.getStatus());
+            System.out.printf("Price/Hour:     €%.2f%n", match.getPricePerHour());
+            System.out.println("==========================================");
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+    }
+
     private void handleApprove() {
         int id = readInt("Enter Match ID to APPROVE: ");
         if (id == -1)
             return;
         try {
+            // Get details before approving for confirmation
+            MatchBean match = controller.getRequestDetails(id);
+            System.out.printf("\n✓ Approving match at '%s' organized by %s on %s at %s%n",
+                    match.getFieldName(), match.getOrganizerName(),
+                    match.getMatchDate(), match.getMatchTime());
+
             controller.approveMatch(id);
-            System.out.println("✓ Match " + id + " approved.");
+            System.out.println("✓ Match " + id + " has been APPROVED successfully!");
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
         }
@@ -116,8 +146,14 @@ public class CLIFieldManagerView implements FieldManagerView {
         if (id == -1)
             return;
         try {
+            // Get details before rejecting for confirmation
+            MatchBean match = controller.getRequestDetails(id);
+            System.out.printf("\n✗ Rejecting match at '%s' organized by %s on %s at %s%n",
+                    match.getFieldName(), match.getOrganizerName(),
+                    match.getMatchDate(), match.getMatchTime());
+
             controller.rejectMatch(id);
-            System.out.println("✓ Match " + id + " rejected.");
+            System.out.println("✓ Match " + id + " has been REJECTED successfully!");
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
         }
@@ -126,12 +162,12 @@ public class CLIFieldManagerView implements FieldManagerView {
     private void showUnreadNotifications() {
         if (notificationService == null)
             return;
-        List<String> unread = notificationService.getUnreadNotifications(manager.getUsername());
+        List<String> unread = notificationService.getUnreadNotifications(controller.getFieldManager().getUsername());
         if (unread.isEmpty())
             return;
         System.out.println("\n🔔 YOU HAVE " + unread.size() + " NEW NOTIFICATION(S):");
         unread.forEach(msg -> System.out.println("  • " + msg));
-        notificationService.markAllAsRead(manager.getUsername());
+        notificationService.markAllAsRead(controller.getFieldManager().getUsername());
     }
 
     private int readInt(String prompt) {

@@ -1,7 +1,7 @@
 package view;
 
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
+
 import javafx.scene.control.DialogPane;
 import model.utils.Constants;
 
@@ -22,22 +22,6 @@ public class ViewUtils {
         if (styleResource != null) {
             dialogPane.getStylesheets().add(styleResource.toExternalForm());
         }
-    }
-
-    public static void showError(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
-
-    public static void showInfo(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
     }
 
     public static String getSportStyleClass(model.domain.Sport sport) {

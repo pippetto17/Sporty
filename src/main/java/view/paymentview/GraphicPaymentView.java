@@ -33,7 +33,17 @@ public class GraphicPaymentView implements PaymentView {
     @FXML
     private Label matchInfoLabel;
     @FXML
+    private Label sportLabel;
+    @FXML
+    private Label cityLabel;
+    @FXML
+    private Label dateLabel;
+    @FXML
     private Label amountLabel;
+    @FXML
+    private Label costPerPersonLabel;
+    @FXML
+    private Label totalLabel;
     @FXML
     private ComboBox<Integer> sharesComboBox;
     @FXML
@@ -72,7 +82,7 @@ public class GraphicPaymentView implements PaymentView {
                     FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/payment.fxml"));
                     loader.setController(this);
                     Parent root = loader.load();
-                    Scene scene = new Scene(root, 600, 550);
+                    Scene scene = new Scene(root, 700, 550);
                     ViewUtils.applyStylesheets(scene);
                     stage.setScene(scene);
                 }
@@ -87,8 +97,17 @@ public class GraphicPaymentView implements PaymentView {
     @Override
     public void displayMatchInfo(MatchBean match, int availableShares) {
         Platform.runLater(() -> {
-            matchInfoLabel.setText(String.format("Payment for: %s - %s @ %s",
-                    match.getSport().getDisplayName(), match.getCity(), match.getMatchTime()));
+            if (sportLabel != null)
+                sportLabel.setText(match.getSport().getDisplayName());
+            if (cityLabel != null)
+                cityLabel.setText(match.getCity() + " - " + match.getFieldAddress());
+            if (dateLabel != null)
+                dateLabel.setText(String.format("%s @ %s", match.getMatchDate(), match.getMatchTime()));
+
+            // Legacy label optional update or removal
+            if (matchInfoLabel != null)
+                matchInfoLabel.setVisible(false);
+
             maxAvailableShares = availableShares;
             currentPricePerHour = match.getPricePerHour();
             currentTotalPlayers = match.getSport().getRequiredPlayers();
@@ -102,26 +121,51 @@ public class GraphicPaymentView implements PaymentView {
 
     private void updateAmountLabel() {
         int shares = sharesComboBox.getValue() != null ? sharesComboBox.getValue() : 1;
-        double costPerPerson = model.service.PricingService.calculateCostPerPerson(currentPricePerHour,
+        double costPerPerson = PaymentController.calculateCostPerPerson(currentPricePerHour,
                 currentTotalPlayers);
-        double totalAmount = model.service.PricingService.calculateTotalToPay(shares, currentPricePerHour,
+        double totalAmount = PaymentController.calculateTotalToPay(shares, currentPricePerHour,
                 currentTotalPlayers);
-        amountLabel.setText(String.format("Cost per person: €%.2f | Total (%d shares): €%.2f",
-                costPerPerson, shares, totalAmount));
+        if (costPerPersonLabel != null) {
+            costPerPersonLabel.setText(String.format("€ %.2f", costPerPerson));
+        }
+        if (totalLabel != null) {
+            totalLabel.setText(String.format("€ %.2f", totalAmount));
+        }
+        // Fallback or debug
+        if (amountLabel != null) {
+            amountLabel.setText(String.format("Cost per person: €%.2f | Total (%d shares): €%.2f",
+                    costPerPerson, shares, totalAmount));
+        }
     }
 
     @Override
     public void displayBookingInfo(FieldBean field, MatchBean context) {
         Platform.runLater(() -> {
-            String addressInfo = (field.getAddress() != null && !field.getAddress().isEmpty())
-                    ? " - " + field.getAddress()
-                    : "";
-            matchInfoLabel.setText(String.format("Booking: %s%s on %s @ %s",
-                    field.getName(), addressInfo, context.getMatchDate(), context.getMatchTime()));
+
+            if (sportLabel != null && field.getSport() != null)
+                sportLabel.setText(field.getSport().getDisplayName());
+            else if (sportLabel != null)
+                sportLabel.setText("Field Booking");
+
+            if (cityLabel != null)
+                cityLabel.setText(field.getName() + " - " + field.getCity());
+            if (dateLabel != null)
+                dateLabel.setText(String.format("%s @ %s", context.getMatchDate(), context.getMatchTime()));
+
+            if (matchInfoLabel != null)
+                matchInfoLabel.setVisible(false);
+
             sharesComboBox.setVisible(false);
             double costPerPerson = field.getPricePerPerson();
-            amountLabel.setText(String.format("Field: €%.2f/hour | Per person: €%.2f",
-                    field.getPricePerHour(), costPerPerson));
+
+            if (costPerPersonLabel != null)
+                costPerPersonLabel.setText(String.format("€ %.2f", costPerPerson));
+            if (totalLabel != null)
+                totalLabel.setText(String.format("€ %.2f", field.getPricePerHour()));
+            if (amountLabel != null)
+                amountLabel.setText(String.format("Field: €%.2f/hour | Per person: €%.2f",
+                        field.getPricePerHour(), costPerPerson));
+
             maxAvailableShares = 0;
         });
     }

@@ -12,7 +12,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
-import model.domain.User;
+
 import model.utils.Constants;
 import view.ViewUtils;
 import java.time.format.DateTimeFormatter;
@@ -21,7 +21,7 @@ import java.util.logging.Logger;
 
 public class GraphicFieldManagerView implements FieldManagerView {
     private final FieldManagerController controller;
-    private final User manager;
+
     private ApplicationController appController;
     private model.notification.NotificationService notificationService;
     private Stage stage;
@@ -54,16 +54,15 @@ public class GraphicFieldManagerView implements FieldManagerView {
     private Button rejectButton;
     private final ObservableList<model.bean.MatchBean> bookingsList = FXCollections.observableArrayList();
 
-    public GraphicFieldManagerView(FieldManagerController controller, User manager) {
+    public GraphicFieldManagerView(FieldManagerController controller) {
         this.controller = controller;
-        this.manager = manager;
     }
 
     @Override
     public void setApplicationController(ApplicationController appController) {
         this.appController = appController;
         this.notificationService = appController.getNotificationService();
-        this.notificationService.subscribe(new model.notification.FieldManagerNotificationObserver());
+        this.notificationService.subscribe(new model.notification.FieldManagerObserver());
     }
 
     @Override
@@ -97,7 +96,8 @@ public class GraphicFieldManagerView implements FieldManagerView {
 
     @FXML
     private void initialize() {
-        managerNameLabel.setText("Manager: " + manager.getName() + " " + manager.getSurname());
+        managerNameLabel.setText(
+                "Manager: " + controller.getFieldManager().getName() + " " + controller.getFieldManager().getSurname());
         try {
             javafx.scene.image.Image img = new javafx.scene.image.Image(
                     java.util.Objects.requireNonNull(getClass().getResourceAsStream("/image/manager.jpeg")),
@@ -111,6 +111,11 @@ public class GraphicFieldManagerView implements FieldManagerView {
         setupTable();
         loadData();
         Platform.runLater(this::checkAndShowNotifications);
+
+        // Auto-open requests if pending
+        if (!controller.getPendingRequests().isEmpty()) {
+            Platform.runLater(() -> handleShowNotifications(0)); // 0 is the Requests tab index
+        }
     }
 
     @FXML
@@ -119,7 +124,7 @@ public class GraphicFieldManagerView implements FieldManagerView {
     private void checkAndShowNotifications() {
         if (notificationService == null)
             return;
-        List<String> unread = notificationService.getUnreadNotifications(manager.getUsername());
+        List<String> unread = notificationService.getUnreadNotifications(controller.getFieldManager().getUsername());
         if (!unread.isEmpty()) {
             notificationButton.setStyle("-fx-text-fill: -color-danger-fg; -fx-border-color: -color-danger-emphasis;");
             notificationButton.setText("🔔 (" + unread.size() + ")");
@@ -131,12 +136,23 @@ public class GraphicFieldManagerView implements FieldManagerView {
 
     @FXML
     private void handleShowNotifications() {
+        handleShowNotifications(0);
+    }
+
+    private void handleShowNotifications(int initialTab) {
         Dialog<Void> dialog = new Dialog<>();
         dialog.setTitle("Notification Center");
         dialog.setHeaderText("Notifications & Requests");
         TabPane tabPane = new TabPane();
         tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
-        tabPane.getTabs().addAll(createRequestsTab(), createAlertsTab());
+        Tab requestsTab = createRequestsTab();
+        Tab alertsTab = createAlertsTab();
+        tabPane.getTabs().addAll(requestsTab, alertsTab);
+
+        if (initialTab >= 0 && initialTab < tabPane.getTabs().size()) {
+            tabPane.getSelectionModel().select(initialTab);
+        }
+
         dialog.getDialogPane().setContent(tabPane);
         dialog.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
         ViewUtils.applyStylesheets(dialog.getDialogPane());
@@ -147,7 +163,7 @@ public class GraphicFieldManagerView implements FieldManagerView {
         Tab alertsTab = new Tab("Alerts");
         VBox alertsBox = new VBox(10);
         alertsBox.setPadding(new javafx.geometry.Insets(10));
-        List<String> unread = notificationService.getUnreadNotifications(manager.getUsername());
+        List<String> unread = notificationService.getUnreadNotifications(controller.getFieldManager().getUsername());
         populateAlertsBox(alertsBox, unread);
         alertsTab.setContent(new ScrollPane(alertsBox));
         return alertsTab;
@@ -163,7 +179,7 @@ public class GraphicFieldManagerView implements FieldManagerView {
             l.setWrapText(true);
             alertsBox.getChildren().add(l);
         }
-        notificationService.markAllAsRead(manager.getUsername());
+        notificationService.markAllAsRead(controller.getFieldManager().getUsername());
         checkAndShowNotifications();
     }
 
@@ -232,7 +248,10 @@ public class GraphicFieldManagerView implements FieldManagerView {
     private void setupTable() {
         fieldNameColumn.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getFieldName()));
         requesterColumn.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getOrganizerName()));
-        typeColumn.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getSport().getDisplayName()));
+        typeColumn.setCellValueFactory(d -> {
+            var sport = d.getValue().getSport();
+            return new SimpleStringProperty(sport != null ? sport.getDisplayName() : "N/A");
+        });
         dateColumn.setCellValueFactory(
                 d -> new SimpleStringProperty(d.getValue().getMatchDate().format(DateTimeFormatter.ISO_LOCAL_DATE)));
         timeColumn.setCellValueFactory(

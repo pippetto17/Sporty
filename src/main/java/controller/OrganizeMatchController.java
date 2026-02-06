@@ -1,5 +1,6 @@
 package controller;
 
+import exception.AuthorizationException;
 import exception.DataAccessException;
 import exception.ValidationException;
 import model.bean.MatchBean;
@@ -7,11 +8,10 @@ import model.domain.Sport;
 import model.domain.User;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import static model.utils.Utils.ITALIAN_CITIES;
+import static model.utils.MapsAPI.ITALIAN_CITIES;
 
 public class OrganizeMatchController {
     private final User organizer;
@@ -19,21 +19,17 @@ public class OrganizeMatchController {
     private final model.dao.MatchDAO matchDAO;
     private final model.dao.FieldDAO fieldDAO;
     private MatchBean currentMatchBean;
-    private List<Sport> availableSports;
-    private List<String> availableCities;
     private String preferredCity;
 
-    public OrganizeMatchController(User organizer, ApplicationController applicationController) {
+    public OrganizeMatchController(User organizer, ApplicationController applicationController)
+            throws AuthorizationException {
         if (!organizer.isOrganizer()) {
-            throw new IllegalArgumentException("User must be an organizer");
+            throw new AuthorizationException("User must be an organizer");
         }
         this.organizer = organizer;
         this.applicationController = applicationController;
         this.matchDAO = applicationController.getDaoFactory().getMatchDAO();
         this.fieldDAO = applicationController.getDaoFactory().getFieldDAO();
-    }
-
-    public void startNewMatch() {
         this.currentMatchBean = new MatchBean();
         this.currentMatchBean.setOrganizerId(organizer.getId());
         this.currentMatchBean.setOrganizerName(organizer.getName() + " " + organizer.getSurname());
@@ -41,8 +37,6 @@ public class OrganizeMatchController {
 
     public void initializeOrganizeMatch() {
         try {
-            this.availableSports = Arrays.asList(Sport.values());
-            this.availableCities = ITALIAN_CITIES;
             List<MatchBean> previousMatches = matchDAO.findByOrganizer(organizer.getId())
                     .stream()
                     .map(model.converter.MatchConverter::toBean)
@@ -60,22 +54,25 @@ public class OrganizeMatchController {
                     .max(Map.Entry.comparingByValue())
                     .map(Map.Entry::getKey)
                     .orElse(null);
-            startNewMatch();
         } catch (DataAccessException e) {
-            this.availableSports = Arrays.asList(Sport.values());
-            this.availableCities = ITALIAN_CITIES;
             this.preferredCity = null;
-            startNewMatch();
             throw new DataAccessException("Failed to initialize organize match data: " + e.getMessage(), e);
         }
     }
 
+    public void startNewMatch() {
+        this.currentMatchBean = new MatchBean();
+        this.currentMatchBean.setOrganizerId(organizer.getId());
+        this.currentMatchBean.setOrganizerName(organizer.getName() + " " + organizer.getSurname());
+        initializeOrganizeMatch();
+    }
+
     public List<Sport> getAvailableSports() {
-        return availableSports != null ? availableSports : Arrays.asList(Sport.values());
+        return List.of(Sport.values());
     }
 
     public List<String> getAvailableCities() {
-        return availableCities != null ? availableCities : ITALIAN_CITIES;
+        return ITALIAN_CITIES;
     }
 
     public String getPreferredCity() {
@@ -86,7 +83,7 @@ public class OrganizeMatchController {
         return currentMatchBean;
     }
 
-    public boolean validateMatchDetails(Sport sport, LocalDate date, LocalTime time,
+    public void validateMatchDetails(Sport sport, LocalDate date, LocalTime time,
             String city, int additionalParticipants) throws ValidationException {
         if (sport == null)
             throw new ValidationException(model.utils.Constants.ERROR_SPORT_REQUIRED);
@@ -105,7 +102,6 @@ public class OrganizeMatchController {
         if (!sport.isValidAdditionalParticipants(additionalParticipants)) {
             throw new ValidationException(model.utils.Constants.ERROR_INVALID_PARTICIPANTS + sport.getDisplayName());
         }
-        return true;
     }
 
     public void saveMatch() throws ValidationException {
@@ -138,7 +134,7 @@ public class OrganizeMatchController {
     }
 
     public boolean isValidCity(String city) {
-        return model.utils.Utils.isValidCity(city);
+        return model.utils.MapsAPI.isValidCity(city);
     }
 
     public User getOrganizer() {

@@ -1,0 +1,16 @@
+[
+  {
+    "id": 1,
+    "organizer": {
+      "id": 4
+    },
+    "field": {
+      "id": 3,
+      "pricePerHour": 0.0
+    },
+    "date": "2026-02-12",
+    "time": "21:00:00",
+    "missingPlayers": 0,
+    "status": "PENDING"
+  }
+]

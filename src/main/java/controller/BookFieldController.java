@@ -9,22 +9,15 @@ import java.util.List;
 public class BookFieldController {
     private final ApplicationController applicationController;
     private final model.dao.FieldDAO fieldDAO;
-    private MatchBean currentMatchBean;
+    private final MatchBean currentMatchBean;
     private List<FieldBean> availableFields;
     private FieldBean selectedField;
     private boolean standaloneMode;
 
-    public BookFieldController(ApplicationController applicationController) {
+    public BookFieldController(ApplicationController applicationController, MatchBean matchBean) {
         this.applicationController = applicationController;
         this.fieldDAO = applicationController.getDaoFactory().getFieldDAO();
-    }
-
-    public void setMatchBean(MatchBean matchBean) {
         this.currentMatchBean = matchBean;
-    }
-
-    public void setStandaloneMode(boolean standalone) {
-        this.standaloneMode = standalone;
     }
 
     public boolean isStandaloneMode() {
@@ -33,10 +26,6 @@ public class BookFieldController {
 
     public MatchBean getCurrentMatchBean() {
         return currentMatchBean;
-    }
-
-    public FieldBean getSelectedField() {
-        return selectedField;
     }
 
     public void setSelectedField(FieldBean field) {
@@ -94,7 +83,7 @@ public class BookFieldController {
     public void updateMatchParameters(model.domain.Sport sport, String city, java.time.LocalDate date,
             java.time.LocalTime time) {
         if (currentMatchBean == null) {
-            currentMatchBean = new MatchBean();
+            throw new IllegalStateException("MatchBean must be provided via constructor");
         }
         currentMatchBean.setSport(sport);
         currentMatchBean.setCity(city);

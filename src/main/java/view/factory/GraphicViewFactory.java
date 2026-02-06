@@ -42,6 +42,6 @@ public class GraphicViewFactory implements ViewFactory {
 
     @Override
     public view.fieldmanagerview.FieldManagerView createFieldManagerView(controller.FieldManagerController controller) {
-        return new view.fieldmanagerview.GraphicFieldManagerView(controller, controller.getFieldManager());
+        return new view.fieldmanagerview.GraphicFieldManagerView(controller);
     }
 }

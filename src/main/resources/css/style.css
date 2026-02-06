@@ -6,8 +6,6 @@
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.4), 20, 0, 0, 5);
 }
 
-
-
 .root {
     /* Palette: Dark Blue & Emerald Green */
     -color-bg-default: #0a192f;
@@ -27,13 +25,6 @@
     -fx-inner-radius: 10px;
     -fx-body-radius: 12px;
 }
-
-/* ScrollPane Fix: rimuove sfondo bianco default */
-
-
-/* --- SCROLLBAR PERSONALIZZATA --- */
-/* --- SCROLLBAR PERSONALIZZATA (Removed for AtlantaFX Native) --- */
-
 
 /* --- HEADER & TOGGLE --- */
 .header-container {
@@ -388,4 +379,190 @@
 .danger-button:hover {
     -fx-background-color: #dc2626;
     -fx-effect: dropshadow(gaussian, rgba(220, 38, 38, 0.6), 12, 0, 0, 4);
+}
+
+/* --- PAYMENT VIEW SPECIFIC STYLES --- */
+
+/* Summary Box */
+.payment-summary-box {
+    -fx-background-color: #111827; /* Darker than standard overlay */
+    -fx-background-radius: 16px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 15, 0, 0, 4);
+    -fx-border-color: rgba(255,255,255,0.05);
+    -fx-border-width: 1;
+}
+
+.summary-icon {
+    -fx-font-size: 18px;
+    -fx-text-fill: -color-accent-fg; /* Greenish/Accent */
+}
+
+/* Price Hierarchy */
+.price-label-small {
+    -fx-text-fill: rgba(255, 255, 255, 0.6);
+    -fx-font-size: 12px;
+    -fx-font-weight: 500;
+}
+
+.price-value-small {
+    -fx-text-fill: #f3f4f6; /* Bright white */
+    -fx-font-size: 14px;
+    -fx-font-weight: 700;
+}
+
+.price-label-large {
+    -fx-text-fill: #f3f4f6;
+    -fx-font-size: 14px;
+    -fx-font-weight: 700;
+}
+
+.price-value-large {
+    -fx-text-fill: #10b981; /* Green accent */
+    -fx-font-size: 22px;
+    -fx-font-weight: 900;
+}
+
+.payment-separator .line {
+    -fx-background-color: white;
+    -fx-opacity: 0.15;
+}
+
+/* Compact Combo for Shares */
+.compact-combo {
+    -fx-background-color: rgba(255,255,255,0.05);
+    -fx-background-radius: 8;
+    -fx-border-color: rgba(255,255,255,0.1);
+    -fx-border-radius: 8;
+}
+
+/* Refined Input Fields */
+.payment-input {
+    -fx-background-color: #0d131f; /* Anthracite/Very Dark Blue */
+    -fx-background-radius: 8px;
+    -fx-border-color: #374151; /* Thin border */
+    -fx-border-radius: 8px;
+    -fx-border-width: 1px;
+    -fx-text-fill: white;
+    -fx-padding: 10 12;
+    -fx-font-size: 14px;
+}
+
+.payment-input:focused {
+    -fx-border-color: #10b981;
+    -fx-effect: dropshadow(gaussian, rgba(16, 185, 129, 0.25), 8, 0, 0, 0); /* Subtle green glow */
+    -fx-background-color: #111827;
+}
+
+.input-label {
+    -fx-text-fill: #9ca3af;
+    -fx-font-size: 11px;
+    -fx-font-weight: 700;
+    -fx-text-transform: uppercase;
+    -fx-letter-spacing: 0.5px;
+}
+
+/* Pay Button Refinement */
+#payButton {
+    -fx-background-color: linear-gradient(to bottom, #34d399, #059669); /* Vertical gradient */
+    -fx-background-radius: 12px;
+    -fx-effect: dropshadow(gaussian, rgba(5, 150, 105, 0.4), 10, 0, 0, 3);
+    -fx-font-weight: 800;
+    -fx-text-fill: white;
+    -fx-cursor: hand;
+}
+
+#payButton:hover {
+    -fx-background-color: linear-gradient(to bottom, #10b981, #047857);
+    -fx-effect: dropshadow(gaussian, rgba(5, 150, 105, 0.6), 15, 0, 0, 5);
+}
+
+#payButton:pressed {
+    -fx-translate-y: 1;
+}
+
+
+/* Error Label */
+.danger {
+    -fx-text-fill: #ef4444;
+    -fx-font-weight: 600;
+}
+
+/* --- RECAP CARD STYLING --- */
+.recap-card {
+    -fx-background-color: -color-bg-overlay;
+    -fx-background-radius: 20;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 20, 0, 5, 5);
+    -fx-alignment: top-center;
+    -fx-min-width: 320px;
+    -fx-max-width: 320px;
+}
+
+.recap-header {
+    -fx-background-radius: 20 20 0 0;
+    -fx-padding: 30 0;
+    -fx-alignment: center;
+}
+
+/* Specific sport header backgrounds are reused from .sport-* classes or mapped dynamically */
+
+.recap-title {
+    -fx-text-fill: white;
+    -fx-font-size: 24px;
+    -fx-font-weight: 900;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 5, 0, 0, 1);
+}
+
+.recap-image {
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 10, 0, 5, 2);
+}
+
+.recap-body {
+    -fx-padding: 20;
+    -fx-alignment: top-center;
+}
+
+.recap-detail-row {
+    -fx-padding: 8 0;
+    -fx-border-color: rgba(255,255,255,0.1);
+    -fx-border-width: 0 0 1 0;
+}
+
+.recap-label {
+    -fx-text-fill: -color-fg-muted;
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+}
+
+.recap-value {
+    -fx-text-fill: white;
+    -fx-font-size: 15px;
+    -fx-font-weight: 700;
+}
+
+.recap-footer {
+    -fx-padding: 20;
+    -fx-alignment: center;
+    -fx-spacing: 10;
+}
+
+/* --- STATUS BADGES --- */
+.status-badge {
+    -fx-min-width: 12px;
+    -fx-min-height: 12px;
+    -fx-max-width: 12px;
+    -fx-max-height: 12px;
+    -fx-background-radius: 6px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 4, 0, 0, 1);
+}
+
+.status-pending {
+    -fx-background-color: #f59e0b;
+}
+
+.status-approved {
+    -fx-background-color: #10b981;
+}
+
+.status-rejected {
+    -fx-background-color: #ef4444;
 }

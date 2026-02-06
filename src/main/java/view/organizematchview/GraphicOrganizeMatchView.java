@@ -14,6 +14,7 @@ import javafx.util.StringConverter;
 import model.bean.MatchBean;
 import model.domain.Sport;
 import model.utils.Constants;
+import model.utils.MapsAPI;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -54,7 +55,7 @@ public class GraphicOrganizeMatchView implements OrganizeMatchView {
     @FXML
     private Button searchFieldsButton;
     @FXML
-    private VBox recapBox;
+    private javafx.scene.layout.StackPane recapBox;
     @FXML
     private Label recapSportLabel;
     @FXML
@@ -172,7 +173,7 @@ public class GraphicOrganizeMatchView implements OrganizeMatchView {
                 if (newValue == null || newValue.isEmpty()) {
                     cityComboBox.hide();
                 } else {
-                    List<String> filtered = model.utils.Utils.searchCitiesByPrefix(newValue);
+                    List<String> filtered = MapsAPI.searchCitiesByPrefix(newValue);
                     if (!filtered.equals(cityComboBox.getItems())) {
                         cityComboBox.getItems().setAll(filtered);
                     }
@@ -269,6 +270,9 @@ public class GraphicOrganizeMatchView implements OrganizeMatchView {
     }
 
     @FXML
+    private VBox inputContainer;
+
+    @FXML
     private void handleClear() {
         sportComboBox.setValue(null);
         datePicker.setValue(null);
@@ -276,10 +280,21 @@ public class GraphicOrganizeMatchView implements OrganizeMatchView {
         cityComboBox.setValue(null);
         cityComboBox.getEditor().clear();
         participantsSpinner.getValueFactory().setValue(1);
+
         summaryBox.setVisible(false);
         summaryBox.setManaged(false);
+
         messageLabel.setText("");
         participantsInfoLabel.setText(Constants.ERROR_SELECT_SPORT_FIRST);
+
+        if (inputContainer != null) {
+            inputContainer.setVisible(true);
+            inputContainer.setManaged(true);
+        }
+        if (recapBox != null) {
+            recapBox.setVisible(false);
+            recapBox.setManaged(false);
+        }
     }
 
     @FXML
@@ -315,6 +330,11 @@ public class GraphicOrganizeMatchView implements OrganizeMatchView {
         showSuccess(message);
     }
 
+    @FXML
+    private javafx.scene.layout.VBox recapHeader;
+    @FXML
+    private javafx.scene.image.ImageView recapImage;
+
     @Override
     public void displayRecap(MatchBean matchBean) {
         Platform.runLater(() -> {
@@ -322,25 +342,19 @@ public class GraphicOrganizeMatchView implements OrganizeMatchView {
                 showError(Constants.ERROR_MATCHBEAN_NULL);
                 return;
             }
-            sportComboBox.setVisible(false);
-            sportComboBox.setManaged(false);
-            datePicker.setVisible(false);
-            datePicker.setManaged(false);
-            timeComboBox.setVisible(false);
-            timeComboBox.setManaged(false);
-            cityComboBox.setVisible(false);
-            cityComboBox.setManaged(false);
-            participantsSpinner.setVisible(false);
-            participantsSpinner.setManaged(false);
-            participantsInfoLabel.setVisible(false);
-            participantsInfoLabel.setManaged(false);
-            summaryBox.setVisible(false);
-            summaryBox.setManaged(false);
-            searchFieldsButton.setVisible(false);
-            searchFieldsButton.setManaged(false);
+
+            if (inputContainer != null) {
+                inputContainer.setVisible(false);
+                inputContainer.setManaged(false);
+            }
+
             messageLabel.setVisible(false);
             messageLabel.setManaged(false);
-            recapSportLabel.setText(matchBean.getSport() != null ? matchBean.getSport().getDisplayName() : "N/A");
+
+            Sport sport = matchBean.getSport();
+            applySportTheme(sport);
+
+            recapSportLabel.setText(sport != null ? sport.getDisplayName() : "N/A");
             recapDateLabel.setText(matchBean.getMatchDate() != null ? matchBean.getMatchDate().toString() : "N/A");
             recapTimeLabel.setText(matchBean.getMatchTime() != null ? matchBean.getMatchTime().toString() : "N/A");
             recapCityLabel.setText(matchBean.getCity());
@@ -348,6 +362,55 @@ public class GraphicOrganizeMatchView implements OrganizeMatchView {
             recapBox.setVisible(true);
             recapBox.setManaged(true);
         });
+    }
+
+    private void applySportTheme(Sport sport) {
+        if (recapHeader == null)
+            return;
+
+        // Remove old sport classes
+        recapHeader.getStyleClass().removeIf(style -> style.startsWith("sport-"));
+
+        String styleClass = "sport-default";
+        String imagePath = "/image/medal.png"; // Fallback
+
+        if (sport != null) {
+            switch (sport) {
+                case FOOTBALL_5:
+                case FOOTBALL_8:
+                case FOOTBALL_11:
+                    styleClass = "sport-soccer";
+                    imagePath = "/image/football.png";
+                    break;
+                case BASKETBALL:
+                    styleClass = "sport-basket";
+                    imagePath = "/image/basketball.png";
+                    break;
+                case TENNIS_SINGLE:
+                case TENNIS_DOUBLE:
+                    styleClass = "sport-tennis";
+                    imagePath = "/image/tennis.png";
+                    break;
+                case PADEL_SINGLE:
+                case PADEL_DOUBLE:
+                    styleClass = "sport-volley"; // Reusing volley color (purple) for now or similar
+                    imagePath = "/image/padel.png";
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        recapHeader.getStyleClass().add(styleClass);
+
+        if (recapImage != null) {
+            try {
+                javafx.scene.image.Image img = new javafx.scene.image.Image(getClass().getResourceAsStream(imagePath));
+                recapImage.setImage(img);
+            } catch (Exception e) {
+                logger.warning("Could not load image: " + imagePath);
+            }
+        }
     }
 
     @FXML

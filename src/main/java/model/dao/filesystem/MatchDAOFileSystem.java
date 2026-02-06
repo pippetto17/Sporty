@@ -15,7 +15,6 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 public class MatchDAOFileSystem implements MatchDAO {
     private static final String DATA_FILE = "data/matches.json";
@@ -29,9 +28,10 @@ public class MatchDAOFileSystem implements MatchDAO {
                 .registerTypeAdapter(LocalTime.class, new LocalTimeAdapter())
                 .setPrettyPrinting()
                 .create();
-        this.matchListType = new TypeToken<List<Match>>() {}.getType();
-        this.idGenerator = new AtomicInteger(getMaxId() + 1);
+        this.matchListType = new TypeToken<List<Match>>() {
+        }.getType();
         ensureDataFileExists();
+        this.idGenerator = new AtomicInteger(getMaxId() + 1);
     }
 
     private void ensureDataFileExists() {
@@ -99,23 +99,23 @@ public class MatchDAOFileSystem implements MatchDAO {
     public List<Match> findByOrganizer(int organizerId) {
         return loadMatches().stream()
                 .filter(m -> m.getOrganizer() != null && m.getOrganizer().getId() == organizerId)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
     public List<Match> findPendingForManager(int managerId) {
         return loadMatches().stream()
                 .filter(m -> m.getStatus() == MatchStatus.PENDING)
-                .filter(m -> m.getField() != null && m.getField().getManager() != null && 
-                             m.getField().getManager().getId() == managerId)
-                .collect(Collectors.toList());
+                .filter(m -> m.getField() != null && m.getField().getManager() != null &&
+                        m.getField().getManager().getId() == managerId)
+                .toList();
     }
 
     @Override
     public List<Match> findApprovedMatches() {
         return loadMatches().stream()
                 .filter(m -> m.getStatus() == MatchStatus.APPROVED)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override

@@ -15,9 +15,12 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import java.io.IOException;
-import java.util.Arrays;
+
 import java.util.List;
 import java.util.Objects;
+import model.bean.MatchBean;
+import model.utils.Constants;
+import model.utils.MapsAPI;
 
 public class GraphicHomeView implements HomeView {
     private final HomeController homeController;
@@ -49,9 +52,6 @@ public class GraphicHomeView implements HomeView {
     private ComboBox<model.domain.Sport> sportFilter;
     private DatePicker dateFilter;
     private boolean isUpdatingCityComboBox = false;
-    private static final List<String> ALL_CITIES = Arrays.asList(
-            "Roma", "Milano", "Napoli", "Torino", "Palermo",
-            "Genova", "Bologna", "Firenze", "Bari", "Catania");
 
     public GraphicHomeView(HomeController homeController) {
         this.homeController = homeController;
@@ -142,15 +142,15 @@ public class GraphicHomeView implements HomeView {
         VBox cityBox = new VBox(0);
         cityBox.getStyleClass().add(model.utils.Constants.CSS_SEARCH_FIELD_CONTAINER);
         cityBox.setAlignment(Pos.CENTER_LEFT);
-        Label cityLbl = new Label("Where");
+        Label cityLbl = new Label(Constants.LABEL_WHERE);
         cityLbl.getStyleClass().addAll(CSS_TEXT_CAPTION, CSS_TEXT_MUTED);
         cityFilter = new ComboBox<>();
         cityFilter.setEditable(true);
-        cityFilter.setPromptText("Search destination");
+        cityFilter.setPromptText(Constants.PROMPT_SEARCH_DESTINATION);
         cityFilter.getStyleClass().add(model.utils.Constants.CSS_INTEGRATED_COMBO);
         cityFilter.setMaxWidth(Double.MAX_VALUE);
         cityFilter.setPrefWidth(250);
-        cityFilter.getItems().addAll(ALL_CITIES);
+        cityFilter.getItems().addAll(MapsAPI.ITALIAN_CITIES);
         cityFilter.getEditor().textProperty().addListener((obs, old, newVal) -> {
             if (!isUpdatingCityComboBox)
                 updateCityAutocomplete(newVal);
@@ -161,10 +161,10 @@ public class GraphicHomeView implements HomeView {
         VBox sportBox = new VBox(0);
         sportBox.getStyleClass().add(CSS_SEARCH_FIELD_CONTAINER);
         sportBox.setAlignment(Pos.CENTER_LEFT);
-        Label sportLbl = new Label("Sport");
+        Label sportLbl = new Label(Constants.PROMPT_SPORT);
         sportLbl.getStyleClass().addAll(CSS_TEXT_CAPTION, CSS_TEXT_MUTED);
         sportFilter = new ComboBox<>();
-        sportFilter.setPromptText("Any");
+        sportFilter.setPromptText(Constants.PROMPT_ANY);
         sportFilter.getStyleClass().add("integrated-combo");
         sportFilter.setPrefWidth(160);
         sportFilter.getItems().add(null);
@@ -174,10 +174,10 @@ public class GraphicHomeView implements HomeView {
         VBox dateBox = new VBox(0);
         dateBox.getStyleClass().add(CSS_SEARCH_FIELD_CONTAINER);
         dateBox.setAlignment(Pos.CENTER_LEFT);
-        Label dateLbl = new Label("When");
+        Label dateLbl = new Label(Constants.LABEL_WHEN);
         dateLbl.getStyleClass().addAll(CSS_TEXT_CAPTION, CSS_TEXT_MUTED);
         dateFilter = new DatePicker();
-        dateFilter.setPromptText("Add dates");
+        dateFilter.setPromptText(Constants.PROMPT_ADD_DATES);
         dateFilter.getStyleClass().add(model.utils.Constants.CSS_INTEGRATED_DATE);
         dateFilter.setPrefWidth(160);
         dateBox.getChildren().addAll(dateLbl, dateFilter);
@@ -189,7 +189,7 @@ public class GraphicHomeView implements HomeView {
         filterContainer.getChildren().add(capsule);
     }
 
-    private VBox createGridMatchCard(model.bean.MatchBean match) {
+    private VBox createGridMatchCard(MatchBean match) {
         VBox card = new VBox(0);
         card.getStyleClass().add("match-card");
         StackPane imageHeader = new StackPane();
@@ -211,6 +211,18 @@ public class GraphicHomeView implements HomeView {
                     .log(java.util.logging.Level.WARNING, () -> String.format("Sport image not found: %s", imagePath));
         }
         imageHeader.getChildren().add(sportIcon);
+
+        // Add status badge for organizer view
+        if (!homeController.isViewingAsPlayer() && match.getStatus() != null) {
+            Region statusBadge = new Region();
+            statusBadge.getStyleClass().add("status-badge");
+            String statusClass = getStatusStyleClass(match.getStatus());
+            statusBadge.getStyleClass().add(statusClass);
+            StackPane.setAlignment(statusBadge, Pos.TOP_RIGHT);
+            StackPane.setMargin(statusBadge, new Insets(10, 10, 0, 0));
+            imageHeader.getChildren().add(statusBadge);
+        }
+
         VBox content = new VBox(5);
         content.getStyleClass().add(model.utils.Constants.CSS_CARD_CONTENT);
         Label locationTitle = new Label(
@@ -251,7 +263,7 @@ public class GraphicHomeView implements HomeView {
 
     private void handleJoinMatch(int matchId) {
         try {
-            homeController.joinMatch(matchId);
+            homeController.joinMatch();
         } catch (exception.ValidationException e) {
             displayError(e.getMessage());
         }
@@ -261,9 +273,9 @@ public class GraphicHomeView implements HomeView {
         isUpdatingCityComboBox = true;
         ObservableList<String> filtered = FXCollections.observableArrayList();
         if (input == null || input.isEmpty())
-            filtered.addAll(ALL_CITIES);
+            filtered.addAll(MapsAPI.ITALIAN_CITIES);
         else
-            for (String c : ALL_CITIES)
+            for (String c : MapsAPI.ITALIAN_CITIES)
                 if (c.toLowerCase().startsWith(input.toLowerCase()))
                     filtered.add(c);
         cityFilter.setItems(filtered);
@@ -279,14 +291,14 @@ public class GraphicHomeView implements HomeView {
 
     @Override
     public void displayWelcome() {
-        model.domain.User u = homeController.getCurrentUser();
+        model.bean.UserBean u = homeController.getCurrentUser();
         welcomeLabel.setText(model.utils.Constants.LABEL_HELLO_PREFIX + u.getName() + " " + u.getSurname());
-        roleLabel.setText(homeController.getUserRole().getDisplayName());
+        roleLabel.setText(homeController.getUserRoleName());
         try {
             String playerPath = System.getProperty("sporty.image.player", model.utils.Constants.IMAGE_PLAYER_PATH);
             String organizerPath = System.getProperty("sporty.image.organizer",
                     model.utils.Constants.IMAGE_ORGANIZER_PATH);
-            String imagePath = homeController.getUserRole() == model.domain.Role.ORGANIZER ? organizerPath : playerPath;
+            String imagePath = homeController.getCurrentUser().isOrganizer() ? organizerPath : playerPath;
             javafx.scene.image.Image img = new javafx.scene.image.Image(
                     java.util.Objects.requireNonNull(getClass().getResourceAsStream(imagePath)),
                     120, 120, true, true);
@@ -311,7 +323,7 @@ public class GraphicHomeView implements HomeView {
         }
         int column = 0;
         int row = 0;
-        for (model.bean.MatchBean match : matches) {
+        for (MatchBean match : matches) {
             VBox card = createGridMatchCard(match);
             matchesContainer.add(card, column, row);
             column++;
@@ -337,7 +349,7 @@ public class GraphicHomeView implements HomeView {
 
     @Override
     public void showMatchDetails(int matchId) {
-        model.bean.MatchBean match = homeController.getMatchById(matchId);
+        MatchBean match = homeController.getMatchById(matchId);
         if (match == null) {
             displayError("Match not found!");
             return;
@@ -351,6 +363,12 @@ public class GraphicHomeView implements HomeView {
         content.getChildren().add(new Label("Time: " + match.getMatchTime()));
         content.getChildren().add(new Label("Field: " + (match.getFieldName() != null ? match.getFieldName() : "TBD")));
         content.getChildren().add(new Label("Organizer: " + match.getOrganizerName()));
+
+        // Add status for organizer view
+        if (!homeController.isViewingAsPlayer() && match.getStatus() != null) {
+            content.getChildren().add(new Label("Status: " + match.getStatus().getDisplayName()));
+        }
+
         int totalPlayers = match.getSport().getRequiredPlayers();
         if (homeController.isViewingAsPlayer()) {
             int joined = view.ViewUtils.getCurrentParticipants(match);
@@ -432,5 +450,13 @@ public class GraphicHomeView implements HomeView {
     public void close() {
         if (stage != null)
             stage.close();
+    }
+
+    private String getStatusStyleClass(model.domain.MatchStatus status) {
+        return switch (status) {
+            case PENDING -> "status-pending";
+            case APPROVED -> "status-approved";
+            case REJECTED -> "status-rejected";
+        };
     }
 }

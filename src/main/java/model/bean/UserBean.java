@@ -64,4 +64,16 @@ public class UserBean {
     public void setRole(int role) {
         this.role = role;
     }
+
+    public boolean isPlayer() {
+        return role == 1;
+    }
+
+    public boolean isOrganizer() {
+        return role == 2;
+    }
+
+    public boolean isFieldManager() {
+        return role == 3;
+    }
 }

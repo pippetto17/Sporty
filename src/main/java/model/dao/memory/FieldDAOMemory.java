@@ -21,7 +21,6 @@ public class FieldDAOMemory implements FieldDAO {
                         double pricePerHour,
                         int managerId) {
                 int id = nextId();
-                // Create stub User for manager
                 model.domain.User manager = new model.domain.User();
                 manager.setId(managerId);
                 Field field = new Field(id, name, city, address, pricePerHour, sport, manager);

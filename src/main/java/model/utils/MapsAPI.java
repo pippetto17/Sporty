@@ -1,10 +1,16 @@
 package model.utils;
+
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
-public final class Utils {
-    private Utils() {
+
+public final class MapsAPI {
+
+    private MapsAPI() {
+        // Utility class
     }
-    public static final List<String> ITALIAN_CITIES = java.util.Collections.unmodifiableList(Arrays.asList(
+
+    public static final List<String> ITALIAN_CITIES = Collections.unmodifiableList(Arrays.asList(
             "Agrigento", "Alessandria", "Ancona", "Aosta", "Arezzo", "Ascoli Piceno", "Asti",
             "Avellino", "Bari", "Barletta-Andria-Trani", "Belluno", "Benevento", "Bergamo",
             "Biella", "Bologna", "Bolzano", "Brescia", "Brindisi", "Cagliari", "Caltanissetta",
@@ -20,15 +26,21 @@ public final class Utils {
             "Savona", "Siena", "Siracusa", "Sondrio", "Sud Sardegna", "Taranto", "Teramo",
             "Terni", "Torino", "Trapani", "Trento", "Treviso", "Trieste", "Udine", "Varese",
             "Venezia", "Verbano-Cusio-Ossola", "Vercelli", "Verona", "Vibo Valentia", "Vicenza", "Viterbo"));
+
     public static List<String> searchCitiesByPrefix(String prefix) {
-        if (prefix == null || prefix.trim().isEmpty())
+        if (prefix == null || prefix.trim().isEmpty()) {
             return ITALIAN_CITIES;
+        }
         String lower = prefix.toLowerCase();
-        return ITALIAN_CITIES.stream().filter(c -> c.toLowerCase().startsWith(lower)).toList();
+        return ITALIAN_CITIES.stream()
+                .filter(city -> city.toLowerCase().startsWith(lower))
+                .toList();
     }
+
     public static boolean isValidCity(String city) {
-        if (city == null)
+        if (city == null) {
             return false;
+        }
         return ITALIAN_CITIES.stream().anyMatch(c -> c.equalsIgnoreCase(city.trim()));
     }
 }

@@ -4,8 +4,7 @@ import model.bean.FieldBean;
 import model.domain.Field;
 
 public class FieldConverter {
-    private FieldConverter() {
-    }
+    private FieldConverter() {}
 
     public static Field toEntity(FieldBean fieldBean) {
         if (fieldBean == null) {

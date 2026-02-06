@@ -2,6 +2,7 @@ package model.domain;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import exception.ValidationException;
 
 public class Match {
     private int id;
@@ -71,7 +72,19 @@ public class Match {
         return missingPlayers;
     }
 
-    public void setMissingPlayers(int missingPlayers) {
+    public void setMissingPlayers(int missingPlayers) throws exception.ValidationException {
+        if (missingPlayers < 0) {
+            throw new ValidationException("Missing players cannot be negative");
+        }
+        if (this.field != null && this.field.getSport() != null) {
+            int requiredPlayers = this.field.getSport().getRequiredPlayers();
+            if (missingPlayers >= requiredPlayers) {
+                throw new ValidationException(
+                        String.format("Missing players (%d) must be less than required players (%d) for %s",
+                                missingPlayers, requiredPlayers, this.field.getSport().getDisplayName()));
+            }
+        }
+
         this.missingPlayers = missingPlayers;
     }
 

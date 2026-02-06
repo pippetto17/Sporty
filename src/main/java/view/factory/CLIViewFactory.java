@@ -42,6 +42,6 @@ public class CLIViewFactory implements ViewFactory {
 
     @Override
     public FieldManagerView createFieldManagerView(FieldManagerController controller) {
-        return new CLIFieldManagerView(controller, controller.getFieldManager());
+        return new CLIFieldManagerView(controller);
     }
 }

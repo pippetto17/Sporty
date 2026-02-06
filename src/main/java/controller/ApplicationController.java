@@ -16,6 +16,7 @@ import java.util.Deque;
 import java.util.Scanner;
 import java.util.logging.Logger;
 import exception.ValidationException;
+import exception.AuthorizationException;
 
 public class ApplicationController {
     private static final Logger logger = Logger.getLogger(ApplicationController.class.getName());
@@ -113,23 +114,25 @@ public class ApplicationController {
     }
 
     public void navigateToOrganizeMatch(User organizer) {
-        var controller = new OrganizeMatchController(organizer, this);
-        var view = viewFactory.createOrganizeMatchView(controller);
-        view.setApplicationController(this);
-        pushView(view);
+        try {
+            var controller = new OrganizeMatchController(organizer, this);
+            var view = viewFactory.createOrganizeMatchView(controller);
+            view.setApplicationController(this);
+            pushView(view);
+        } catch (AuthorizationException e) {
+            logger.warning("Authorization failed for organize match: " + e.getMessage());
+        }
     }
 
     public void navigateToBookField(MatchBean match) {
-        var controller = new BookFieldController(this);
-        controller.setMatchBean(match);
+        var controller = new BookFieldController(this, match);
         var view = viewFactory.createBookFieldView(controller);
         view.setApplicationController(this);
         pushView(view);
     }
 
     public void navigateToPayment(MatchBean matchBean) {
-        var controller = new PaymentController(this);
-        controller.setMatchBean(matchBean);
+        var controller = new PaymentController(this, matchBean);
         var view = viewFactory.createPaymentView(controller);
         view.setApplicationController(this);
         controller.setView(view);

@@ -2,7 +2,8 @@ package view.homeview;
 
 import controller.ApplicationController;
 import controller.HomeController;
-import model.domain.User;
+import model.bean.MatchBean;
+import model.bean.UserBean;
 import model.utils.Constants;
 import java.util.Scanner;
 
@@ -43,28 +44,29 @@ public class CLIHomeView implements HomeView {
     @Override
     public void close() {
         running = false;
-        System.out.println("\nLogging out...");
+        System.out.println("\n" + Constants.STATUS_LOGGING_OUT);
     }
 
     @Override
     public void displayWelcome() {
-        User user = homeController.getCurrentUser();
+        UserBean user = homeController.getCurrentUser();
         System.out.println("\n" + Constants.SEPARATOR);
         System.out.println("    HOME - SPORTY");
         System.out.println(Constants.SEPARATOR);
-        System.out.println("Welcome, " + user.getName() + " " + user.getSurname() + "!");
-        System.out.println("Role: " + homeController.getUserRole());
+        System.out.println(Constants.LABEL_WELCOME_PREFIX + user.getName() + " " + user.getSurname()
+                + Constants.LABEL_WELCOME_SUFFIX);
+        System.out.println("Role: " + homeController.getUserRoleName());
         System.out.println(Constants.SEPARATOR);
     }
 
     @Override
-    public void displayMatches(java.util.List<model.bean.MatchBean> matches) {
+    public void displayMatches(java.util.List<MatchBean> matches) {
         System.out.println("\n--- AVAILABLE MATCHES ---");
         if (matches == null || matches.isEmpty()) {
-            System.out.println("No matches available at the moment.");
+            System.out.println(Constants.LABEL_NO_MATCHES);
         } else {
             for (int i = 0; i < matches.size(); i++) {
-                model.bean.MatchBean match = matches.get(i);
+                MatchBean match = matches.get(i);
                 String matchStr = String.format("%d. %s %s - %s - %s at %s | 💰 €%.2f/persona (%d players)",
                         i + 1,
                         view.ViewUtils.getSportEmoji(match.getSport()),
@@ -74,6 +76,12 @@ public class CLIHomeView implements HomeView {
                         match.getMatchTime(),
                         match.getCostPerPerson(),
                         view.ViewUtils.getCurrentParticipants(match));
+
+                // Add status for organizer view
+                if (!homeController.isViewingAsPlayer() && match.getStatus() != null) {
+                    matchStr += " [" + match.getStatus().name() + "]";
+                }
+
                 System.out.println(matchStr);
             }
         }
@@ -129,14 +137,14 @@ public class CLIHomeView implements HomeView {
     }
 
     private void handleJoinMatchInteraction() {
-        java.util.List<model.bean.MatchBean> matches = homeController.getMatches();
+        java.util.List<MatchBean> matches = homeController.getMatches();
         displayMatches(matches);
         if (matches != null && !matches.isEmpty()) {
             System.out.print("\nEnter match number to join (0 to cancel): ");
             try {
                 int matchNum = Integer.parseInt(scanner.nextLine().trim());
                 if (matchNum > 0 && matchNum <= matches.size()) {
-                    model.bean.MatchBean selectedMatch = matches.get(matchNum - 1);
+                    MatchBean selectedMatch = matches.get(matchNum - 1);
                     attemptJoinMatch(selectedMatch);
                 }
             } catch (NumberFormatException e) {
@@ -148,7 +156,7 @@ public class CLIHomeView implements HomeView {
     private boolean handleOrganizerChoice(String choice) {
         switch (choice) {
             case "1" -> {
-                java.util.List<model.bean.MatchBean> matches = homeController.getMatches();
+                java.util.List<MatchBean> matches = homeController.getMatches();
                 displayMatches(matches);
             }
             case "2" -> {
@@ -172,9 +180,9 @@ public class CLIHomeView implements HomeView {
     @Override
     public void showMatchDetails(int matchId) {
         try {
-            model.bean.MatchBean match = homeController.getMatchById(matchId);
+            MatchBean match = homeController.getMatchById(matchId);
             if (match == null) {
-                displayError("Match not found");
+                displayError(Constants.ERROR_MATCH_NOT_FOUND);
                 return;
             }
             System.out.println("\n" + Constants.SEPARATOR);
@@ -191,7 +199,7 @@ public class CLIHomeView implements HomeView {
             System.out.print("\nPress Enter to continue...");
             scanner.nextLine();
         } catch (Exception e) {
-            displayError("Error showing match details: " + e.getMessage());
+            displayError(Constants.MSG_ERROR_MATCH_DETAILS + e.getMessage());
         }
     }
 
@@ -210,9 +218,9 @@ public class CLIHomeView implements HomeView {
         displayMatches(homeController.getMatches());
     }
 
-    private void attemptJoinMatch(model.bean.MatchBean selectedMatch) {
+    private void attemptJoinMatch(MatchBean selectedMatch) {
         try {
-            homeController.joinMatch(selectedMatch.getMatchId());
+            homeController.joinMatch();
         } catch (exception.ValidationException e) {
             System.out.println("Error joining match: " + e.getMessage());
         }

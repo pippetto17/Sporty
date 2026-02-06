@@ -145,10 +145,8 @@ public class FieldDAODBMS implements FieldDAO {
     }
 
     private Field mapRowToField(ResultSet rs) throws SQLException {
-        // Load manager ID
         int managerId = rs.getInt("manager_id");
 
-        // Load complete User entity for manager
         UserDAODBMS userDAO = new UserDAODBMS(connection);
         model.domain.User manager = userDAO.findById(managerId);
 

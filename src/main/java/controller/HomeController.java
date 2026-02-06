@@ -2,7 +2,8 @@ package controller;
 
 import exception.ValidationException;
 import model.bean.MatchBean;
-import model.domain.Role;
+import model.bean.UserBean;
+
 import model.domain.Sport;
 import model.domain.User;
 import java.time.LocalDate;
@@ -31,12 +32,18 @@ public class HomeController {
         this.homeView = homeView;
     }
 
-    public User getCurrentUser() {
-        return currentUser;
+    public UserBean getCurrentUser() {
+        UserBean bean = new UserBean();
+        bean.setId(currentUser.getId());
+        bean.setUsername(currentUser.getUsername());
+        bean.setName(currentUser.getName());
+        bean.setSurname(currentUser.getSurname());
+        bean.setRole(currentUser.getRole().getCode());
+        return bean;
     }
 
-    public Role getUserRole() {
-        return currentUser.getRole();
+    public String getUserRoleName() {
+        return currentUser.getRole().getDisplayName();
     }
 
     public boolean isViewingAsPlayer() {
@@ -86,11 +93,13 @@ public class HomeController {
     private void enrichMatchBean(MatchBean match) {
         model.domain.Field field = fieldDAO.findById(match.getFieldId());
         if (field != null) {
+
             match.setCity(field.getCity());
             match.setSport(field.getSport());
             match.setFieldName(field.getName());
             match.setFieldAddress(field.getAddress());
             match.setPricePerHour(field.getPricePerHour());
+
         }
         model.domain.User organizer = userDAO.findById(match.getOrganizerId());
         if (organizer != null) {
@@ -114,7 +123,7 @@ public class HomeController {
         applicationController.navigateToOrganizeMatch(currentUser);
     }
 
-    public void joinMatch(int matchId) throws ValidationException {
+    public void joinMatch() throws ValidationException {
         throw new ValidationException("Join Match feature is currently disabled.");
     }
 

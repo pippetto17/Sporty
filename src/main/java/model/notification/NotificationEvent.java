@@ -3,8 +3,11 @@ package model.notification;
 import java.time.LocalDateTime;
 
 public class NotificationEvent {
+
+    /* Event */
+
     public enum Type {
-        BOOKING_CREATED, MATCH_CREATED
+        BOOKING_CREATED, BOOKING_REQUEST, MATCH_CREATED
     }
 
     public final Type type;
