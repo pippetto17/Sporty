@@ -3,20 +3,29 @@ package controller;
 import exception.AuthorizationException;
 import exception.ValidationException;
 import model.bean.FieldBean;
+import model.bean.MatchBean;
+import model.converter.FieldConverter;
+import model.converter.MatchConverter;
+import model.dao.DAOFactory;
+import model.dao.FieldDAO;
+import model.dao.MatchDAO;
+import model.domain.Match;
+import model.domain.MatchStatus;
 import model.domain.User;
+import model.utils.Constants;
 
 import java.util.List;
 
 public class FieldManagerController {
-    private static final String ERROR_NOT_OWNER = model.utils.Constants.ERROR_NOT_FIELD_OWNER;
+    private static final String ERROR_NOT_OWNER = Constants.ERROR_NOT_FIELD_OWNER;
     private final User fieldManager;
-    private final model.dao.FieldDAO fieldDAO;
-    private final model.dao.MatchDAO matchDAO;
+    private final FieldDAO fieldDAO;
+    private final MatchDAO matchDAO;
 
-    public FieldManagerController(User fieldManager, model.dao.DAOFactory daoFactory)
+    public FieldManagerController(User fieldManager, DAOFactory daoFactory)
             throws ValidationException {
         if (!fieldManager.isFieldManager()) {
-            throw new ValidationException(model.utils.Constants.ERROR_NOT_FIELD_MANAGER);
+            throw new ValidationException(Constants.ERROR_NOT_FIELD_MANAGER);
         }
         this.fieldManager = fieldManager;
         this.fieldDAO = daoFactory.getFieldDAO();
@@ -25,21 +34,21 @@ public class FieldManagerController {
     }
 
     public void addNewField(FieldBean fieldBean) {
-        var field = model.converter.FieldConverter.toEntity(fieldBean);
+        var field = FieldConverter.toEntity(fieldBean);
         field.setManager(fieldManager);
         fieldDAO.save(field);
     }
 
     public List<FieldBean> getMyFields() {
         return fieldDAO.findByManagerId(fieldManager.getId()).stream()
-                .map(model.converter.FieldConverter::toBean)
+                .map(FieldConverter::toBean)
                 .toList();
     }
 
-    public List<model.bean.MatchBean> getPendingRequests() {
+    public List<MatchBean> getPendingRequests() {
         return matchDAO.findPendingForManager(fieldManager.getId()).stream()
                 .map(match -> {
-                    var bean = model.converter.MatchConverter.toBean(match);
+                    var bean = MatchConverter.toBean(match);
                     var field = match.getField();
                     if (field != null) {
                         bean.setFieldName(field.getName());
@@ -51,23 +60,23 @@ public class FieldManagerController {
 
     public void approveMatch(int matchId) throws AuthorizationException {
         validateMatchOwnership(matchId);
-        matchDAO.updateStatus(matchId, model.domain.MatchStatus.APPROVED);
+        matchDAO.updateStatus(matchId, MatchStatus.APPROVED);
     }
 
     public void rejectMatch(int matchId) throws AuthorizationException {
         validateMatchOwnership(matchId);
-        matchDAO.updateStatus(matchId, model.domain.MatchStatus.REJECTED);
+        matchDAO.updateStatus(matchId, MatchStatus.REJECTED);
     }
 
-    public model.bean.MatchBean getRequestDetails(int matchId) throws AuthorizationException {
-        model.domain.Match match = matchDAO.findById(matchId);
+    public MatchBean getRequestDetails(int matchId) throws AuthorizationException {
+        Match match = matchDAO.findById(matchId);
         if (match == null) {
             throw new AuthorizationException("Match not found: " + matchId);
         }
 
         validateMatchOwnership(matchId);
 
-        var bean = model.converter.MatchConverter.toBean(match);
+        var bean = MatchConverter.toBean(match);
         if (match.getField() != null) {
             bean.setFieldName(match.getField().getName());
         }
@@ -75,7 +84,7 @@ public class FieldManagerController {
     }
 
     private void validateMatchOwnership(int matchId) throws AuthorizationException {
-        List<model.domain.Match> pendingMatches = getPendingMatches();
+        List<Match> pendingMatches = getPendingMatches();
         boolean isOwner = pendingMatches.stream()
                 .anyMatch(m -> m.getId() == matchId);
 
@@ -97,17 +106,17 @@ public class FieldManagerController {
         return fieldManager;
     }
 
-    public List<model.domain.Match> getPendingMatches() {
+    public List<Match> getPendingMatches() {
         return matchDAO.findPendingForManager(fieldManager.getId());
     }
 
     public record DashboardData(int totalFields, int pendingRequests, int todayBookings, double weekRevenue) {
     }
 
-    /* Not implemented yet*/
+    /* Not implemented yet */
     public void updateField(FieldBean fieldBean) throws AuthorizationException {
         validateOwnership(fieldBean.getFieldId());
-        var field = model.converter.FieldConverter.toEntity(fieldBean);
+        var field = FieldConverter.toEntity(fieldBean);
         field.setManager(fieldManager);
         field.setId(fieldBean.getFieldId());
         fieldDAO.save(field);
@@ -117,6 +126,7 @@ public class FieldManagerController {
         validateOwnership(fieldId);
         fieldDAO.delete(fieldId);
     }
+
     private void validateOwnership(int fieldId) throws AuthorizationException {
         boolean isOwner = getMyFields().stream()
                 .anyMatch(f -> f.getFieldId() == fieldId);

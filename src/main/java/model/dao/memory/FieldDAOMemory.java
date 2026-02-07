@@ -3,6 +3,7 @@ package model.dao.memory;
 import model.dao.FieldDAO;
 import model.domain.Field;
 import model.domain.Sport;
+import model.domain.User;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -22,7 +23,7 @@ public class FieldDAOMemory implements FieldDAO {
                         double pricePerHour,
                         int managerId) {
                 int id = nextId();
-                model.domain.User manager = new model.domain.User();
+                User manager = new User();
                 manager.setId(managerId);
                 Field field = new Field(id, name, city, address, pricePerHour, sport, manager);
                 fields.put(id, field);

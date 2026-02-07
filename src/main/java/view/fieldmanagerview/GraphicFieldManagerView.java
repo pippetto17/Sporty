@@ -8,24 +8,33 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
+import model.bean.MatchBean;
+import model.notification.FieldManagerObserver;
+import model.notification.NotificationService;
 import model.utils.Constants;
 import view.ViewUtils;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Objects;
 import java.util.logging.Logger;
 
 public class GraphicFieldManagerView implements FieldManagerView {
     private final FieldManagerController controller;
 
     private ApplicationController appController;
-    private model.notification.NotificationService notificationService;
+    private NotificationService notificationService;
     private Stage stage;
     private final Logger logger = Logger.getLogger(getClass().getName());
     @FXML
@@ -39,22 +48,26 @@ public class GraphicFieldManagerView implements FieldManagerView {
     @FXML
     private Label messageLabel;
     @FXML
-    private TableView<model.bean.MatchBean> bookingsTable;
+    private TableView<MatchBean> bookingsTable;
     @FXML
-    private TableColumn<model.bean.MatchBean, String> fieldNameColumn;
+    private TableColumn<MatchBean, String> fieldNameColumn;
     @FXML
-    private TableColumn<model.bean.MatchBean, String> requesterColumn;
+    private TableColumn<MatchBean, String> requesterColumn;
     @FXML
-    private TableColumn<model.bean.MatchBean, String> dateColumn;
+    private TableColumn<MatchBean, String> dateColumn;
     @FXML
-    private TableColumn<model.bean.MatchBean, String> timeColumn;
+    private TableColumn<MatchBean, String> timeColumn;
     @FXML
-    private TableColumn<model.bean.MatchBean, String> typeColumn;
+    private TableColumn<MatchBean, String> typeColumn;
     @FXML
     private Button approveButton;
     @FXML
     private Button rejectButton;
-    private final ObservableList<model.bean.MatchBean> bookingsList = FXCollections.observableArrayList();
+    private final ObservableList<MatchBean> bookingsList = FXCollections.observableArrayList();
+    @FXML
+    private ImageView managerImageView;
+    @FXML
+    private Button notificationButton;
 
     public GraphicFieldManagerView(FieldManagerController controller) {
         this.controller = controller;
@@ -64,7 +77,7 @@ public class GraphicFieldManagerView implements FieldManagerView {
     public void setApplicationController(ApplicationController appController) {
         this.appController = appController;
         this.notificationService = appController.getNotificationService();
-        this.notificationService.attach(new model.notification.FieldManagerObserver());
+        this.notificationService.attach(new FieldManagerObserver());
     }
 
     @Override
@@ -94,18 +107,15 @@ public class GraphicFieldManagerView implements FieldManagerView {
     }
 
     @FXML
-    private javafx.scene.image.ImageView managerImageView;
-
-    @FXML
     private void initialize() {
         managerNameLabel.setText(
                 "Manager: " + controller.getFieldManager().getName() + " " + controller.getFieldManager().getSurname());
         try {
-            javafx.scene.image.Image img = new javafx.scene.image.Image(
-                    java.util.Objects.requireNonNull(getClass().getResourceAsStream("/image/manager.jpeg")),
+            Image img = new Image(
+                    Objects.requireNonNull(getClass().getResourceAsStream("/image/manager.jpeg")),
                     120, 120, true, true);
             managerImageView.setImage(img);
-            javafx.scene.shape.Circle clip = new javafx.scene.shape.Circle(30, 30, 30);
+            Circle clip = new Circle(30, 30, 30);
             managerImageView.setClip(clip);
         } catch (Exception e) {
             logger.warning("Manager image not found: " + e.getMessage());
@@ -119,9 +129,6 @@ public class GraphicFieldManagerView implements FieldManagerView {
             Platform.runLater(() -> handleShowNotifications(0)); // 0 is the Requests tab index
         }
     }
-
-    @FXML
-    private Button notificationButton;
 
     private void checkAndShowNotifications() {
         if (notificationService == null)
@@ -189,32 +196,32 @@ public class GraphicFieldManagerView implements FieldManagerView {
         Tab requestsTab = new Tab("Pending Requests");
         VBox requestsBox = new VBox(10);
         requestsBox.setPadding(new javafx.geometry.Insets(10));
-        List<model.bean.MatchBean> pendingRequests = controller.getPendingRequests();
+        List<MatchBean> pendingRequests = controller.getPendingRequests();
         populateRequestsBox(requestsBox, pendingRequests);
         requestsTab.setContent(new ScrollPane(requestsBox));
         return requestsTab;
     }
 
-    private void populateRequestsBox(VBox requestsBox, List<model.bean.MatchBean> pendingRequests) {
+    private void populateRequestsBox(VBox requestsBox, List<MatchBean> pendingRequests) {
         if (pendingRequests.isEmpty()) {
             requestsBox.getChildren().add(new Label("No pending requests."));
             return;
         }
-        for (model.bean.MatchBean m : pendingRequests) {
+        for (MatchBean m : pendingRequests) {
             requestsBox.getChildren().add(createMatchRequestRow(m, requestsBox));
         }
     }
 
-    private HBox createMatchRequestRow(model.bean.MatchBean m, VBox requestsBox) {
+    private HBox createMatchRequestRow(MatchBean m, VBox requestsBox) {
         HBox row = new HBox(10);
-        row.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+        row.setAlignment(Pos.CENTER_LEFT);
         VBox info = new VBox(2);
         Label title = new Label(m.getFieldName() + " - " + m.getMatchDate());
         title.setStyle("-fx-font-weight: bold");
         Label subtitle = new Label(m.getMatchTime() + " (" + m.getOrganizerName() + ")");
         info.getChildren().addAll(title, subtitle);
         Region spacer = new Region();
-        HBox.setHgrow(spacer, javafx.scene.layout.Priority.ALWAYS);
+        HBox.setHgrow(spacer, Priority.ALWAYS);
         Button approveBtn = new Button("✓");
         approveBtn.getStyleClass().add("success-button");
         approveBtn.setOnAction(e -> handleApproveFromDialog(m, row, requestsBox));
@@ -225,7 +232,7 @@ public class GraphicFieldManagerView implements FieldManagerView {
         return row;
     }
 
-    private void handleApproveFromDialog(model.bean.MatchBean m, HBox row, VBox requestsBox) {
+    private void handleApproveFromDialog(MatchBean m, HBox row, VBox requestsBox) {
         try {
             controller.approveMatch(m.getMatchId());
             requestsBox.getChildren().remove(row);
@@ -236,7 +243,7 @@ public class GraphicFieldManagerView implements FieldManagerView {
         }
     }
 
-    private void handleRejectFromDialog(model.bean.MatchBean m, HBox row, VBox requestsBox) {
+    private void handleRejectFromDialog(MatchBean m, HBox row, VBox requestsBox) {
         try {
             controller.rejectMatch(m.getMatchId());
             requestsBox.getChildren().remove(row);
@@ -280,7 +287,7 @@ public class GraphicFieldManagerView implements FieldManagerView {
 
     @FXML
     private void handleApprove() {
-        model.bean.MatchBean selected = bookingsTable.getSelectionModel().getSelectedItem();
+        MatchBean selected = bookingsTable.getSelectionModel().getSelectedItem();
         if (selected == null)
             return;
         try {
@@ -294,7 +301,7 @@ public class GraphicFieldManagerView implements FieldManagerView {
 
     @FXML
     private void handleReject() {
-        model.bean.MatchBean selected = bookingsTable.getSelectionModel().getSelectedItem();
+        MatchBean selected = bookingsTable.getSelectionModel().getSelectedItem();
         if (selected == null)
             return;
         try {

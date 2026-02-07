@@ -111,6 +111,16 @@ public class OrganizeMatchController {
             throw new ValidationException("MatchBean cannot be null");
         try {
             model.domain.Match match = model.converter.MatchConverter.toEntity(currentMatchBean);
+
+            // Populate full Field and User entities from DAOs
+            if (currentMatchBean.getFieldId() != 0) {
+                model.domain.Field fullField = fieldDAO.findById(currentMatchBean.getFieldId());
+                match.setField(fullField);
+            }
+            if (currentMatchBean.getOrganizerId() != 0) {
+                match.setOrganizer(organizer);
+            }
+
             matchDAO.save(match);
             if (match.getId() != 0) {
                 currentMatchBean.setMatchId(match.getId());

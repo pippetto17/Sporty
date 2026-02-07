@@ -1,9 +1,11 @@
 package model.dao.memory;
 
 import model.dao.MatchDAO;
+import model.domain.Field;
 import model.domain.Match;
 import model.domain.MatchStatus;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,8 +43,8 @@ public class MatchDAOMemory implements MatchDAO {
     public List<Match> findPendingForManager(int managerId) {
         List<Match> pendingMatches = new ArrayList<>();
         for (Match match : matches.values()) {
-            if (match.getStatus() == model.domain.MatchStatus.PENDING) {
-                model.domain.Field field = match.getField();
+            if (match.getStatus() == MatchStatus.PENDING) {
+                Field field = match.getField();
                 if (field != null && field.getManager() != null && field.getManager().getId() == managerId) {
                     pendingMatches.add(match);
                 }
@@ -55,7 +57,7 @@ public class MatchDAOMemory implements MatchDAO {
     public List<Match> findApprovedMatches() {
         List<Match> approvedMatches = new ArrayList<>();
         for (Match match : matches.values()) {
-            if (match.getStatus() == model.domain.MatchStatus.APPROVED) {
+            if (match.getStatus() == MatchStatus.APPROVED) {
                 approvedMatches.add(match);
             }
         }
@@ -77,7 +79,7 @@ public class MatchDAOMemory implements MatchDAO {
 
     @Override
     public int deleteExpiredMatches() {
-        java.time.LocalDate today = java.time.LocalDate.now();
+        LocalDate today = LocalDate.now();
         List<Integer> toDelete = matches.values().stream()
                 .filter(match -> match.getDate().isBefore(today))
                 .map(Match::getId)

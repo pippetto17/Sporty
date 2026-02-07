@@ -3,7 +3,9 @@ package model.converter;
 import exception.DataAccessException;
 import exception.ValidationException;
 import model.bean.MatchBean;
+import model.domain.Field;
 import model.domain.Match;
+import model.domain.User;
 
 public class MatchConverter {
     private MatchConverter() {
@@ -15,10 +17,10 @@ public class MatchConverter {
         }
         Match match = new Match();
         match.setId(matchBean.getMatchId());
-        model.domain.User organizer = new model.domain.User();
+        User organizer = new User();
         organizer.setId(matchBean.getOrganizerId());
         match.setOrganizer(organizer);
-        model.domain.Field field = new model.domain.Field();
+        Field field = new Field();
         field.setId(matchBean.getFieldId());
         match.setField(field);
         match.setDate(matchBean.getMatchDate());

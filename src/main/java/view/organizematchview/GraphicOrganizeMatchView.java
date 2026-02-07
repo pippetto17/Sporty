@@ -2,12 +2,16 @@ package view.organizematchview;
 
 import controller.ApplicationController;
 import controller.OrganizeMatchController;
+import exception.ValidationException;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
@@ -20,6 +24,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -56,7 +61,7 @@ public class GraphicOrganizeMatchView implements OrganizeMatchView {
     @FXML
     private Button searchFieldsButton;
     @FXML
-    private javafx.scene.layout.StackPane recapBox;
+    private StackPane recapBox;
     @FXML
     private Label recapSportLabel;
     @FXML
@@ -122,7 +127,7 @@ public class GraphicOrganizeMatchView implements OrganizeMatchView {
         }
         SpinnerValueFactory<Integer> valueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 20, 1);
         participantsSpinner.setValueFactory(valueFactory);
-        List<LocalTime> times = new java.util.ArrayList<>();
+        List<LocalTime> times = new ArrayList<>();
         for (int h = 0; h < 24; h++) {
             times.add(LocalTime.of(h, 0));
             times.add(LocalTime.of(h, 30));
@@ -220,7 +225,7 @@ public class GraphicOrganizeMatchView implements OrganizeMatchView {
         int participants = participantsSpinner.getValue();
         try {
             organizeMatchController.validateMatchDetails(sport, date, time, city, participants);
-        } catch (exception.ValidationException e) {
+        } catch (ValidationException e) {
             showError(e.getMessage());
             return;
         }
@@ -332,9 +337,9 @@ public class GraphicOrganizeMatchView implements OrganizeMatchView {
     }
 
     @FXML
-    private javafx.scene.layout.VBox recapHeader;
+    private VBox recapHeader;
     @FXML
-    private javafx.scene.image.ImageView recapImage;
+    private ImageView recapImage;
 
     @Override
     public void displayRecap(MatchBean matchBean) {
@@ -401,7 +406,7 @@ public class GraphicOrganizeMatchView implements OrganizeMatchView {
 
         if (recapImage != null) {
             try {
-                javafx.scene.image.Image img = new javafx.scene.image.Image(getClass().getResourceAsStream(imagePath));
+                Image img = new Image(getClass().getResourceAsStream(imagePath));
                 recapImage.setImage(img);
             } catch (Exception e) {
                 logger.warning("Could not load image: " + imagePath);

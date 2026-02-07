@@ -1,6 +1,7 @@
 package model.dao.filesystem;
 
 import model.dao.*;
+import model.dao.memory.NotificationDAOMemory;
 
 public class FileSystemDAOFactory implements DAOFactory {
     private final DAOFactory dbmsDelegate;
@@ -26,6 +27,6 @@ public class FileSystemDAOFactory implements DAOFactory {
 
     @Override
     public NotificationDAO getNotificationDAO() {
-        return new model.dao.memory.NotificationDAOMemory();
+        return new NotificationDAOMemory();
     }
 }

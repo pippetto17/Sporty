@@ -3,6 +3,8 @@ package view.factory;
 import controller.*;
 import view.bookfieldview.BookFieldView;
 import view.bookfieldview.GraphicBookFieldView;
+import view.fieldmanagerview.FieldManagerView;
+import view.fieldmanagerview.GraphicFieldManagerView;
 import view.homeview.GraphicHomeView;
 import view.homeview.HomeView;
 import view.loginview.GraphicLoginView;
@@ -41,7 +43,7 @@ public class GraphicViewFactory implements ViewFactory {
     }
 
     @Override
-    public view.fieldmanagerview.FieldManagerView createFieldManagerView(controller.FieldManagerController controller) {
-        return new view.fieldmanagerview.GraphicFieldManagerView(controller);
+    public FieldManagerView createFieldManagerView(FieldManagerController controller) {
+        return new GraphicFieldManagerView(controller);
     }
 }

@@ -78,7 +78,7 @@ public class Match {
         return missingPlayers;
     }
 
-    public void setMissingPlayers(int missingPlayers) throws exception.ValidationException {
+    public void setMissingPlayers(int missingPlayers) throws ValidationException {
         if (missingPlayers < 0) {
             throw new ValidationException("Missing players cannot be negative");
         }

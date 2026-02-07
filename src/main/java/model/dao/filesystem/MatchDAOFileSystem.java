@@ -3,6 +3,7 @@ package model.dao.filesystem;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import exception.DataAccessException;
 import model.dao.MatchDAO;
 import model.domain.Match;
 import model.domain.MatchStatus;
@@ -49,7 +50,7 @@ public class MatchDAOFileSystem implements MatchDAO {
                 }
             }
         } catch (IOException e) {
-            throw new exception.DataAccessException("Error creating data file: " + DATA_FILE, e);
+            throw new DataAccessException("Error creating data file: " + DATA_FILE, e);
         }
     }
 
@@ -58,7 +59,7 @@ public class MatchDAOFileSystem implements MatchDAO {
             List<Match> matches = gson.fromJson(reader, matchListType);
             return matches != null ? matches : new ArrayList<>();
         } catch (IOException e) {
-            throw new exception.DataAccessException("Error loading matches from file", e);
+            throw new DataAccessException("Error loading matches from file", e);
         }
     }
 
@@ -66,7 +67,7 @@ public class MatchDAOFileSystem implements MatchDAO {
         try (Writer writer = new FileWriter(DATA_FILE)) {
             gson.toJson(matches, writer);
         } catch (IOException e) {
-            throw new exception.DataAccessException("Error saving matches to file", e);
+            throw new DataAccessException("Error saving matches to file", e);
         }
     }
 

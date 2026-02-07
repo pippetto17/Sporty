@@ -1,10 +1,19 @@
 package controller;
 
+import exception.DataAccessException;
 import exception.ValidationException;
 import model.bean.MatchBean;
 import model.bean.UserBean;
+import model.converter.MatchConverter;
+import model.dao.DAOFactory;
+import model.dao.FieldDAO;
+import model.dao.MatchDAO;
+import model.dao.UserDAO;
+import model.domain.Field;
+import model.domain.Match;
 import model.domain.Sport;
 import model.domain.User;
+import view.homeview.HomeView;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -12,13 +21,13 @@ import java.util.List;
 public class HomeController {
     private final User currentUser;
     private final ApplicationController applicationController;
-    private final model.dao.UserDAO userDAO;
-    private final model.dao.FieldDAO fieldDAO;
-    private final model.dao.MatchDAO matchDAO;
+    private final UserDAO userDAO;
+    private final FieldDAO fieldDAO;
+    private final MatchDAO matchDAO;
     private boolean viewAsPlayer;
-    private view.homeview.HomeView homeView;
+    private HomeView homeView;
 
-    public HomeController(User user, ApplicationController applicationController, model.dao.DAOFactory daoFactory) {
+    public HomeController(User user, ApplicationController applicationController, DAOFactory daoFactory) {
         this.currentUser = user;
         this.applicationController = applicationController;
         this.matchDAO = daoFactory.getMatchDAO();
@@ -28,7 +37,7 @@ public class HomeController {
         matchDAO.deleteExpiredMatches();
     }
 
-    public void setHomeView(view.homeview.HomeView homeView) {
+    public void setHomeView(HomeView homeView) {
         this.homeView = homeView;
     }
 
@@ -59,7 +68,7 @@ public class HomeController {
     public List<MatchBean> getMatches() {
         try {
             List<MatchBean> matches;
-            List<model.domain.Match> matchEntities;
+            List<Match> matchEntities;
             if (viewAsPlayer) {
                 matchEntities = matchDAO.findApprovedMatches();
                 matchEntities = matchEntities.stream()
@@ -70,29 +79,29 @@ public class HomeController {
                 matchEntities = matchDAO.findByOrganizer(currentUser.getId());
             }
             matches = matchEntities.stream()
-                    .map(model.converter.MatchConverter::toBean)
+                    .map(MatchConverter::toBean)
                     .toList();
             for (MatchBean match : matches) {
                 enrichMatchBean(match);
             }
             return matches;
-        } catch (exception.DataAccessException e) {
-            throw new exception.DataAccessException("Error loading matches: " + e.getMessage(), e);
+        } catch (DataAccessException e) {
+            throw new DataAccessException("Error loading matches: " + e.getMessage(), e);
         }
     }
 
     public MatchBean getMatchById(int matchId) {
-        model.domain.Match matchEntity = matchDAO.findById(matchId);
+        Match matchEntity = matchDAO.findById(matchId);
         if (matchEntity == null) {
             return null;
         }
-        MatchBean matchBean = model.converter.MatchConverter.toBean(matchEntity);
+        MatchBean matchBean = MatchConverter.toBean(matchEntity);
         enrichMatchBean(matchBean);
         return matchBean;
     }
 
     private void enrichMatchBean(MatchBean match) {
-        model.domain.Field field = fieldDAO.findById(match.getFieldId());
+        Field field = fieldDAO.findById(match.getFieldId());
         if (field != null) {
 
             match.setCity(field.getCity());
@@ -102,7 +111,7 @@ public class HomeController {
             match.setPricePerHour(field.getPricePerHour());
 
         }
-        model.domain.User organizer = userDAO.findById(match.getOrganizerId());
+        User organizer = userDAO.findById(match.getOrganizerId());
         if (organizer != null) {
             match.setOrganizerName(organizer.getName() + " " + organizer.getSurname());
         }
@@ -134,16 +143,16 @@ public class HomeController {
 
     public List<MatchBean> getJoinedMatches() {
         try {
-            List<model.domain.Match> matchEntities = matchDAO.findByJoinedPlayer(currentUser.getId());
+            List<Match> matchEntities = matchDAO.findByJoinedPlayer(currentUser.getId());
             List<MatchBean> matches = matchEntities.stream()
-                    .map(model.converter.MatchConverter::toBean)
+                    .map(MatchConverter::toBean)
                     .toList();
             for (MatchBean match : matches) {
                 enrichMatchBean(match);
             }
             return matches;
-        } catch (exception.DataAccessException e) {
-            throw new exception.DataAccessException("Error loading joined matches: " + e.getMessage(), e);
+        } catch (DataAccessException e) {
+            throw new DataAccessException("Error loading joined matches: " + e.getMessage(), e);
         }
     }
 

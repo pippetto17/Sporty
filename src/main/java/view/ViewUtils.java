@@ -2,6 +2,8 @@ package view;
 
 import javafx.scene.Scene;
 import javafx.scene.control.DialogPane;
+import model.bean.MatchBean;
+import model.domain.Sport;
 import model.utils.Constants;
 
 public class ViewUtils {
@@ -23,7 +25,7 @@ public class ViewUtils {
         }
     }
 
-    public static String getSportStyleClass(model.domain.Sport sport) {
+    public static String getSportStyleClass(Sport sport) {
         if (sport == null)
             return "sport-default";
         String name = sport.name().toUpperCase();
@@ -36,37 +38,37 @@ public class ViewUtils {
         return "sport-default";
     }
 
-    public static String getSportImagePath(model.domain.Sport sport) {
+    public static String getSportImagePath(Sport sport) {
         if (sport == null)
-            return model.utils.Constants.IMAGE_MEDAL_PATH;
+            return Constants.IMAGE_MEDAL_PATH;
         String name = sport.name().toUpperCase();
         if (name.contains(Constants.FOOTBALL))
-            return model.utils.Constants.IMAGE_FOOTBALL_PATH;
+            return Constants.IMAGE_FOOTBALL_PATH;
         if (name.contains(Constants.BASKET))
-            return model.utils.Constants.IMAGE_BASKETBALL_PATH;
+            return Constants.IMAGE_BASKETBALL_PATH;
         if (name.contains(Constants.TENNIS))
-            return model.utils.Constants.IMAGE_TENNIS_PATH;
+            return Constants.IMAGE_TENNIS_PATH;
         if (name.contains(Constants.PADEL))
-            return model.utils.Constants.IMAGE_PADEL_PATH;
-        return model.utils.Constants.IMAGE_MEDAL_PATH;
+            return Constants.IMAGE_PADEL_PATH;
+        return Constants.IMAGE_MEDAL_PATH;
     }
 
-    public static String getSportEmoji(model.domain.Sport sport) {
+    public static String getSportEmoji(Sport sport) {
         if (sport == null)
-            return model.utils.Constants.ICON_EXTRAS_MEDAL;
+            return Constants.ICON_EXTRAS_MEDAL;
         String name = sport.name().toUpperCase();
         if (name.contains(Constants.FOOTBALL))
-            return model.utils.Constants.ICON_FOOTBALL;
+            return Constants.ICON_FOOTBALL;
         if (name.contains(Constants.BASKET))
-            return model.utils.Constants.ICON_BASKETBALL;
+            return Constants.ICON_BASKETBALL;
         if (name.contains(Constants.TENNIS))
-            return model.utils.Constants.ICON_TENNIS;
+            return Constants.ICON_TENNIS;
         if (name.contains(Constants.PADEL))
-            return model.utils.Constants.ICON_PADEL;
-        return model.utils.Constants.ICON_EXTRAS_MEDAL;
+            return Constants.ICON_PADEL;
+        return Constants.ICON_EXTRAS_MEDAL;
     }
 
-    public static double getCapacityBarProgress(model.bean.MatchBean match) {
+    public static double getCapacityBarProgress(MatchBean match) {
         if (match == null || match.getSport() == null) {
             return 0.0;
         }
@@ -75,7 +77,7 @@ public class ViewUtils {
         return max > 0 ? (double) current / max : 0.0;
     }
 
-    public static int getCurrentParticipants(model.bean.MatchBean match) {
+    public static int getCurrentParticipants(MatchBean match) {
         if (match == null || match.getSport() == null) {
             return 0;
         }

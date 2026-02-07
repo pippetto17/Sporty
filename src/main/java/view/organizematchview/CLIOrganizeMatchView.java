@@ -2,6 +2,7 @@ package view.organizematchview;
 
 import controller.ApplicationController;
 import controller.OrganizeMatchController;
+import exception.ValidationException;
 import model.bean.MatchBean;
 import model.domain.Sport;
 import model.utils.Constants;
@@ -93,7 +94,7 @@ public class CLIOrganizeMatchView implements OrganizeMatchView {
             displayMatchSummary();
             System.out.println("\nProceeding to field selection...");
             organizeMatchController.proceedToFieldSelection();
-        } catch (exception.ValidationException e) {
+        } catch (ValidationException e) {
             displayError(e.getMessage());
         }
     }

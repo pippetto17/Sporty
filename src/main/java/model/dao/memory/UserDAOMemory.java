@@ -6,20 +6,25 @@ import model.domain.User;
 
 import java.util.HashMap;
 import java.util.Map;
+
 public class UserDAOMemory implements UserDAO {
-    private final Map<String, User> usersByUsername;
-    private final Map<Integer, User> usersById;
-    private int idCounter = 1;
+    private static final Map<String, User> usersByUsername = new HashMap<>();
+    private static final Map<Integer, User> usersById = new HashMap<>();
+    private static int idCounter = 1;
+
     public UserDAOMemory() {
-        usersByUsername = new HashMap<>();
-        usersById = new HashMap<>();
-        initializeDemoData();
+        // Only initialize demo data if the maps are empty
+        if (usersByUsername.isEmpty()) {
+            initializeDemoData();
+        }
     }
+
     private void initializeDemoData() {
         save(new User(idCounter++, "demo", "demo123", "Demo", "Player", Role.PLAYER));
         save(new User(idCounter++, "organizer", "org123", "Test", "Organizer", Role.ORGANIZER));
         save(new User(idCounter++, "manager", "man123", "Test", "Manager", Role.FIELD_MANAGER));
     }
+
     @Override
     public User authenticate(String username, String password) {
         User user = findByUsername(username);
@@ -28,14 +33,17 @@ public class UserDAOMemory implements UserDAO {
         }
         return null;
     }
+
     @Override
     public User findById(int id) {
         return usersById.get(id);
     }
+
     @Override
     public User findByUsername(String username) {
         return usersByUsername.get(username);
     }
+
     @Override
     public void save(User user) {
         if (user.getId() == 0) {

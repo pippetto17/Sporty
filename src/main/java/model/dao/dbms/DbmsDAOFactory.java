@@ -1,6 +1,8 @@
 package model.dao.dbms;
 
+import exception.DataAccessException;
 import model.dao.*;
+import model.dao.memory.NotificationDAOMemory;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -12,7 +14,7 @@ public class DbmsDAOFactory implements DAOFactory {
             Connection connection = ConnectionFactory.getConnection();
             return new UserDAODBMS(connection);
         } catch (SQLException e) {
-            throw new exception.DataAccessException("Error creating UserDAO: " + e.getMessage(), e);
+            throw new DataAccessException("Error creating UserDAO: " + e.getMessage(), e);
         }
     }
 
@@ -22,7 +24,7 @@ public class DbmsDAOFactory implements DAOFactory {
             Connection connection = ConnectionFactory.getConnection();
             return new MatchDAODBMS(connection);
         } catch (SQLException e) {
-            throw new exception.DataAccessException("Error creating MatchDAO: " + e.getMessage(), e);
+            throw new DataAccessException("Error creating MatchDAO: " + e.getMessage(), e);
         }
     }
 
@@ -32,12 +34,12 @@ public class DbmsDAOFactory implements DAOFactory {
             Connection connection = ConnectionFactory.getConnection();
             return new FieldDAODBMS(connection);
         } catch (SQLException e) {
-            throw new exception.DataAccessException("Error creating FieldDAO: " + e.getMessage(), e);
+            throw new DataAccessException("Error creating FieldDAO: " + e.getMessage(), e);
         }
     }
 
     @Override
     public NotificationDAO getNotificationDAO() {
-        return new model.dao.memory.NotificationDAOMemory();
+        return new NotificationDAOMemory();
     }
 }

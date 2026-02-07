@@ -1,8 +1,11 @@
 package model.dao.dbms;
 
+import exception.DataAccessException;
 import model.dao.FieldDAO;
 import model.domain.Field;
+import model.domain.MatchStatus;
 import model.domain.Sport;
+import model.domain.User;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -27,7 +30,7 @@ public class FieldDAODBMS implements FieldDAO {
                 fields.add(mapRowToField(rs));
             }
         } catch (SQLException e) {
-            throw new exception.DataAccessException("Error finding all fields", e);
+            throw new DataAccessException("Error finding all fields", e);
         }
         return fields;
     }
@@ -43,7 +46,7 @@ public class FieldDAODBMS implements FieldDAO {
                 }
             }
         } catch (SQLException e) {
-            throw new exception.DataAccessException("Error finding field by id: " + id, e);
+            throw new DataAccessException("Error finding field by id: " + id, e);
         }
         return null;
     }
@@ -60,7 +63,7 @@ public class FieldDAODBMS implements FieldDAO {
                 }
             }
         } catch (SQLException e) {
-            throw new exception.DataAccessException("Error finding fields by city: " + city, e);
+            throw new DataAccessException("Error finding fields by city: " + city, e);
         }
         return fields;
     }
@@ -77,14 +80,14 @@ public class FieldDAODBMS implements FieldDAO {
             stmt.setInt(2, sport.getCode());
             stmt.setDate(3, java.sql.Date.valueOf(date));
             stmt.setTime(4, java.sql.Time.valueOf(time));
-            stmt.setInt(5, model.domain.MatchStatus.APPROVED.getCode());
+            stmt.setInt(5, MatchStatus.APPROVED.getCode());
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     fields.add(mapRowToField(rs));
                 }
             }
         } catch (SQLException e) {
-            throw new exception.DataAccessException("Error finding available fields in " + city, e);
+            throw new DataAccessException("Error finding available fields in " + city, e);
         }
         return fields;
     }
@@ -101,7 +104,7 @@ public class FieldDAODBMS implements FieldDAO {
                 }
             }
         } catch (SQLException e) {
-            throw new exception.DataAccessException("Error finding fields by manager id: " + managerId, e);
+            throw new DataAccessException("Error finding fields by manager id: " + managerId, e);
         }
         return fields;
     }
@@ -126,7 +129,7 @@ public class FieldDAODBMS implements FieldDAO {
                 }
             }
         } catch (SQLException e) {
-            throw new exception.DataAccessException("Error saving field", e);
+            throw new DataAccessException("Error saving field", e);
         }
     }
 
@@ -137,7 +140,7 @@ public class FieldDAODBMS implements FieldDAO {
             stmt.setInt(1, id);
             stmt.executeUpdate();
         } catch (SQLException e) {
-            throw new exception.DataAccessException("Error deleting field with id: " + id, e);
+            throw new DataAccessException("Error deleting field with id: " + id, e);
         }
     }
 
@@ -145,7 +148,7 @@ public class FieldDAODBMS implements FieldDAO {
         int managerId = rs.getInt("manager_id");
 
         UserDAODBMS userDAO = new UserDAODBMS(connection);
-        model.domain.User manager = userDAO.findById(managerId);
+        User manager = userDAO.findById(managerId);
 
         return new Field(
                 rs.getInt("id"),
@@ -153,7 +156,7 @@ public class FieldDAODBMS implements FieldDAO {
                 rs.getString("city"),
                 rs.getString("address"),
                 rs.getDouble("price_per_hour"),
-                model.domain.Sport.fromCode(rs.getInt("sport")),
+                Sport.fromCode(rs.getInt("sport")),
                 manager); // Full entity instead of ID
     }
 }

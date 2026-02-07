@@ -4,9 +4,16 @@ import exception.ValidationException;
 import model.bean.FieldBean;
 import model.bean.MatchBean;
 import model.bean.PaymentBean;
+import model.converter.MatchConverter;
 import model.dao.MatchDAO;
+import model.domain.Field;
+import model.domain.Match;
+import model.domain.MatchStatus;
+import model.domain.User;
 import model.notification.NotificationService;
 import model.utils.Constants;
+import view.organizematchview.OrganizeMatchView;
+import view.paymentview.GraphicPaymentView;
 import view.paymentview.PaymentView;
 
 import java.util.logging.Level;
@@ -21,7 +28,7 @@ public class PaymentController {
     private final FieldBean fieldBean;
     private final boolean bookingMode;
     private final boolean joinMode;
-    private final model.domain.User joiningUser;
+    private final User joiningUser;
     private PaymentView view;
 
     /**
@@ -55,7 +62,7 @@ public class PaymentController {
     /**
      * Constructor for join match mode.
      */
-    public PaymentController(ApplicationController applicationController, MatchBean matchBean, model.domain.User user) {
+    public PaymentController(ApplicationController applicationController, MatchBean matchBean, User user) {
         this.applicationController = applicationController;
         this.matchDAO = applicationController.getDaoFactory().getMatchDAO();
         this.notificationService = applicationController.getNotificationService();
@@ -68,7 +75,7 @@ public class PaymentController {
 
     public void setView(PaymentView view) {
         this.view = view;
-        if (view instanceof view.paymentview.GraphicPaymentView graphicView) {
+        if (view instanceof GraphicPaymentView graphicView) {
             graphicView.setController(this);
         }
     }
@@ -81,7 +88,7 @@ public class PaymentController {
             int availableShares = calculateAvailableShares();
             view.displayMatchInfo(matchBean, availableShares);
         }
-        if (!(view instanceof view.paymentview.GraphicPaymentView)) {
+        if (!(view instanceof GraphicPaymentView)) {
             PaymentBean paymentData = view.collectPaymentData(bookingMode ? 0 : calculateAvailableShares());
             if (paymentData == null) {
                 applicationController.back();
@@ -93,7 +100,7 @@ public class PaymentController {
 
     public void processPaymentFromView(PaymentBean paymentData) {
         if (paymentData == null) {
-            view.showError(model.utils.Constants.ERROR_PAYMENT_INVALID);
+            view.showError(Constants.ERROR_PAYMENT_INVALID);
             return;
         }
         double pricePerHour = getPricePerHour();
@@ -106,7 +113,7 @@ public class PaymentController {
             if (success) {
                 handlePaymentSuccess();
             } else {
-                view.showError(model.utils.Constants.ERROR_PAYMENT_REJECTED);
+                view.showError(Constants.ERROR_PAYMENT_REJECTED);
             }
         } catch (ValidationException e) {
             view.showError(e.getMessage());
@@ -134,8 +141,8 @@ public class PaymentController {
     }
 
     private void handlePaymentSuccess() {
-        view.showSuccess(model.utils.Constants.SUCCESS_PAYMENT);
-        if (view instanceof view.paymentview.GraphicPaymentView) {
+        view.showSuccess(Constants.SUCCESS_PAYMENT);
+        if (view instanceof GraphicPaymentView) {
             handleGraphicViewSuccess();
         } else {
             handleCliViewSuccess();
@@ -145,7 +152,7 @@ public class PaymentController {
     private void handleGraphicViewSuccess() {
         new Thread(() -> {
             try {
-                Thread.sleep(model.utils.Constants.PAYMENT_SUCCESS_DELAY_MS);
+                Thread.sleep(Constants.PAYMENT_SUCCESS_DELAY_MS);
                 javafx.application.Platform.runLater(this::closeAndNavigateBack);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
@@ -203,15 +210,15 @@ public class PaymentController {
     private boolean processMatchPayment() throws ValidationException {
         if (matchBean == null)
             throw new ValidationException("MatchBean cannot be null");
-        model.domain.Field field = null;
+        Field field = null;
         if (matchBean.getFieldId() != 0) {
             field = applicationController.getDaoFactory().getFieldDAO().findById(matchBean.getFieldId());
         }
 
         // Validate and save match
         try {
-            model.domain.Match match = model.converter.MatchConverter.toEntity(matchBean);
-            match.setStatus(model.domain.MatchStatus.PENDING);
+            Match match = MatchConverter.toEntity(matchBean);
+            match.setStatus(MatchStatus.PENDING);
             // Ensure ID is handled if it's new (should be 0)
             matchDAO.save(match);
             matchBean.setMatchId(match.getId()); // Update bean with assigned ID
@@ -236,7 +243,7 @@ public class PaymentController {
         }
         applicationController.back();
         applicationController.back();
-        view.organizematchview.OrganizeMatchView organizeView = (view.organizematchview.OrganizeMatchView) applicationController
+        OrganizeMatchView organizeView = (OrganizeMatchView) applicationController
                 .getCurrentView();
         if (organizeView != null) {
             organizeView.displayRecap(matchBean);
@@ -247,7 +254,7 @@ public class PaymentController {
     private boolean processJoinPayment() throws ValidationException {
         if (matchBean == null || joiningUser == null)
             throw new ValidationException("Match and user required for join");
-        model.domain.Match match = matchDAO.findById(matchBean.getMatchId());
+        Match match = matchDAO.findById(matchBean.getMatchId());
         if (match == null)
             throw new ValidationException(Constants.ERROR_MATCH_NOT_FOUND);
 

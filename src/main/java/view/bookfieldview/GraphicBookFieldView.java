@@ -1,6 +1,8 @@
 package view.bookfieldview;
 
+import controller.ApplicationController;
 import controller.BookFieldController;
+import exception.ValidationException;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -10,7 +12,12 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.DatePicker;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
@@ -18,9 +25,12 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import model.bean.FieldBean;
 import model.bean.MatchBean;
+import model.domain.Sport;
 import model.utils.Constants;
 import view.ViewUtils;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -41,7 +51,7 @@ public class GraphicBookFieldView implements BookFieldView {
     @FXML
     private Button confirmButton;
     @FXML
-    private javafx.scene.control.ComboBox<String> sortComboBox;
+    private ComboBox<String> sortComboBox;
     private FieldBean selectedField;
 
     public GraphicBookFieldView(BookFieldController controller) {
@@ -49,7 +59,7 @@ public class GraphicBookFieldView implements BookFieldView {
     }
 
     @Override
-    public void setApplicationController(controller.ApplicationController app) {
+    public void setApplicationController(ApplicationController app) {
         // Intentionally empty
     }
 
@@ -112,23 +122,23 @@ public class GraphicBookFieldView implements BookFieldView {
 
     private void showStandaloneSearchForm() {
         matchInfoLabel.setText("Select booking parameters:");
-        javafx.scene.control.Dialog<ButtonType> dialog = new javafx.scene.control.Dialog<>();
+        Dialog<ButtonType> dialog = new Dialog<>();
         dialog.setTitle("Book Field - Search Parameters");
         dialog.setHeaderText("Enter search criteria");
-        javafx.scene.control.ComboBox<model.domain.Sport> sportCombo = new javafx.scene.control.ComboBox<>();
-        sportCombo.getItems().addAll(model.domain.Sport.values());
+        ComboBox<Sport> sportCombo = new ComboBox<>();
+        sportCombo.getItems().addAll(Sport.values());
         sportCombo.setPromptText("Select Sport");
-        javafx.scene.control.TextField cityField = new javafx.scene.control.TextField();
+        TextField cityField = new TextField();
         cityField.setPromptText("City (e.g., Milan)");
-        javafx.scene.control.DatePicker datePicker = new javafx.scene.control.DatePicker();
+        DatePicker datePicker = new DatePicker();
         datePicker.setPromptText("Select Date");
-        datePicker.setValue(java.time.LocalDate.now());
-        javafx.scene.control.ComboBox<String> timeCombo = new javafx.scene.control.ComboBox<>();
+        datePicker.setValue(LocalDate.now());
+        ComboBox<String> timeCombo = new ComboBox<>();
         for (int h = 8; h <= 22; h++) {
             timeCombo.getItems().add(String.format("%02d:00", h));
         }
         timeCombo.setPromptText("Select Time");
-        javafx.scene.layout.GridPane grid = new javafx.scene.layout.GridPane();
+        GridPane grid = new GridPane();
         grid.setHgap(10);
         grid.setVgap(10);
         grid.add(new Label("Sport:"), 0, 0);
@@ -150,7 +160,7 @@ public class GraphicBookFieldView implements BookFieldView {
                         sportCombo.getValue(),
                         cityField.getText().trim(),
                         datePicker.getValue(),
-                        java.time.LocalTime.parse(timeCombo.getValue()));
+                        LocalTime.parse(timeCombo.getValue()));
                 MatchBean contextBean = controller.getCurrentMatchBean();
                 matchInfoLabel.setText(String.format("Booking: %s - %s - %s %s",
                         contextBean.getSport().getDisplayName(),
@@ -164,7 +174,7 @@ public class GraphicBookFieldView implements BookFieldView {
         });
     }
 
-    private void searchFieldsStandalone(model.domain.Sport sport, String city) {
+    private void searchFieldsStandalone(Sport sport, String city) {
         if (resultsLabel != null) {
             resultsLabel.setText("Searching available fields...");
         }
@@ -283,7 +293,7 @@ public class GraphicBookFieldView implements BookFieldView {
             if (response == ButtonType.OK) {
                 try {
                     controller.proceedToPayment();
-                } catch (exception.ValidationException e) {
+                } catch (ValidationException e) {
                     showAlert(ERROR_TITLE, e.getMessage(), Alert.AlertType.ERROR);
                 } catch (Exception e) {
                     showAlert(ERROR_TITLE, "Cannot proceed: " + e.getMessage(), Alert.AlertType.ERROR);

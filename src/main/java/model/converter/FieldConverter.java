@@ -2,9 +2,11 @@ package model.converter;
 
 import model.bean.FieldBean;
 import model.domain.Field;
+import model.domain.User;
 
 public class FieldConverter {
-    private FieldConverter() {}
+    private FieldConverter() {
+    }
 
     public static Field toEntity(FieldBean fieldBean) {
         if (fieldBean == null) {
@@ -17,7 +19,7 @@ public class FieldConverter {
         field.setCity(fieldBean.getCity());
         field.setAddress(fieldBean.getAddress());
         field.setPricePerHour(fieldBean.getPricePerHour());
-        model.domain.User manager = new model.domain.User();
+        User manager = new User();
         manager.setId(fieldBean.getManagerId());
         field.setManager(manager);
         return field;

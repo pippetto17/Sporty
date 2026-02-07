@@ -1,8 +1,12 @@
 package model.dao.dbms;
 
+import exception.DataAccessException;
 import model.dao.MatchDAO;
+import model.domain.Field;
 import model.domain.Match;
 import model.domain.MatchStatus;
+import model.domain.User;
+import model.utils.JsonUtils;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -26,7 +30,7 @@ public class MatchDAODBMS implements MatchDAO {
             stmt.setTime(4, java.sql.Time.valueOf(match.getTime()));
             stmt.setInt(5, match.getMissingPlayers());
             stmt.setInt(6, match.getStatus().getCode());
-            stmt.setString(7, model.utils.JsonUtils.listToJson(match.getJoinedPlayers()));
+            stmt.setString(7, JsonUtils.listToJson(match.getJoinedPlayers()));
             int affectedRows = stmt.executeUpdate();
             if (affectedRows > 0) {
                 try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
@@ -36,7 +40,7 @@ public class MatchDAODBMS implements MatchDAO {
                 }
             }
         } catch (SQLException e) {
-            throw new exception.DataAccessException("Error saving match", e);
+            throw new DataAccessException("Error saving match", e);
         }
     }
 
@@ -51,7 +55,7 @@ public class MatchDAODBMS implements MatchDAO {
                 }
             }
         } catch (SQLException e) {
-            throw new exception.DataAccessException("Error finding match by id: " + id, e);
+            throw new DataAccessException("Error finding match by id: " + id, e);
         }
         return null;
     }
@@ -68,7 +72,7 @@ public class MatchDAODBMS implements MatchDAO {
                 }
             }
         } catch (SQLException e) {
-            throw new exception.DataAccessException("Error finding matches by organizer: " + organizerId, e);
+            throw new DataAccessException("Error finding matches by organizer: " + organizerId, e);
         }
         return matches;
     }
@@ -82,14 +86,14 @@ public class MatchDAODBMS implements MatchDAO {
                 "WHERE f.manager_id = ? AND m.status = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setInt(1, managerId);
-            stmt.setInt(2, model.domain.MatchStatus.PENDING.getCode());
+            stmt.setInt(2, MatchStatus.PENDING.getCode());
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     matches.add(mapRowToMatch(rs));
                 }
             }
         } catch (SQLException e) {
-            throw new exception.DataAccessException("Error finding pending matches for manager: " + managerId, e);
+            throw new DataAccessException("Error finding pending matches for manager: " + managerId, e);
         }
         return matches;
     }
@@ -102,7 +106,7 @@ public class MatchDAODBMS implements MatchDAO {
             stmt.setInt(2, matchId);
             stmt.executeUpdate();
         } catch (SQLException e) {
-            throw new exception.DataAccessException("Error updating match status for match id: " + matchId, e);
+            throw new DataAccessException("Error updating match status for match id: " + matchId, e);
         }
     }
 
@@ -112,11 +116,11 @@ public class MatchDAODBMS implements MatchDAO {
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setInt(1, match.getMissingPlayers());
             stmt.setInt(2, match.getStatus().getCode());
-            stmt.setString(3, model.utils.JsonUtils.listToJson(match.getJoinedPlayers()));
+            stmt.setString(3, JsonUtils.listToJson(match.getJoinedPlayers()));
             stmt.setInt(4, match.getId());
             stmt.executeUpdate();
         } catch (SQLException e) {
-            throw new exception.DataAccessException("Error updating match with id: " + match.getId(), e);
+            throw new DataAccessException("Error updating match with id: " + match.getId(), e);
         }
     }
 
@@ -140,7 +144,7 @@ public class MatchDAODBMS implements MatchDAO {
                 }
             }
         } catch (SQLException e) {
-            throw new exception.DataAccessException("Error finding matches by joined player: " + userId, e);
+            throw new DataAccessException("Error finding matches by joined player: " + userId, e);
         }
         return matches;
     }
@@ -150,14 +154,14 @@ public class MatchDAODBMS implements MatchDAO {
         List<Match> matches = new ArrayList<>();
         String query = "SELECT id, organizer_id, field_id, date, time, missing_players, status, joined_players FROM matches WHERE status = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setInt(1, model.domain.MatchStatus.APPROVED.getCode());
+            stmt.setInt(1, MatchStatus.APPROVED.getCode());
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     matches.add(mapRowToMatch(rs));
                 }
             }
         } catch (SQLException e) {
-            throw new exception.DataAccessException("Error finding approved matches", e);
+            throw new DataAccessException("Error finding approved matches", e);
         }
         return matches;
     }
@@ -169,7 +173,7 @@ public class MatchDAODBMS implements MatchDAO {
             stmt.setInt(1, id);
             stmt.executeUpdate();
         } catch (SQLException e) {
-            throw new exception.DataAccessException("Error deleting match with id: " + id, e);
+            throw new DataAccessException("Error deleting match with id: " + id, e);
         }
     }
 
@@ -179,7 +183,7 @@ public class MatchDAODBMS implements MatchDAO {
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             return stmt.executeUpdate();
         } catch (SQLException e) {
-            throw new exception.DataAccessException("Error deleting expired matches", e);
+            throw new DataAccessException("Error deleting expired matches", e);
         }
     }
 
@@ -191,8 +195,8 @@ public class MatchDAODBMS implements MatchDAO {
         UserDAODBMS userDAO = new UserDAODBMS(connection);
         FieldDAODBMS fieldDAO = new FieldDAODBMS(connection);
 
-        model.domain.User organizer = userDAO.findById(organizerId);
-        model.domain.Field field = fieldDAO.findById(fieldId);
+        User organizer = userDAO.findById(organizerId);
+        Field field = fieldDAO.findById(fieldId);
 
         Match match = new Match(
                 rs.getInt("id"),
@@ -201,12 +205,12 @@ public class MatchDAODBMS implements MatchDAO {
                 rs.getDate("date").toLocalDate(),
                 rs.getTime("time").toLocalTime(),
                 rs.getInt("missing_players"),
-                model.domain.MatchStatus.fromCode(rs.getInt("status")));
+                MatchStatus.fromCode(rs.getInt("status")));
 
         // Parse joined_players from JSON
         String joinedPlayersJson = rs.getString("joined_players");
         if (joinedPlayersJson != null) {
-            match.setJoinedPlayers(model.utils.JsonUtils.jsonToList(joinedPlayersJson));
+            match.setJoinedPlayers(JsonUtils.jsonToList(joinedPlayersJson));
         }
 
         return match;

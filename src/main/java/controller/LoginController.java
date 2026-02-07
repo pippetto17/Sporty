@@ -2,14 +2,16 @@ package controller;
 
 import exception.ValidationException;
 import model.bean.UserBean;
+import model.dao.DAOFactory;
 import model.dao.UserDAO;
+import model.domain.Role;
 import model.domain.User;
 import model.utils.Constants;
 
 public class LoginController {
     private final UserDAO userDAO;
 
-    public LoginController(model.dao.DAOFactory daoFactory) {
+    public LoginController(DAOFactory daoFactory) {
         this.userDAO = daoFactory.getUserDAO();
     }
 
@@ -39,7 +41,7 @@ public class LoginController {
             throw new ValidationException(Constants.ERROR_USERNAME_EXISTS);
         }
         var newUser = new User(0, userBean.getUsername(), userBean.getPassword(), name, surname,
-                model.domain.Role.fromCode(role));
+                Role.fromCode(role));
         userDAO.save(newUser);
     }
 
@@ -48,9 +50,9 @@ public class LoginController {
             throw new ValidationException("Role cannot be null");
         }
         return switch (roleString) {
-            case Constants.ROLE_PLAYER -> model.domain.Role.PLAYER.getCode();
-            case Constants.ROLE_ORGANIZER -> model.domain.Role.ORGANIZER.getCode();
-            case Constants.ROLE_FIELD_MANAGER -> model.domain.Role.FIELD_MANAGER.getCode();
+            case Constants.ROLE_PLAYER -> Role.PLAYER.getCode();
+            case Constants.ROLE_ORGANIZER -> Role.ORGANIZER.getCode();
+            case Constants.ROLE_FIELD_MANAGER -> Role.FIELD_MANAGER.getCode();
             default -> throw new ValidationException("Unknown role: " + roleString);
         };
     }

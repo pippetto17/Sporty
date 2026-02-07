@@ -3,9 +3,9 @@ package view.fieldmanagerview;
 import controller.ApplicationController;
 import controller.FieldManagerController;
 import model.bean.MatchBean;
-import model.utils.Constants;
-import model.notification.NotificationService;
 import model.notification.FieldManagerObserver;
+import model.notification.NotificationService;
+import model.utils.Constants;
 
 import java.util.List;
 import java.util.Scanner;

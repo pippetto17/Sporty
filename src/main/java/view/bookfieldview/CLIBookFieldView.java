@@ -2,8 +2,12 @@ package view.bookfieldview;
 
 import controller.ApplicationController;
 import controller.BookFieldController;
+import exception.ValidationException;
 import model.bean.FieldBean;
+import model.domain.Sport;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
@@ -59,7 +63,7 @@ public class CLIBookFieldView implements BookFieldView {
     private List<FieldBean> promptStandaloneSearch() {
         System.out.println("\n=== BOOK FIELD - SEARCH PARAMETERS ===");
         System.out.print("Select sport (");
-        model.domain.Sport[] sports = model.domain.Sport.values();
+        Sport[] sports = Sport.values();
         for (int i = 0; i < sports.length; i++) {
             System.out.print((i + 1) + "=" + sports[i].getDisplayName());
             if (i < sports.length - 1)
@@ -86,7 +90,7 @@ public class CLIBookFieldView implements BookFieldView {
         System.out.print("Enter date (yyyy-mm-dd): ");
         String dateStr = scanner.nextLine().trim();
         try {
-            java.time.LocalDate date = java.time.LocalDate.parse(dateStr);
+            LocalDate date = LocalDate.parse(dateStr);
             bookFieldController.getCurrentMatchBean().setMatchDate(date);
         } catch (Exception e) {
             displayError("Invalid date format");
@@ -95,7 +99,7 @@ public class CLIBookFieldView implements BookFieldView {
         System.out.print("Enter time (HH:mm): ");
         String timeStr = scanner.nextLine().trim();
         try {
-            java.time.LocalTime time = java.time.LocalTime.parse(timeStr);
+            LocalTime time = LocalTime.parse(timeStr);
             bookFieldController.getCurrentMatchBean().setMatchTime(time);
         } catch (Exception e) {
             displayError("Invalid time format");
@@ -235,7 +239,7 @@ public class CLIBookFieldView implements BookFieldView {
                 System.out.println("\nProceeding to payment...");
                 bookFieldController.proceedToPayment();
                 running = false;
-            } catch (exception.ValidationException e) {
+            } catch (ValidationException e) {
                 displayError(e.getMessage());
             }
         } else {

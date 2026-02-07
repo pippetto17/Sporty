@@ -5,6 +5,7 @@ import controller.HomeController;
 import model.bean.MatchBean;
 import model.bean.UserBean;
 import model.utils.Constants;
+import view.ViewUtils;
 
 import java.util.Scanner;
 
@@ -68,15 +69,16 @@ public class CLIHomeView implements HomeView {
         } else {
             for (int i = 0; i < matches.size(); i++) {
                 MatchBean match = matches.get(i);
+
                 String matchStr = String.format("%d. %s %s - %s - %s at %s | 💰 €%.2f/persona (%d players)",
                         i + 1,
-                        view.ViewUtils.getSportEmoji(match.getSport()),
+                        ViewUtils.getSportEmoji(match.getSport()),
                         match.getSport().getDisplayName(),
                         match.getCity(),
                         match.getMatchDate(),
                         match.getMatchTime(),
                         match.getCostPerPerson(),
-                        view.ViewUtils.getCurrentParticipants(match));
+                        ViewUtils.getCurrentParticipants(match));
 
                 // Add status for organizer view
                 if (!homeController.isViewingAsPlayer() && match.getStatus() != null) {
@@ -203,7 +205,7 @@ public class CLIHomeView implements HomeView {
             System.out.println("Date: " + match.getMatchDate() + " at " + match.getMatchTime());
             System.out.println("City: " + match.getCity());
             System.out.println("Organizer: " + match.getOrganizerName());
-            System.out.println("Players: " + view.ViewUtils.getCurrentParticipants(match)
+            System.out.println("Players: " + ViewUtils.getCurrentParticipants(match)
                     + "/" + match.getSport().getRequiredPlayers());
             System.out.println("Status: " + match.getStatus().name());
             System.out.println(Constants.SEPARATOR);
@@ -247,13 +249,13 @@ public class CLIHomeView implements HomeView {
                 MatchBean match = joinedMatches.get(i);
                 System.out.printf("%d. %s %s - %s - %s at %s | 💰 €%.2f/persona (%d players)%n",
                         i + 1,
-                        view.ViewUtils.getSportEmoji(match.getSport()),
+                        ViewUtils.getSportEmoji(match.getSport()),
                         match.getSport().getDisplayName(),
                         match.getCity(),
                         match.getMatchDate(),
                         match.getMatchTime(),
                         match.getCostPerPerson(),
-                        view.ViewUtils.getCurrentParticipants(match));
+                        ViewUtils.getCurrentParticipants(match));
             }
         }
         System.out.print("\nPress Enter to continue...");

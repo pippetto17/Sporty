@@ -1,7 +1,9 @@
 package view.loginview;
 
+import atlantafx.base.theme.PrimerDark;
 import controller.ApplicationController;
 import controller.LoginController;
+import exception.ValidationException;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -101,7 +103,7 @@ public class GraphicLoginView extends Application implements LoginView {
 
     @Override
     public void start(Stage primaryStage) {
-        Application.setUserAgentStylesheet(new atlantafx.base.theme.PrimerDark().getUserAgentStylesheet());
+        Application.setUserAgentStylesheet(new PrimerDark().getUserAgentStylesheet());
         this.primaryStage = primaryStage;
         primaryStage.setTitle("Sporty - Login");
         try {
@@ -129,14 +131,14 @@ public class GraphicLoginView extends Application implements LoginView {
                     primaryStage.close();
                     try {
                         applicationController.navigateToHome(loggedInUser);
-                    } catch (exception.ValidationException e) {
+                    } catch (ValidationException e) {
                         displayLoginError(e.getMessage());
                     }
                 });
             } else {
                 displayLoginError(Constants.ERROR_INVALID_CREDENTIALS);
             }
-        } catch (exception.ValidationException e) {
+        } catch (ValidationException e) {
             displayLoginError(e.getMessage());
         }
     }
@@ -192,7 +194,7 @@ public class GraphicLoginView extends Application implements LoginView {
                     Thread.currentThread().interrupt();
                 }
             }).start();
-        } catch (exception.ValidationException e) {
+        } catch (ValidationException e) {
             showRegisterError(e.getMessage());
         }
     }

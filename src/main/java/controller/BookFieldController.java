@@ -3,13 +3,19 @@ package controller;
 import exception.ValidationException;
 import model.bean.FieldBean;
 import model.bean.MatchBean;
+import model.converter.FieldConverter;
+import model.dao.FieldDAO;
+import model.domain.Field;
+import model.domain.Sport;
 import model.utils.Constants;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 public class BookFieldController {
     private final ApplicationController applicationController;
-    private final model.dao.FieldDAO fieldDAO;
+    private final FieldDAO fieldDAO;
     private final MatchBean currentMatchBean;
     private List<FieldBean> availableFields;
     private FieldBean selectedField;
@@ -53,8 +59,8 @@ public class BookFieldController {
         return availableFields;
     }
 
-    public List<FieldBean> searchFieldsForDirectBooking(model.domain.Sport sport, String city, java.time.LocalDate date,
-            java.time.LocalTime time) {
+    public List<FieldBean> searchFieldsForDirectBooking(Sport sport, String city, LocalDate date,
+            LocalTime time) {
         var fields = fieldDAO.findAvailableFields(city, sport, date, time);
         this.availableFields = convertToFieldBeans(fields);
         return availableFields;
@@ -75,14 +81,14 @@ public class BookFieldController {
         return availableFields != null ? availableFields : List.of();
     }
 
-    private List<FieldBean> convertToFieldBeans(List<model.domain.Field> fields) {
+    private List<FieldBean> convertToFieldBeans(List<Field> fields) {
         return fields.stream()
-                .map(model.converter.FieldConverter::toBean)
+                .map(FieldConverter::toBean)
                 .toList();
     }
 
-    public void updateMatchParameters(model.domain.Sport sport, String city, java.time.LocalDate date,
-            java.time.LocalTime time) {
+    public void updateMatchParameters(Sport sport, String city, LocalDate date,
+            LocalTime time) {
         if (currentMatchBean == null) {
             throw new IllegalStateException("MatchBean must be provided via constructor");
         }

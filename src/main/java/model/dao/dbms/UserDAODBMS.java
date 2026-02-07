@@ -1,6 +1,8 @@
 package model.dao.dbms;
 
+import exception.DataAccessException;
 import model.dao.UserDAO;
+import model.domain.Role;
 import model.domain.User;
 
 import java.sql.*;
@@ -24,7 +26,7 @@ public class UserDAODBMS implements UserDAO {
                 }
             }
         } catch (SQLException e) {
-            throw new exception.DataAccessException("Error authenticating user", e);
+            throw new DataAccessException("Error authenticating user", e);
         }
         return null;
     }
@@ -40,7 +42,7 @@ public class UserDAODBMS implements UserDAO {
                 }
             }
         } catch (SQLException e) {
-            throw new exception.DataAccessException("Error finding user by id: " + id, e);
+            throw new DataAccessException("Error finding user by id: " + id, e);
         }
         return null;
     }
@@ -56,7 +58,7 @@ public class UserDAODBMS implements UserDAO {
                 }
             }
         } catch (SQLException e) {
-            throw new exception.DataAccessException("Error finding user by username: " + username, e);
+            throw new DataAccessException("Error finding user by username: " + username, e);
         }
         return null;
     }
@@ -79,7 +81,7 @@ public class UserDAODBMS implements UserDAO {
                 }
             }
         } catch (SQLException e) {
-            throw new exception.DataAccessException("Error saving user", e);
+            throw new DataAccessException("Error saving user", e);
         }
     }
 
@@ -90,6 +92,6 @@ public class UserDAODBMS implements UserDAO {
                 rs.getString("password"),
                 rs.getString("name"),
                 rs.getString("surname"),
-                model.domain.Role.fromCode(rs.getInt("role")));
+                Role.fromCode(rs.getInt("role")));
     }
 }

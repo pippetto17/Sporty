@@ -3,9 +3,11 @@ package controller;
 import exception.AuthorizationException;
 import exception.ValidationException;
 import model.bean.MatchBean;
+import model.bean.UserBean;
 import model.dao.DAOFactory;
 import model.domain.Role;
 import model.domain.User;
+import model.notification.NotificationService;
 import view.View;
 import view.factory.ViewFactory;
 
@@ -18,21 +20,21 @@ public class ApplicationController {
     private final Deque<View> viewStack = new ArrayDeque<>();
     private ViewFactory viewFactory;
     private DAOFactory daoFactory;
-    private model.notification.NotificationService notificationService;
+    private NotificationService notificationService;
 
     public ApplicationController() {
     }
 
-    public ApplicationController(model.dao.DAOFactory daoFactory) {
+    public ApplicationController(DAOFactory daoFactory) {
         this.daoFactory = daoFactory;
-        this.notificationService = new model.notification.NotificationService(daoFactory.getNotificationDAO());
+        this.notificationService = new NotificationService(daoFactory.getNotificationDAO());
     }
 
     public void start() {
         ApplicationConfiguration config = ApplicationConfiguration.create();
         this.daoFactory = config.getDaoFactory();
         this.viewFactory = config.getViewFactory();
-        this.notificationService = new model.notification.NotificationService(daoFactory.getNotificationDAO());
+        this.notificationService = new NotificationService(daoFactory.getNotificationDAO());
         navigateToLogin();
     }
 
@@ -43,7 +45,7 @@ public class ApplicationController {
         pushView(view);
     }
 
-    public void navigateToHome(model.bean.UserBean userBean) throws ValidationException {
+    public void navigateToHome(UserBean userBean) throws ValidationException {
         User user = new User(
                 userBean.getId(),
                 userBean.getUsername(),
@@ -147,7 +149,7 @@ public class ApplicationController {
         return daoFactory;
     }
 
-    public model.notification.NotificationService getNotificationService() {
+    public NotificationService getNotificationService() {
         return notificationService;
     }
 

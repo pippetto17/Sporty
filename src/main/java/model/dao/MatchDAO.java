@@ -1,6 +1,7 @@
 package model.dao;
 
 import model.domain.Match;
+import model.domain.MatchStatus;
 
 import java.util.List;
 
@@ -15,7 +16,7 @@ public interface MatchDAO {
 
     List<Match> findApprovedMatches();
 
-    void updateStatus(int matchId, model.domain.MatchStatus status);
+    void updateStatus(int matchId, MatchStatus status);
 
     void update(Match match);
 
