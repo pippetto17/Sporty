@@ -12,17 +12,23 @@ public class UserDAOMemory implements UserDAO {
     private static final Map<Integer, User> usersById = new HashMap<>();
     private static int idCounter = 1;
 
-    public UserDAOMemory() {
-        // Only initialize demo data if the maps are empty
-        if (usersByUsername.isEmpty()) {
-            initializeDemoData();
-        }
+    static {
+        addStaticUser(new User(idCounter++, "demo", "demo123", "Demo", "Player", Role.PLAYER));
+        addStaticUser(new User(idCounter++, "organizer", "org123", "Test", "Organizer", Role.ORGANIZER));
+        addStaticUser(new User(idCounter++, "manager", "man123", "Test", "Manager", Role.FIELD_MANAGER));
     }
 
-    private void initializeDemoData() {
-        save(new User(idCounter++, "demo", "demo123", "Demo", "Player", Role.PLAYER));
-        save(new User(idCounter++, "organizer", "org123", "Test", "Organizer", Role.ORGANIZER));
-        save(new User(idCounter++, "manager", "man123", "Test", "Manager", Role.FIELD_MANAGER));
+    private static void addStaticUser(User user) {
+        usersByUsername.put(user.getUsername(), user);
+        usersById.put(user.getId(), user);
+    }
+
+    private static synchronized int getNextId() {
+        return idCounter++;
+    }
+
+    public UserDAOMemory() {
+        // Default constructor
     }
 
     @Override
@@ -47,9 +53,8 @@ public class UserDAOMemory implements UserDAO {
     @Override
     public void save(User user) {
         if (user.getId() == 0) {
-            user.setId(idCounter++);
+            user.setId(getNextId());
         }
-        usersByUsername.put(user.getUsername(), user);
-        usersById.put(user.getId(), user);
+        addStaticUser(user);
     }
 }
