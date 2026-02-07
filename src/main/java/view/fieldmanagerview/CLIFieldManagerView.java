@@ -4,6 +4,8 @@ import controller.ApplicationController;
 import controller.FieldManagerController;
 import model.bean.MatchBean;
 import model.utils.Constants;
+import model.notification.NotificationService;
+import model.notification.FieldManagerObserver;
 
 import java.util.List;
 import java.util.Scanner;
@@ -12,7 +14,7 @@ public class CLIFieldManagerView implements FieldManagerView {
     private final FieldManagerController controller;
 
     private final Scanner scanner;
-    private model.notification.NotificationService notificationService;
+    private NotificationService notificationService;
 
     public CLIFieldManagerView(FieldManagerController controller) {
         this.controller = controller;
@@ -22,7 +24,7 @@ public class CLIFieldManagerView implements FieldManagerView {
     @Override
     public void setApplicationController(ApplicationController appController) {
         this.notificationService = appController.getNotificationService();
-        this.notificationService.subscribe(new model.notification.FieldManagerObserver());
+        this.notificationService.attach(new FieldManagerObserver());
     }
 
     @Override

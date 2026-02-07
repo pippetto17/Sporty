@@ -5,9 +5,9 @@ import javafx.scene.control.Alert;
 
 /* Concrete Observer */
 
-public class FieldManagerObserver implements NotificationObserver {
+public class FieldManagerObserver implements Observer {
     @Override
-    public void onEvent(NotificationEvent event) {
+    public void update(NotificationEvent event) {
         Platform.runLater(() -> {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Nuova Notifica");

@@ -6,12 +6,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-public class NotificationService {
+public class NotificationService implements Subject {
 
-    /* Subject */
+    /* Concrete Subject */
 
     private static final Logger logger = Logger.getLogger(NotificationService.class.getName());
-    private final List<NotificationObserver> observers = new ArrayList<>();
+    private final List<Observer> observers = new ArrayList<>();
     private final Object mutex = new Object();
     private final NotificationDAO dao;
 
@@ -19,13 +19,15 @@ public class NotificationService {
         this.dao = dao;
     }
 
-    public void subscribe(NotificationObserver observer) {
+    @Override
+    public void attach(Observer observer) {
         synchronized (mutex) {
             observers.add(observer);
         }
     }
 
-    public void unsubscribe(NotificationObserver observer) {
+    @Override
+    public void detach(Observer observer) {
         synchronized (mutex) {
             observers.remove(observer);
         }
@@ -41,7 +43,7 @@ public class NotificationService {
                 organizerUsername,
                 "New booking!",
                 message);
-        notifyObservers(event);
+        notifyObserversWithEvent(event);
     }
 
     public void notifyMatchCreated(String fieldManagerUsername, String organizerUsername,
@@ -54,7 +56,7 @@ public class NotificationService {
                 organizerUsername,
                 "New match organized!",
                 message);
-        notifyObservers(event);
+        notifyObserversWithEvent(event);
     }
 
     public void notifyBookingRequest(String fieldManagerUsername, String organizerUsername,
@@ -68,20 +70,27 @@ public class NotificationService {
                 organizerUsername,
                 "⚠️ Booking Request - Action Required",
                 message);
-        notifyObservers(event);
+        notifyObserversWithEvent(event);
     }
 
-    private void notifyObservers(NotificationEvent event) {
+    @Override
+    public void notifyObservers() {
+        // This is a simplified version without event data
+        // In practice, the specific notify methods handle the full notification logic
+        throw new UnsupportedOperationException("Use specific notify methods instead");
+    }
+
+    private void notifyObserversWithEvent(NotificationEvent event) {
         dao.save(event.recipient, event.sender, event.type.name(), event.title, event.message);
 
-        List<NotificationObserver> observersCopy;
+        List<Observer> observersCopy;
         synchronized (mutex) {
             observersCopy = new ArrayList<>(observers);
         }
 
         observersCopy.forEach(o -> {
             try {
-                o.onEvent(event);
+                o.update(event);
             } catch (Exception e) {
                 logger.warning("Observer error: " + e.getMessage());
             }
