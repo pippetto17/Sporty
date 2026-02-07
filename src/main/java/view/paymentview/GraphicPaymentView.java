@@ -24,6 +24,7 @@ import java.util.stream.IntStream;
 
 public class GraphicPaymentView implements PaymentView {
     private static final Logger logger = Logger.getLogger(GraphicPaymentView.class.getName());
+    private static final String CURRENCY_FORMAT = "€ %.2f";
     private Stage stage;
     private PaymentBean collectedPaymentData;
     private int maxAvailableShares;
@@ -127,10 +128,10 @@ public class GraphicPaymentView implements PaymentView {
         double totalAmount = PaymentController.calculateTotalToPay(shares, currentPricePerHour,
                 currentTotalPlayers);
         if (costPerPersonLabel != null) {
-            costPerPersonLabel.setText(String.format("€ %.2f", costPerPerson));
+            costPerPersonLabel.setText(String.format(CURRENCY_FORMAT, costPerPerson));
         }
         if (totalLabel != null) {
-            totalLabel.setText(String.format("€ %.2f", totalAmount));
+            totalLabel.setText(String.format(CURRENCY_FORMAT, totalAmount));
         }
         // Fallback or debug
         if (amountLabel != null) {
@@ -142,33 +143,49 @@ public class GraphicPaymentView implements PaymentView {
     @Override
     public void displayBookingInfo(FieldBean field, MatchBean context) {
         Platform.runLater(() -> {
-
-            if (sportLabel != null && field.getSport() != null)
-                sportLabel.setText(field.getSport().getDisplayName());
-            else if (sportLabel != null)
-                sportLabel.setText("Field Booking");
-
-            if (cityLabel != null)
-                cityLabel.setText(field.getName() + " - " + field.getCity());
-            if (dateLabel != null)
-                dateLabel.setText(String.format("%s @ %s", context.getMatchDate(), context.getMatchTime()));
-
-            if (matchInfoLabel != null)
-                matchInfoLabel.setVisible(false);
-
+            updateSportLabel(field);
+            updateLocationAndDateLabels(field, context);
+            updatePriceLabels(field);
             sharesComboBox.setVisible(false);
-            double costPerPerson = field.getPricePerPerson();
-
-            if (costPerPersonLabel != null)
-                costPerPersonLabel.setText(String.format("€ %.2f", costPerPerson));
-            if (totalLabel != null)
-                totalLabel.setText(String.format("€ %.2f", field.getPricePerHour()));
-            if (amountLabel != null)
-                amountLabel.setText(String.format("Field: €%.2f/hour | Per person: €%.2f",
-                        field.getPricePerHour(), costPerPerson));
-
             maxAvailableShares = 0;
         });
+    }
+
+    private void updateSportLabel(FieldBean field) {
+        if (sportLabel == null) {
+            return;
+        }
+        if (field.getSport() != null) {
+            sportLabel.setText(field.getSport().getDisplayName());
+        } else {
+            sportLabel.setText("Field Booking");
+        }
+    }
+
+    private void updateLocationAndDateLabels(FieldBean field, MatchBean context) {
+        if (cityLabel != null) {
+            cityLabel.setText(field.getName() + " - " + field.getCity());
+        }
+        if (dateLabel != null) {
+            dateLabel.setText(String.format("%s @ %s", context.getMatchDate(), context.getMatchTime()));
+        }
+        if (matchInfoLabel != null) {
+            matchInfoLabel.setVisible(false);
+        }
+    }
+
+    private void updatePriceLabels(FieldBean field) {
+        double costPerPerson = field.getPricePerPerson();
+        if (costPerPersonLabel != null) {
+            costPerPersonLabel.setText(String.format(CURRENCY_FORMAT, costPerPerson));
+        }
+        if (totalLabel != null) {
+            totalLabel.setText(String.format(CURRENCY_FORMAT, field.getPricePerHour()));
+        }
+        if (amountLabel != null) {
+            amountLabel.setText(String.format("Field: €%.2f/hour | Per person: €%.2f",
+                    field.getPricePerHour(), costPerPerson));
+        }
     }
 
     @Override
