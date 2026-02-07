@@ -20,6 +20,7 @@ import model.bean.FieldBean;
 import model.bean.MatchBean;
 import model.utils.Constants;
 import view.ViewUtils;
+
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;

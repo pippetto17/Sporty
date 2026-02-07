@@ -5,6 +5,7 @@ import controller.HomeController;
 import model.bean.MatchBean;
 import model.bean.UserBean;
 import model.utils.Constants;
+
 import java.util.Scanner;
 
 public class CLIHomeView implements HomeView {
@@ -92,11 +93,12 @@ public class CLIHomeView implements HomeView {
         if (homeController.isViewingAsPlayer()) {
             System.out.println("1. View available matches");
             System.out.println("2. Join match");
+            System.out.println("3. View my joined matches");
             if (homeController.getCurrentUser().isOrganizer()) {
-                System.out.println("3. Switch to Organizer View");
-                System.out.println("4. Logout");
+                System.out.println("4. Switch to Organizer View");
+                System.out.println("5. Logout");
             } else {
-                System.out.println("3. Logout");
+                System.out.println("4. Logout");
             }
         } else {
             System.out.println("1. View available matches");
@@ -116,14 +118,23 @@ public class CLIHomeView implements HomeView {
             case "2" -> handleJoinMatchInteraction();
             case "3" -> {
                 if (homeController.getCurrentUser().isOrganizer()) {
-                    homeController.switchRole();
-                    displaySuccess("Switched to Organizer View");
+                    // View joined matches
+                    displayJoinedMatches();
                 } else {
+                    // Logout for non-organizer players
                     applicationController.logout();
                     return false;
                 }
             }
             case "4" -> {
+                if (homeController.getCurrentUser().isOrganizer()) {
+                    homeController.switchRole();
+                    displaySuccess("Switched to Organizer View");
+                } else {
+                    System.out.println(Constants.ERROR_INVALID_OPTION);
+                }
+            }
+            case "5" -> {
                 if (homeController.getCurrentUser().isOrganizer()) {
                     applicationController.logout();
                     return false;
@@ -220,9 +231,32 @@ public class CLIHomeView implements HomeView {
 
     private void attemptJoinMatch(MatchBean selectedMatch) {
         try {
-            homeController.joinMatch();
+            homeController.joinMatch(selectedMatch.getMatchId());
         } catch (exception.ValidationException e) {
             System.out.println("Error joining match: " + e.getMessage());
         }
+    }
+
+    private void displayJoinedMatches() {
+        java.util.List<MatchBean> joinedMatches = homeController.getJoinedMatches();
+        System.out.println("\n--- MY JOINED MATCHES ---");
+        if (joinedMatches == null || joinedMatches.isEmpty()) {
+            System.out.println("You haven't joined any matches yet.");
+        } else {
+            for (int i = 0; i < joinedMatches.size(); i++) {
+                MatchBean match = joinedMatches.get(i);
+                System.out.printf("%d. %s %s - %s - %s at %s | 💰 €%.2f/persona (%d players)%n",
+                        i + 1,
+                        view.ViewUtils.getSportEmoji(match.getSport()),
+                        match.getSport().getDisplayName(),
+                        match.getCity(),
+                        match.getMatchDate(),
+                        match.getMatchTime(),
+                        match.getCostPerPerson(),
+                        view.ViewUtils.getCurrentParticipants(match));
+            }
+        }
+        System.out.print("\nPress Enter to continue...");
+        scanner.nextLine();
     }
 }

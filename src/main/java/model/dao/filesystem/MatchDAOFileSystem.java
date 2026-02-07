@@ -6,6 +6,7 @@ import com.google.gson.reflect.TypeToken;
 import model.dao.MatchDAO;
 import model.domain.Match;
 import model.domain.MatchStatus;
+
 import java.io.*;
 import java.lang.reflect.Type;
 import java.nio.file.Files;
@@ -143,5 +144,24 @@ public class MatchDAOFileSystem implements MatchDAO {
         matches.removeIf(m -> m.getDate() != null && m.getDate().isBefore(today));
         saveMatches(matches);
         return initialSize - matches.size();
+    }
+
+    @Override
+    public void update(Match match) {
+        List<Match> matches = loadMatches();
+        for (int i = 0; i < matches.size(); i++) {
+            if (matches.get(i).getId() == match.getId()) {
+                matches.set(i, match);
+                saveMatches(matches);
+                return;
+            }
+        }
+    }
+
+    @Override
+    public List<Match> findByJoinedPlayer(int userId) {
+        return loadMatches().stream()
+                .filter(m -> m.getJoinedPlayers().contains(userId))
+                .toList();
     }
 }

@@ -17,6 +17,7 @@ import model.bean.FieldBean;
 import model.bean.MatchBean;
 import model.bean.PaymentBean;
 import view.ViewUtils;
+
 import java.io.IOException;
 import java.util.logging.Logger;
 import java.util.stream.IntStream;

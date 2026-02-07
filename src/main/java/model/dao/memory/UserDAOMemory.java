@@ -1,7 +1,9 @@
 package model.dao.memory;
+
 import model.dao.UserDAO;
 import model.domain.Role;
 import model.domain.User;
+
 import java.util.HashMap;
 import java.util.Map;
 public class UserDAOMemory implements UserDAO {

@@ -3,14 +3,11 @@ package model.dao.dbms;
 import model.dao.FieldDAO;
 import model.domain.Field;
 import model.domain.Sport;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.sql.Connection;
+
+import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 
 public class FieldDAODBMS implements FieldDAO {

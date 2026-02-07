@@ -15,6 +15,7 @@ import model.bean.MatchBean;
 import model.domain.Sport;
 import model.utils.Constants;
 import model.utils.MapsAPI;
+
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -368,33 +369,28 @@ public class GraphicOrganizeMatchView implements OrganizeMatchView {
         if (recapHeader == null)
             return;
 
-        // Remove old sport classes
         recapHeader.getStyleClass().removeIf(style -> style.startsWith("sport-"));
 
         String styleClass = "sport-default";
-        String imagePath = "/image/medal.png"; // Fallback
+        String imagePath = Constants.IMAGE_MEDAL_PATH;
 
         if (sport != null) {
             switch (sport) {
-                case FOOTBALL_5:
-                case FOOTBALL_8:
-                case FOOTBALL_11:
+                case FOOTBALL_5, FOOTBALL_8, FOOTBALL_11:
                     styleClass = "sport-soccer";
-                    imagePath = "/image/football.png";
+                    imagePath = Constants.IMAGE_FOOTBALL_PATH;
                     break;
                 case BASKETBALL:
                     styleClass = "sport-basket";
-                    imagePath = "/image/basketball.png";
+                    imagePath = Constants.IMAGE_BASKETBALL_PATH;
                     break;
-                case TENNIS_SINGLE:
-                case TENNIS_DOUBLE:
+                case TENNIS_SINGLE, TENNIS_DOUBLE:
                     styleClass = "sport-tennis";
-                    imagePath = "/image/tennis.png";
+                    imagePath = Constants.IMAGE_TENNIS_PATH;
                     break;
-                case PADEL_SINGLE:
-                case PADEL_DOUBLE:
-                    styleClass = "sport-volley"; // Reusing volley color (purple) for now or similar
-                    imagePath = "/image/padel.png";
+                case PADEL_SINGLE, PADEL_DOUBLE:
+                    styleClass = "sport-padel";
+                    imagePath = Constants.IMAGE_PADEL_PATH;
                     break;
                 default:
                     break;

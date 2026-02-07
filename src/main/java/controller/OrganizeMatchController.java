@@ -6,11 +6,13 @@ import exception.ValidationException;
 import model.bean.MatchBean;
 import model.domain.Sport;
 import model.domain.User;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
 import static model.utils.MapsAPI.ITALIAN_CITIES;
 
 public class OrganizeMatchController {

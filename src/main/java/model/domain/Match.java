@@ -1,8 +1,11 @@
 package model.domain;
 
+import exception.ValidationException;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
-import exception.ValidationException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Match {
     private int id;
@@ -12,9 +15,11 @@ public class Match {
     private LocalTime time;
     private int missingPlayers;
     private MatchStatus status;
+    private List<Integer> joinedPlayers;
 
     public Match() {
         this.status = MatchStatus.PENDING;
+        this.joinedPlayers = new ArrayList<>();
     }
 
     public Match(int id, User organizer, Field field, LocalDate date, LocalTime time, int missingPlayers,
@@ -26,6 +31,7 @@ public class Match {
         this.time = time;
         this.missingPlayers = missingPlayers;
         this.status = status;
+        this.joinedPlayers = new ArrayList<>();
     }
 
     public int getId() {
@@ -98,5 +104,32 @@ public class Match {
 
     public boolean isApproved() {
         return status == MatchStatus.APPROVED;
+    }
+
+    public List<Integer> getJoinedPlayers() {
+        return joinedPlayers;
+    }
+
+    public void setJoinedPlayers(List<Integer> joinedPlayers) {
+        this.joinedPlayers = joinedPlayers != null ? joinedPlayers : new ArrayList<>();
+    }
+
+    public void addJoinedPlayer(int userId) throws ValidationException {
+        if (joinedPlayers.contains(userId)) {
+            throw new ValidationException("User has already joined this match");
+        }
+        if (missingPlayers <= 0) {
+            throw new ValidationException("Match is full, cannot join");
+        }
+        joinedPlayers.add(userId);
+        setMissingPlayers(missingPlayers - 1);
+    }
+
+    public boolean isUserJoined(int userId) {
+        return joinedPlayers.contains(userId);
+    }
+
+    public int getJoinedPlayersCount() {
+        return joinedPlayers.size();
     }
 }

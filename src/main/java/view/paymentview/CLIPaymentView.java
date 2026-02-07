@@ -4,6 +4,7 @@ import controller.ApplicationController;
 import model.bean.FieldBean;
 import model.bean.MatchBean;
 import model.bean.PaymentBean;
+
 import java.util.Scanner;
 
 public class CLIPaymentView implements PaymentView {

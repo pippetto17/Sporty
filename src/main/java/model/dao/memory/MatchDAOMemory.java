@@ -3,6 +3,7 @@ package model.dao.memory;
 import model.dao.MatchDAO;
 import model.domain.Match;
 import model.domain.MatchStatus;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -83,6 +84,20 @@ public class MatchDAOMemory implements MatchDAO {
                 .toList();
         toDelete.forEach(matches::remove);
         return toDelete.size();
+    }
+
+    @Override
+    public void update(Match match) {
+        if (match != null && matches.containsKey(match.getId())) {
+            matches.put(match.getId(), match);
+        }
+    }
+
+    @Override
+    public List<Match> findByJoinedPlayer(int userId) {
+        return matches.values().stream()
+                .filter(match -> match.getJoinedPlayers().contains(userId))
+                .toList();
     }
 
     public static void clearAll() {

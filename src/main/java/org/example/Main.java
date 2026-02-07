@@ -1,6 +1,7 @@
 package org.example;
 
 import controller.ApplicationController;
+
 import java.util.logging.Logger;
 
 public class Main {

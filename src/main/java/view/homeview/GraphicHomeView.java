@@ -14,13 +14,13 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
-import java.io.IOException;
-
-import java.util.List;
-import java.util.Objects;
 import model.bean.MatchBean;
 import model.utils.Constants;
 import model.utils.MapsAPI;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Objects;
 
 public class GraphicHomeView implements HomeView {
     private final HomeController homeController;
@@ -48,10 +48,14 @@ public class GraphicHomeView implements HomeView {
     private GridPane matchesContainer;
     @FXML
     private ScrollPane mainScrollPane;
+    @FXML
+    private VBox mainContentBox;
     private ComboBox<String> cityFilter;
     private ComboBox<model.domain.Sport> sportFilter;
     private DatePicker dateFilter;
     private boolean isUpdatingCityComboBox = false;
+    private VBox joinedMatchesSection;
+    private GridPane joinedMatchesContainer;
 
     public GraphicHomeView(HomeController homeController) {
         this.homeController = homeController;
@@ -91,8 +95,10 @@ public class GraphicHomeView implements HomeView {
             addRoleSwitchToggle();
         }
         buildSearchCapsule();
+        createJoinedMatchesSection();
         updateViewMode();
         displayMatches(homeController.getMatches());
+        displayJoinedMatches();
     }
 
     private void addRoleSwitchToggle() {
@@ -263,7 +269,7 @@ public class GraphicHomeView implements HomeView {
 
     private void handleJoinMatch(int matchId) {
         try {
-            homeController.joinMatch();
+            homeController.joinMatch(matchId);
         } catch (exception.ValidationException e) {
             displayError(e.getMessage());
         }
@@ -340,6 +346,13 @@ public class GraphicHomeView implements HomeView {
         organizerActionsBox.setManaged(showOrganizerActions);
         matchesTitle.setText(homeController.isViewingAsPlayer() ? model.utils.Constants.LABEL_EXPLORE_MATCHES
                 : model.utils.Constants.LABEL_YOUR_MATCHES);
+
+        // Only show joined matches section when viewing as player
+        if (joinedMatchesSection != null) {
+            boolean showJoinedMatches = homeController.isViewingAsPlayer();
+            joinedMatchesSection.setVisible(showJoinedMatches);
+            joinedMatchesSection.setManaged(showJoinedMatches);
+        }
     }
 
     @Override
@@ -458,5 +471,59 @@ public class GraphicHomeView implements HomeView {
             case APPROVED -> "status-approved";
             case REJECTED -> "status-rejected";
         };
+    }
+
+    private void createJoinedMatchesSection() {
+        joinedMatchesSection = new VBox(20);
+        joinedMatchesSection.setVisible(false);
+        joinedMatchesSection.setManaged(false);
+
+        HBox headerBox = new HBox();
+        headerBox.setAlignment(Pos.CENTER_LEFT);
+        Label sectionTitle = new Label("My Joined Matches");
+        sectionTitle.getStyleClass().add("title-4");
+        headerBox.getChildren().add(sectionTitle);
+
+        joinedMatchesContainer = new GridPane();
+        joinedMatchesContainer.setHgap(25);
+        joinedMatchesContainer.setVgap(25);
+        joinedMatchesContainer.setAlignment(Pos.TOP_LEFT);
+
+        joinedMatchesSection.getChildren().addAll(headerBox, joinedMatchesContainer);
+
+        // Add to main content box (inject after available matches section)
+        if (mainContentBox != null) {
+            mainContentBox.getChildren().add(0, joinedMatchesSection);
+        }
+    }
+
+    private void displayJoinedMatches() {
+        if (joinedMatchesContainer == null || !homeController.isViewingAsPlayer()) {
+            return;
+        }
+
+        joinedMatchesContainer.getChildren().clear();
+        List<MatchBean> joinedMatches = homeController.getJoinedMatches();
+
+        if (joinedMatches == null || joinedMatches.isEmpty()) {
+            joinedMatchesSection.setVisible(false);
+            joinedMatchesSection.setManaged(false);
+            return;
+        }
+
+        joinedMatchesSection.setVisible(true);
+        joinedMatchesSection.setManaged(true);
+
+        int column = 0;
+        int row = 0;
+        for (MatchBean match : joinedMatches) {
+            VBox card = createGridMatchCard(match);
+            joinedMatchesContainer.add(card, column, row);
+            column++;
+            if (column >= 3) {
+                column = 0;
+                row++;
+            }
+        }
     }
 }

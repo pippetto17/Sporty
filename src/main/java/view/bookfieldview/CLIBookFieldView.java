@@ -3,9 +3,11 @@ package view.bookfieldview;
 import controller.ApplicationController;
 import controller.BookFieldController;
 import model.bean.FieldBean;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
+
 import static model.utils.Constants.FOUND_PREFIX;
 import static model.utils.Constants.SEPARATOR;
 

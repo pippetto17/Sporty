@@ -2,11 +2,8 @@ package model.dao.dbms;
 
 import model.dao.UserDAO;
 import model.domain.User;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Connection;
+
+import java.sql.*;
 
 public class UserDAODBMS implements UserDAO {
     private final Connection connection;

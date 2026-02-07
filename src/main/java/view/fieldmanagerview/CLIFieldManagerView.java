@@ -3,6 +3,7 @@ package view.fieldmanagerview;
 import controller.ApplicationController;
 import controller.FieldManagerController;
 import model.bean.MatchBean;
+import model.utils.Constants;
 
 import java.util.List;
 import java.util.Scanner;
@@ -119,7 +120,7 @@ public class CLIFieldManagerView implements FieldManagerView {
             System.out.printf("Price/Hour:     €%.2f%n", match.getPricePerHour());
             System.out.println("==========================================");
         } catch (Exception e) {
-            System.out.println("Error: " + e.getMessage());
+            System.out.println(Constants.ERROR_UNEXPECTED + e.getMessage());
         }
     }
 
@@ -130,14 +131,14 @@ public class CLIFieldManagerView implements FieldManagerView {
         try {
             // Get details before approving for confirmation
             MatchBean match = controller.getRequestDetails(id);
-            System.out.printf("\n✓ Approving match at '%s' organized by %s on %s at %s%n",
+            System.out.printf("%n✓ Approving match at '%s' organized by %s on %s at %s%n",
                     match.getFieldName(), match.getOrganizerName(),
                     match.getMatchDate(), match.getMatchTime());
 
             controller.approveMatch(id);
             System.out.println("✓ Match " + id + " has been APPROVED successfully!");
         } catch (Exception e) {
-            System.out.println("Error: " + e.getMessage());
+            System.out.println(Constants.ERROR_UNEXPECTED + e.getMessage());
         }
     }
 
@@ -148,14 +149,14 @@ public class CLIFieldManagerView implements FieldManagerView {
         try {
             // Get details before rejecting for confirmation
             MatchBean match = controller.getRequestDetails(id);
-            System.out.printf("\n✗ Rejecting match at '%s' organized by %s on %s at %s%n",
+            System.out.printf("%n✗ Rejecting match at '%s' organized by %s on %s at %s%n",
                     match.getFieldName(), match.getOrganizerName(),
                     match.getMatchDate(), match.getMatchTime());
 
             controller.rejectMatch(id);
             System.out.println("✓ Match " + id + " has been REJECTED successfully!");
         } catch (Exception e) {
-            System.out.println("Error: " + e.getMessage());
+            System.out.println(Constants.ERROR_UNEXPECTED + e.getMessage());
         }
     }
 

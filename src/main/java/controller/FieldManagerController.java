@@ -4,6 +4,7 @@ import exception.AuthorizationException;
 import exception.ValidationException;
 import model.bean.FieldBean;
 import model.domain.User;
+
 import java.util.List;
 
 public class FieldManagerController {

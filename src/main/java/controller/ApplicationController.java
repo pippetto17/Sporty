@@ -1,5 +1,7 @@
 package controller;
 
+import exception.AuthorizationException;
+import exception.ValidationException;
 import model.bean.MatchBean;
 import model.dao.DAOFactory;
 import model.dao.dbms.DbmsDAOFactory;
@@ -11,12 +13,11 @@ import view.View;
 import view.factory.CLIViewFactory;
 import view.factory.GraphicViewFactory;
 import view.factory.ViewFactory;
+
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Scanner;
 import java.util.logging.Logger;
-import exception.ValidationException;
-import exception.AuthorizationException;
 
 public class ApplicationController {
     private static final Logger logger = Logger.getLogger(ApplicationController.class.getName());
@@ -133,6 +134,15 @@ public class ApplicationController {
 
     public void navigateToPayment(MatchBean matchBean) {
         var controller = new PaymentController(this, matchBean);
+        var view = viewFactory.createPaymentView(controller);
+        view.setApplicationController(this);
+        controller.setView(view);
+        pushView(view);
+        controller.start();
+    }
+
+    public void navigateToJoinMatchPayment(MatchBean matchBean, User user) {
+        var controller = new PaymentController(this, matchBean, user);
         var view = viewFactory.createPaymentView(controller);
         view.setApplicationController(this);
         controller.setView(view);

@@ -1,9 +1,9 @@
 package model.converter;
 
-import model.bean.MatchBean;
-import model.domain.Match;
 import exception.DataAccessException;
 import exception.ValidationException;
+import model.bean.MatchBean;
+import model.domain.Match;
 
 public class MatchConverter {
     private MatchConverter() {
@@ -29,6 +29,7 @@ public class MatchConverter {
             throw new DataAccessException("Invalid match data: " + e.getMessage(), e);
         }
         match.setStatus(matchBean.getStatus());
+        match.setJoinedPlayers(matchBean.getJoinedPlayers());
         return match;
     }
 
@@ -44,6 +45,7 @@ public class MatchConverter {
         matchBean.setMatchTime(match.getTime());
         matchBean.setMissingPlayers(match.getMissingPlayers());
         matchBean.setStatus(match.getStatus());
+        matchBean.setJoinedPlayers(match.getJoinedPlayers());
         // city, sport, pricePerHour, etc. will be populated by enrichMatchBean()
         return matchBean;
     }

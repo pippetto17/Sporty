@@ -1,5 +1,7 @@
 package model.dao.memory;
+
 import model.dao.NotificationDAO;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

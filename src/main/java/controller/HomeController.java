@@ -3,9 +3,9 @@ package controller;
 import exception.ValidationException;
 import model.bean.MatchBean;
 import model.bean.UserBean;
-
 import model.domain.Sport;
 import model.domain.User;
+
 import java.time.LocalDate;
 import java.util.List;
 
@@ -64,6 +64,7 @@ public class HomeController {
                 matchEntities = matchDAO.findApprovedMatches();
                 matchEntities = matchEntities.stream()
                         .filter(m -> (m.getOrganizer() != null ? m.getOrganizer().getId() : 0) != currentUser.getId())
+                        .filter(m -> !m.isUserJoined(currentUser.getId())) // Filter out already joined matches
                         .toList();
             } else {
                 matchEntities = matchDAO.findByOrganizer(currentUser.getId());
@@ -123,8 +124,27 @@ public class HomeController {
         applicationController.navigateToOrganizeMatch(currentUser);
     }
 
-    public void joinMatch() throws ValidationException {
-        throw new ValidationException("Join Match feature is currently disabled.");
+    public void joinMatch(int matchId) throws ValidationException {
+        MatchBean matchBean = getMatchById(matchId);
+        if (matchBean == null) {
+            throw new ValidationException("Match not found");
+        }
+        applicationController.navigateToJoinMatchPayment(matchBean, currentUser);
+    }
+
+    public List<MatchBean> getJoinedMatches() {
+        try {
+            List<model.domain.Match> matchEntities = matchDAO.findByJoinedPlayer(currentUser.getId());
+            List<MatchBean> matches = matchEntities.stream()
+                    .map(model.converter.MatchConverter::toBean)
+                    .toList();
+            for (MatchBean match : matches) {
+                enrichMatchBean(match);
+            }
+            return matches;
+        } catch (exception.DataAccessException e) {
+            throw new exception.DataAccessException("Error loading joined matches: " + e.getMessage(), e);
+        }
     }
 
     private boolean matchesCity(MatchBean match, String city) {

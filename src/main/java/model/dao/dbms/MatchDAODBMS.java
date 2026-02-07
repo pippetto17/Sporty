@@ -3,12 +3,9 @@ package model.dao.dbms;
 import model.dao.MatchDAO;
 import model.domain.Match;
 import model.domain.MatchStatus;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+
+import java.sql.*;
 import java.util.ArrayList;
-import java.sql.Connection;
 import java.util.List;
 
 public class MatchDAODBMS implements MatchDAO {
@@ -20,7 +17,7 @@ public class MatchDAODBMS implements MatchDAO {
 
     @Override
     public void save(Match match) {
-        String query = "INSERT INTO matches (organizer_id, field_id, date, time, missing_players, status) VALUES (?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO matches (organizer_id, field_id, date, time, missing_players, status, joined_players) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
 
             stmt.setInt(1, match.getOrganizer() != null ? match.getOrganizer().getId() : 0);
@@ -29,6 +26,7 @@ public class MatchDAODBMS implements MatchDAO {
             stmt.setTime(4, java.sql.Time.valueOf(match.getTime()));
             stmt.setInt(5, match.getMissingPlayers());
             stmt.setInt(6, match.getStatus().getCode());
+            stmt.setString(7, model.utils.JsonUtils.listToJson(match.getJoinedPlayers()));
             int affectedRows = stmt.executeUpdate();
             if (affectedRows > 0) {
                 try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
@@ -44,7 +42,7 @@ public class MatchDAODBMS implements MatchDAO {
 
     @Override
     public Match findById(int id) {
-        String query = "SELECT id, organizer_id, field_id, date, time, missing_players, status FROM matches WHERE id = ?";
+        String query = "SELECT id, organizer_id, field_id, date, time, missing_players, status, joined_players FROM matches WHERE id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setInt(1, id);
             try (ResultSet rs = stmt.executeQuery()) {
@@ -61,7 +59,7 @@ public class MatchDAODBMS implements MatchDAO {
     @Override
     public List<Match> findByOrganizer(int organizerId) {
         List<Match> matches = new ArrayList<>();
-        String query = "SELECT id, organizer_id, field_id, date, time, missing_players, status FROM matches WHERE organizer_id = ?";
+        String query = "SELECT id, organizer_id, field_id, date, time, missing_players, status, joined_players FROM matches WHERE organizer_id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setInt(1, organizerId);
             try (ResultSet rs = stmt.executeQuery()) {
@@ -78,7 +76,7 @@ public class MatchDAODBMS implements MatchDAO {
     @Override
     public List<Match> findPendingForManager(int managerId) {
         List<Match> matches = new ArrayList<>();
-        String query = "SELECT m.id, m.organizer_id, m.field_id, m.date, m.time, m.missing_players, m.status FROM matches m "
+        String query = "SELECT m.id, m.organizer_id, m.field_id, m.date, m.time, m.missing_players, m.status, m.joined_players FROM matches m "
                 +
                 "JOIN field f ON m.field_id = f.id " +
                 "WHERE f.manager_id = ? AND m.status = ?";
@@ -109,9 +107,48 @@ public class MatchDAODBMS implements MatchDAO {
     }
 
     @Override
+    public void update(Match match) {
+        String query = "UPDATE matches SET missing_players = ?, status = ?, joined_players = ? WHERE id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setInt(1, match.getMissingPlayers());
+            stmt.setInt(2, match.getStatus().getCode());
+            stmt.setString(3, model.utils.JsonUtils.listToJson(match.getJoinedPlayers()));
+            stmt.setInt(4, match.getId());
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new exception.DataAccessException("Error updating match with id: " + match.getId(), e);
+        }
+    }
+
+    @Override
+    public List<Match> findByJoinedPlayer(int userId) {
+        List<Match> matches = new ArrayList<>();
+        // Use LIKE for broader MySQL compatibility (works even without JSON functions)
+        String query = "SELECT id, organizer_id, field_id, date, time, missing_players, status, joined_players " +
+                "FROM matches WHERE joined_players LIKE ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            // Search for the user ID as a number in the JSON array
+            String searchPattern = "%" + userId + "%";
+            stmt.setString(1, searchPattern);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Match match = mapRowToMatch(rs);
+                    // Double-check that the user is actually in the list (not a substring match)
+                    if (match.getJoinedPlayers().contains(userId)) {
+                        matches.add(match);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            throw new exception.DataAccessException("Error finding matches by joined player: " + userId, e);
+        }
+        return matches;
+    }
+
+    @Override
     public List<Match> findApprovedMatches() {
         List<Match> matches = new ArrayList<>();
-        String query = "SELECT id, organizer_id, field_id, date, time, missing_players, status FROM matches WHERE status = ?";
+        String query = "SELECT id, organizer_id, field_id, date, time, missing_players, status, joined_players FROM matches WHERE status = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setInt(1, model.domain.MatchStatus.APPROVED.getCode());
             try (ResultSet rs = stmt.executeQuery()) {
@@ -157,7 +194,7 @@ public class MatchDAODBMS implements MatchDAO {
         model.domain.User organizer = userDAO.findById(organizerId);
         model.domain.Field field = fieldDAO.findById(fieldId);
 
-        return new Match(
+        Match match = new Match(
                 rs.getInt("id"),
                 organizer,
                 field,
@@ -165,5 +202,13 @@ public class MatchDAODBMS implements MatchDAO {
                 rs.getTime("time").toLocalTime(),
                 rs.getInt("missing_players"),
                 model.domain.MatchStatus.fromCode(rs.getInt("status")));
+
+        // Parse joined_players from JSON
+        String joinedPlayersJson = rs.getString("joined_players");
+        if (joinedPlayersJson != null) {
+            match.setJoinedPlayers(model.utils.JsonUtils.jsonToList(joinedPlayersJson));
+        }
+
+        return match;
     }
 }

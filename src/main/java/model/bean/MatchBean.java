@@ -2,8 +2,11 @@ package model.bean;
 
 import model.domain.MatchStatus;
 import model.domain.Sport;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MatchBean {
     private int matchId;
@@ -19,9 +22,10 @@ public class MatchBean {
     private String fieldAddress;
     private double pricePerHour;
     private MatchStatus status;
+    private List<Integer> joinedPlayers;
 
     public MatchBean() {
-        // Intentionally empty
+        this.joinedPlayers = new ArrayList<>();
     }
 
     public int getMatchId() {
@@ -133,5 +137,13 @@ public class MatchBean {
             return 0.0;
         }
         return pricePerHour / sport.getRequiredPlayers();
+    }
+
+    public List<Integer> getJoinedPlayers() {
+        return joinedPlayers;
+    }
+
+    public void setJoinedPlayers(List<Integer> joinedPlayers) {
+        this.joinedPlayers = joinedPlayers != null ? joinedPlayers : new ArrayList<>();
     }
 }

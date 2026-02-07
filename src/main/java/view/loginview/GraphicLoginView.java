@@ -13,6 +13,7 @@ import javafx.stage.Stage;
 import model.bean.UserBean;
 import model.utils.Constants;
 import view.ViewUtils;
+
 import java.io.IOException;
 import java.util.logging.Logger;
 

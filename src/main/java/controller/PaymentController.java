@@ -8,6 +8,7 @@ import model.dao.MatchDAO;
 import model.notification.NotificationService;
 import model.utils.Constants;
 import view.paymentview.PaymentView;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -215,7 +216,6 @@ public class PaymentController {
             matchDAO.save(match);
             matchBean.setMatchId(match.getId()); // Update bean with assigned ID
         } catch (Exception e) {
-            logger.log(Level.SEVERE, "Error saving match: {0}", e.getMessage());
             throw new ValidationException("Could not save match: " + e.getMessage());
         }
 
@@ -250,13 +250,18 @@ public class PaymentController {
         model.domain.Match match = matchDAO.findById(matchBean.getMatchId());
         if (match == null)
             throw new ValidationException(Constants.ERROR_MATCH_NOT_FOUND);
-        if (match.getMissingPlayers() <= 0) {
-            throw new ValidationException("Match is full");
-        }
-        match.setMissingPlayers(match.getMissingPlayers() - 1);
-        matchDAO.save(match);
+
+        // addJoinedPlayer already checks if match is full and if user already joined
+        match.addJoinedPlayer(joiningUser.getId());
+
+        // Update the match with new joined_players and missing_players
+        matchDAO.update(match);
+
+        // Update the bean as well
         matchBean.setMissingPlayers(match.getMissingPlayers());
-        applicationController.back();
+        matchBean.setJoinedPlayers(match.getJoinedPlayers());
+
+        // Only one back() needed for join flow: PaymentView -> HomeView
         applicationController.back();
         return true;
     }
