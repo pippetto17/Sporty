@@ -3,10 +3,10 @@ package model.dao.filesystem;
 import model.dao.*;
 
 public class FileSystemDAOFactory implements DAOFactory {
-    private final model.dao.dbms.DbmsDAOFactory dbmsDelegate;
+    private final DAOFactory dbmsDelegate;
 
-    public FileSystemDAOFactory() {
-        this.dbmsDelegate = new model.dao.dbms.DbmsDAOFactory();
+    public FileSystemDAOFactory(DAOFactory dbmsDelegate) {
+        this.dbmsDelegate = dbmsDelegate;
     }
 
     @Override

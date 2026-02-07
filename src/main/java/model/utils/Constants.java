@@ -1,8 +1,10 @@
 package model.utils;
+
 public final class Constants {
     private Constants() {
         throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
     }
+
     public static final String SEPARATOR = "----------------------------------------";
     public static final String FOUND_PREFIX = "Found ";
     public static final String ROLE_PLAYER = "Player";
@@ -164,7 +166,7 @@ public final class Constants {
     public static final String ICON_FOOTBALL = "⚽";
     public static final String ICON_BASKETBALL = "🏀";
     public static final String ICON_TENNIS = "🎾";
-    public static final String ICON_PADEL = "🎾"; 
+    public static final String ICON_PADEL = "🎾";
     public static final String ICON_EXTRAS_MEDAL = "🏅";
     public static final String BULLET = " • ";
     public static final String CSS_TOGGLE_CONTAINER = "toggle-container";
