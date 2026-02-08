@@ -6,11 +6,10 @@ import model.bean.FieldBean;
 import model.bean.MatchBean;
 import model.converter.FieldConverter;
 import model.converter.MatchConverter;
-import model.dao.DAOFactory;
-import model.dao.FieldDAO;
-import model.dao.MatchDAO;
+import model.dao.*;
 import model.domain.Match;
 import model.domain.MatchStatus;
+import model.domain.Notification;
 import model.domain.User;
 import model.utils.Constants;
 
@@ -21,6 +20,8 @@ public class FieldManagerController {
     private final User fieldManager;
     private final FieldDAO fieldDAO;
     private final MatchDAO matchDAO;
+    private final NotificationDAO notificationDAO;
+    private final UserDAO userDAO;
 
     public FieldManagerController(User fieldManager, DAOFactory daoFactory)
             throws ValidationException {
@@ -30,7 +31,17 @@ public class FieldManagerController {
         this.fieldManager = fieldManager;
         this.fieldDAO = daoFactory.getFieldDAO();
         this.matchDAO = daoFactory.getMatchDAO();
+        this.notificationDAO = daoFactory.getNotificationDAO();
+        this.userDAO = daoFactory.getUserDAO();
         this.matchDAO.deleteExpiredMatches();
+    }
+
+    public List<Notification> getUnreadNotifications() {
+        return notificationDAO.findUnreadByUsername(fieldManager.getUsername());
+    }
+
+    public void markNotificationsAsRead() {
+        notificationDAO.markAllAsRead(fieldManager.getUsername());
     }
 
     public void addNewField(FieldBean fieldBean) {
@@ -52,6 +63,14 @@ public class FieldManagerController {
                     var field = match.getField();
                     if (field != null) {
                         bean.setFieldName(field.getName());
+                        bean.setSport(field.getSport());
+                    }
+                    var organizer = match.getOrganizer();
+                    if (organizer != null) {
+                        User fullOrganizer = userDAO.findById(organizer.getId());
+                        if (fullOrganizer != null) {
+                            bean.setOrganizerName(fullOrganizer.getName() + " " + fullOrganizer.getSurname());
+                        }
                     }
                     return bean;
                 })
@@ -79,6 +98,14 @@ public class FieldManagerController {
         var bean = MatchConverter.toBean(match);
         if (match.getField() != null) {
             bean.setFieldName(match.getField().getName());
+            bean.setSport(match.getField().getSport());
+            bean.setPricePerHour(match.getField().getPricePerHour());
+        }
+        if (match.getOrganizer() != null) {
+            User organizer = userDAO.findById(match.getOrganizer().getId());
+            if (organizer != null) {
+                bean.setOrganizerName(organizer.getName() + " " + organizer.getSurname());
+            }
         }
         return bean;
     }

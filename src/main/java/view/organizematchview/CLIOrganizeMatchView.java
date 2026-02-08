@@ -231,8 +231,16 @@ public class CLIOrganizeMatchView implements OrganizeMatchView {
         if (matchBean.getFieldId() != 0) {
             System.out.println("  Field:        " + matchBean.getFieldId());
         }
-        System.out.println("  Status:       " + (matchBean.getStatus() != null ? matchBean.getStatus() : "CONFIRMED"));
+        String status = matchBean.getStatus() != null ? matchBean.getStatus().getDisplayName() : "Pending";
+        System.out.println("  Status:       " + status);
         System.out.println(Constants.SEPARATOR);
+
+        if (matchBean.getStatus() != null && matchBean.getStatus().toString().equals("Pending")) {
+            System.out.println("\n📢 Field Manager Notified!");
+            System.out.println("Your match request has been sent to the field manager.");
+            System.out.println("You will be notified once it's approved.");
+        }
+
         System.out.println("\nOptions:");
         System.out.println("1. Invite players (coming soon)");
         System.out.println("2. Back to Home");

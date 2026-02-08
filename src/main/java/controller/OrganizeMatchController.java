@@ -137,8 +137,7 @@ public class OrganizeMatchController {
         currentMatchBean.setMatchDate(date);
         currentMatchBean.setMatchTime(time);
         currentMatchBean.setCity(city);
-        int totalRequired = sport.getRequiredPlayers();
-        currentMatchBean.setMissingPlayers(totalRequired - 1 - additionalParticipants);
+        currentMatchBean.setMissingPlayers(additionalParticipants);
     }
 
     public void proceedToFieldSelection() {

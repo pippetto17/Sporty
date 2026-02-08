@@ -73,6 +73,8 @@ public class GraphicOrganizeMatchView implements OrganizeMatchView {
     @FXML
     private Label recapStatusLabel;
     @FXML
+    private VBox notificationBox;
+    @FXML
     private Button inviteButton;
     private boolean isUpdatingCityComboBox = false;
 
@@ -364,7 +366,22 @@ public class GraphicOrganizeMatchView implements OrganizeMatchView {
             recapDateLabel.setText(matchBean.getMatchDate() != null ? matchBean.getMatchDate().toString() : "N/A");
             recapTimeLabel.setText(matchBean.getMatchTime() != null ? matchBean.getMatchTime().toString() : "N/A");
             recapCityLabel.setText(matchBean.getCity());
-            recapStatusLabel.setText(matchBean.getStatus() != null ? matchBean.getStatus().toString() : "CONFIRMED");
+
+            String statusText = matchBean.getStatus() != null ? matchBean.getStatus().getDisplayName() : "Pending";
+            recapStatusLabel.setText(statusText);
+
+            boolean isPending = matchBean.getStatus() != null && matchBean.getStatus().toString().equals("Pending");
+            if (isPending) {
+                recapStatusLabel.setStyle("-fx-text-fill: #f59e0b;");
+            } else {
+                recapStatusLabel.setStyle("-fx-text-fill: #10b981;");
+            }
+
+            if (notificationBox != null) {
+                notificationBox.setVisible(isPending);
+                notificationBox.setManaged(isPending);
+            }
+
             recapBox.setVisible(true);
             recapBox.setManaged(true);
         });

@@ -7,13 +7,13 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 
-public class ConnectionFactory {
-    private ConnectionFactory() {
+public class DatabaseConnection {
+    private DatabaseConnection() {
     }
 
     private static final Properties properties;
     static {
-        try (InputStream input = ConnectionFactory.class.getResourceAsStream("/db.properties")) {
+        try (InputStream input = DatabaseConnection.class.getResourceAsStream("/db.properties")) {
             properties = new Properties();
             if (input == null) {
                 throw new IOException("File db.properties not found in resources.");

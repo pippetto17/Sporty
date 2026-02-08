@@ -20,8 +20,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import model.bean.MatchBean;
-import model.notification.FieldManagerObserver;
-import model.notification.NotificationService;
+import model.domain.Notification;
 import model.utils.Constants;
 import view.ViewUtils;
 
@@ -32,11 +31,11 @@ import java.util.logging.Logger;
 
 public class GraphicFieldManagerView implements FieldManagerView {
     private final FieldManagerController controller;
-
     private ApplicationController appController;
-    private NotificationService notificationService;
     private Stage stage;
     private final Logger logger = Logger.getLogger(getClass().getName());
+    private boolean notificationsShown = false;
+
     @FXML
     private Label managerNameLabel;
     @FXML
@@ -76,8 +75,6 @@ public class GraphicFieldManagerView implements FieldManagerView {
     @Override
     public void setApplicationController(ApplicationController appController) {
         this.appController = appController;
-        this.notificationService = appController.getNotificationService();
-        this.notificationService.attach(new FieldManagerObserver());
     }
 
     @Override
@@ -122,7 +119,7 @@ public class GraphicFieldManagerView implements FieldManagerView {
         }
         setupTable();
         loadData();
-        Platform.runLater(this::checkAndShowNotifications);
+        Platform.runLater(this::showUnreadNotificationsOnce);
 
         // Auto-open requests if pending
         if (!controller.getPendingRequests().isEmpty()) {
@@ -130,13 +127,43 @@ public class GraphicFieldManagerView implements FieldManagerView {
         }
     }
 
-    private void checkAndShowNotifications() {
-        if (notificationService == null)
+    /**
+     * Shows unread notifications as popup only on first access.
+     */
+    private void showUnreadNotificationsOnce() {
+        if (notificationsShown) {
             return;
-        List<String> unread = notificationService.getUnreadNotifications(controller.getFieldManager().getUsername());
-        if (!unread.isEmpty()) {
+        }
+        notificationsShown = true;
+
+        List<Notification> unread = controller.getUnreadNotifications();
+        if (unread.isEmpty()) {
+            updateNotificationButton(0);
+            return;
+        }
+
+        // Show popup with unread notifications
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("New Notifications");
+        alert.setHeaderText("🔔 You have " + unread.size() + " new notification(s)!");
+
+        StringBuilder content = new StringBuilder();
+        for (Notification n : unread) {
+            content.append("• ").append(n.getTitle()).append("\n  ").append(n.getMessage()).append("\n\n");
+        }
+        alert.setContentText(content.toString());
+        ViewUtils.applyStylesheets(alert.getDialogPane());
+        alert.showAndWait();
+
+        // Mark as read after showing
+        controller.markNotificationsAsRead();
+        updateNotificationButton(0);
+    }
+
+    private void updateNotificationButton(int unreadCount) {
+        if (unreadCount > 0) {
             notificationButton.setStyle("-fx-text-fill: -color-danger-fg; -fx-border-color: -color-danger-emphasis;");
-            notificationButton.setText("🔔 (" + unread.size() + ")");
+            notificationButton.setText("🔔 (" + unreadCount + ")");
         } else {
             notificationButton.setStyle("");
             notificationButton.setText("🔔");
@@ -172,24 +199,24 @@ public class GraphicFieldManagerView implements FieldManagerView {
         Tab alertsTab = new Tab("Alerts");
         VBox alertsBox = new VBox(10);
         alertsBox.setPadding(new javafx.geometry.Insets(10));
-        List<String> unread = notificationService.getUnreadNotifications(controller.getFieldManager().getUsername());
+        List<Notification> unread = controller.getUnreadNotifications();
         populateAlertsBox(alertsBox, unread);
         alertsTab.setContent(new ScrollPane(alertsBox));
         return alertsTab;
     }
 
-    private void populateAlertsBox(VBox alertsBox, List<String> unread) {
+    private void populateAlertsBox(VBox alertsBox, List<Notification> unread) {
         if (unread.isEmpty()) {
             alertsBox.getChildren().add(new Label("No new notifications."));
             return;
         }
-        for (String note : unread) {
-            Label l = new Label("🔔 " + note);
+        for (Notification note : unread) {
+            Label l = new Label("🔔 " + note.getTitle() + ": " + note.getMessage());
             l.setWrapText(true);
             alertsBox.getChildren().add(l);
         }
-        notificationService.markAllAsRead(controller.getFieldManager().getUsername());
-        checkAndShowNotifications();
+        controller.markNotificationsAsRead();
+        updateNotificationButton(0);
     }
 
     private Tab createRequestsTab() {

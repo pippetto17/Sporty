@@ -6,11 +6,12 @@ import model.bean.MatchBean;
 import model.bean.PaymentBean;
 import model.converter.MatchConverter;
 import model.dao.MatchDAO;
+import model.dao.NotificationDAO;
 import model.domain.Field;
 import model.domain.Match;
 import model.domain.MatchStatus;
 import model.domain.User;
-import model.notification.NotificationService;
+import model.observer.MatchNotificationObserver;
 import model.utils.Constants;
 import view.organizematchview.OrganizeMatchView;
 import view.paymentview.GraphicPaymentView;
@@ -23,7 +24,7 @@ public class PaymentController {
     private static final Logger logger = Logger.getLogger(PaymentController.class.getName());
     private final ApplicationController applicationController;
     private final MatchDAO matchDAO;
-    private final NotificationService notificationService;
+    private final NotificationDAO notificationDAO;
     private final MatchBean matchBean;
     private final FieldBean fieldBean;
     private final boolean bookingMode;
@@ -37,7 +38,7 @@ public class PaymentController {
     public PaymentController(ApplicationController applicationController, MatchBean matchBean) {
         this.applicationController = applicationController;
         this.matchDAO = applicationController.getDaoFactory().getMatchDAO();
-        this.notificationService = applicationController.getNotificationService();
+        this.notificationDAO = applicationController.getDaoFactory().getNotificationDAO();
         this.matchBean = matchBean;
         this.fieldBean = null;
         this.bookingMode = false;
@@ -51,7 +52,7 @@ public class PaymentController {
     public PaymentController(ApplicationController applicationController, FieldBean fieldBean, MatchBean contextBean) {
         this.applicationController = applicationController;
         this.matchDAO = applicationController.getDaoFactory().getMatchDAO();
-        this.notificationService = applicationController.getNotificationService();
+        this.notificationDAO = applicationController.getDaoFactory().getNotificationDAO();
         this.matchBean = contextBean;
         this.fieldBean = fieldBean;
         this.bookingMode = true;
@@ -65,7 +66,7 @@ public class PaymentController {
     public PaymentController(ApplicationController applicationController, MatchBean matchBean, User user) {
         this.applicationController = applicationController;
         this.matchDAO = applicationController.getDaoFactory().getMatchDAO();
-        this.notificationService = applicationController.getNotificationService();
+        this.notificationDAO = applicationController.getDaoFactory().getNotificationDAO();
         this.matchBean = matchBean;
         this.fieldBean = null;
         this.bookingMode = false;
@@ -215,36 +216,36 @@ public class PaymentController {
             field = applicationController.getDaoFactory().getFieldDAO().findById(matchBean.getFieldId());
         }
 
-        // Validate and save match
         try {
             Match match = MatchConverter.toEntity(matchBean);
+
+            if (matchBean.getOrganizerId() != 0) {
+                User organizer = applicationController.getDaoFactory().getUserDAO()
+                        .findById(matchBean.getOrganizerId());
+                match.setOrganizer(organizer);
+            }
+
+            if (field != null) {
+                match.setField(field);
+            }
+
             match.setStatus(MatchStatus.PENDING);
-            // Ensure ID is handled if it's new (should be 0)
+
+            match.attach(new MatchNotificationObserver(match, notificationDAO));
+
             matchDAO.save(match);
-            matchBean.setMatchId(match.getId()); // Update bean with assigned ID
+
+            matchBean.setMatchId(match.getId());
+            matchBean.setStatus(MatchStatus.PENDING);
+
+            logger.info("Match created with ID: " + match.getId() + " - Notification sent via Observer pattern");
         } catch (Exception e) {
             throw new ValidationException("Could not save match: " + e.getMessage());
         }
 
-        // Send booking request notification to field manager
-        if (field != null && field.getManager() != null) {
-            try {
-                notificationService.notifyBookingRequest(
-                        field.getManager().getUsername(),
-                        matchBean.getOrganizerName(),
-                        field.getName(),
-                        matchBean.getMatchDate().toString(),
-                        matchBean.getMatchTime().toString(),
-                        matchBean.getSport().getDisplayName());
-                logger.info("Booking request notification sent to field manager: " + field.getManager().getUsername());
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "Could not send booking request notification: {0}", e.getMessage());
-            }
-        }
         applicationController.back();
         applicationController.back();
-        OrganizeMatchView organizeView = (OrganizeMatchView) applicationController
-                .getCurrentView();
+        OrganizeMatchView organizeView = (OrganizeMatchView) applicationController.getCurrentView();
         if (organizeView != null) {
             organizeView.displayRecap(matchBean);
         }
@@ -254,21 +255,20 @@ public class PaymentController {
     private boolean processJoinPayment() throws ValidationException {
         if (matchBean == null || joiningUser == null)
             throw new ValidationException("Match and user required for join");
+
         Match match = matchDAO.findById(matchBean.getMatchId());
+
         if (match == null)
             throw new ValidationException(Constants.ERROR_MATCH_NOT_FOUND);
 
-        // addJoinedPlayer already checks if match is full and if user already joined
         match.addJoinedPlayer(joiningUser.getId());
 
-        // Update the match with new joined_players and missing_players
         matchDAO.update(match);
 
-        // Update the bean as well
         matchBean.setMissingPlayers(match.getMissingPlayers());
+
         matchBean.setJoinedPlayers(match.getJoinedPlayers());
 
-        // Only one back() needed for join flow: PaymentView -> HomeView
         applicationController.back();
         return true;
     }

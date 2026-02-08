@@ -9,18 +9,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import model.bean.FieldBean;
@@ -242,23 +233,11 @@ public class GraphicBookFieldView implements BookFieldView {
         Label priceHourLabel = createLabel(String.format("💰 €%.2f/ora", field.getPricePerHour()), "text-bold");
         Label pricePersonLabel = createLabel(String.format("👤 €%.2f/persona", field.getPricePerPerson()), "accent");
         pricingBox.getChildren().addAll(priceHourLabel, pricePersonLabel);
-        HBox footer = createCardFooter(field, card);
-        card.getChildren().addAll(header, infoBox, pricingBox, footer);
+        card.getChildren().addAll(header, infoBox, pricingBox);
         card.setOnMouseClicked(e -> selectField(field, card));
         return card;
     }
 
-    private HBox createCardFooter(FieldBean field, VBox card) {
-        HBox footer = new HBox(15);
-        footer.setAlignment(Pos.CENTER_LEFT);
-        Region spacer = new Region();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
-        Button selectBtn = new Button("Select");
-        selectBtn.getStyleClass().add("button-outlined");
-        selectBtn.setOnAction(e -> selectField(field, card));
-        footer.getChildren().addAll(spacer, selectBtn);
-        return footer;
-    }
 
     private Label createLabel(String text, String styleClass) {
         Label l = new Label(text);

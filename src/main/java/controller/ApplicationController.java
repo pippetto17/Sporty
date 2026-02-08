@@ -7,7 +7,6 @@ import model.bean.UserBean;
 import model.dao.DAOFactory;
 import model.domain.Role;
 import model.domain.User;
-import model.notification.NotificationService;
 import view.View;
 import view.factory.ViewFactory;
 
@@ -20,21 +19,18 @@ public class ApplicationController {
     private final Deque<View> viewStack = new ArrayDeque<>();
     private ViewFactory viewFactory;
     private DAOFactory daoFactory;
-    private NotificationService notificationService;
 
     public ApplicationController() {
     }
 
     public ApplicationController(DAOFactory daoFactory) {
         this.daoFactory = daoFactory;
-        this.notificationService = new NotificationService(daoFactory.getNotificationDAO());
     }
 
     public void start() {
         ApplicationConfiguration config = ApplicationConfiguration.create();
         this.daoFactory = config.getDaoFactory();
         this.viewFactory = config.getViewFactory();
-        this.notificationService = new NotificationService(daoFactory.getNotificationDAO());
         navigateToLogin();
     }
 
@@ -147,10 +143,6 @@ public class ApplicationController {
 
     public DAOFactory getDaoFactory() {
         return daoFactory;
-    }
-
-    public NotificationService getNotificationService() {
-        return notificationService;
     }
 
     public String getConfigurationInfo() {

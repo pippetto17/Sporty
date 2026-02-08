@@ -18,7 +18,7 @@
         <!-- Title -->
         <Label text="Create New Account" styleClass="title-2"/>
         <Label text="Fill in the details to register" styleClass="text-caption"/>
-        
+
         <Separator/>
 
         <!-- Register Form -->

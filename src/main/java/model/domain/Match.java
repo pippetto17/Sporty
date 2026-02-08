@@ -1,13 +1,14 @@
 package model.domain;
 
 import exception.ValidationException;
+import model.observer.Subject;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Match {
+public class Match extends Subject {
     private int id;
     private User organizer;
     private Field field;
@@ -100,6 +101,9 @@ public class Match {
 
     public void setStatus(MatchStatus status) {
         this.status = status;
+        if (status == MatchStatus.PENDING) {
+            notifyObservers();
+        }
     }
 
     public boolean isApproved() {

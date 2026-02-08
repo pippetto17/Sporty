@@ -1,11 +1,16 @@
 package model.dao;
 
+import model.domain.Notification;
+
 import java.util.List;
 
+/**
+ * DAO interface for Notification persistence.
+ */
 public interface NotificationDAO {
-    void save(String recipient, String sender, String type, String title, String message);
+    void save(Notification notification);
 
-    List<String> getUnreadNotifications(String username);
+    List<Notification> findUnreadByUsername(String username);
 
     void markAllAsRead(String username);
 }

@@ -3,8 +3,7 @@ package view.fieldmanagerview;
 import controller.ApplicationController;
 import controller.FieldManagerController;
 import model.bean.MatchBean;
-import model.notification.FieldManagerObserver;
-import model.notification.NotificationService;
+import model.domain.Notification;
 import model.utils.Constants;
 
 import java.util.List;
@@ -12,9 +11,8 @@ import java.util.Scanner;
 
 public class CLIFieldManagerView implements FieldManagerView {
     private final FieldManagerController controller;
-
     private final Scanner scanner;
-    private NotificationService notificationService;
+    private boolean notificationsShown = false;
 
     public CLIFieldManagerView(FieldManagerController controller) {
         this.controller = controller;
@@ -23,13 +21,12 @@ public class CLIFieldManagerView implements FieldManagerView {
 
     @Override
     public void setApplicationController(ApplicationController appController) {
-        this.notificationService = appController.getNotificationService();
-        this.notificationService.attach(new FieldManagerObserver());
+        // No longer needed - notifications are handled via controller
     }
 
     @Override
     public void display() {
-        showUnreadNotifications();
+        showUnreadNotificationsOnce();
         boolean running = true;
         while (running) {
             printHeader();
@@ -41,7 +38,7 @@ public class CLIFieldManagerView implements FieldManagerView {
                 case "2" -> viewRequestDetails();
                 case "3" -> handleApprove();
                 case "4" -> handleReject();
-                case "5" -> showUnreadNotifications();
+                case "5" -> showNotifications();
                 case "0" -> running = false;
                 default -> System.out.println("⚠ Invalid choice, try again.");
             }
@@ -131,7 +128,6 @@ public class CLIFieldManagerView implements FieldManagerView {
         if (id == -1)
             return;
         try {
-            // Get details before approving for confirmation
             MatchBean match = controller.getRequestDetails(id);
             System.out.printf("%n✓ Approving match at '%s' organized by %s on %s at %s%n",
                     match.getFieldName(), match.getOrganizerName(),
@@ -149,7 +145,6 @@ public class CLIFieldManagerView implements FieldManagerView {
         if (id == -1)
             return;
         try {
-            // Get details before rejecting for confirmation
             MatchBean match = controller.getRequestDetails(id);
             System.out.printf("%n✗ Rejecting match at '%s' organized by %s on %s at %s%n",
                     match.getFieldName(), match.getOrganizerName(),
@@ -162,15 +157,41 @@ public class CLIFieldManagerView implements FieldManagerView {
         }
     }
 
-    private void showUnreadNotifications() {
-        if (notificationService == null)
+    /**
+     * Shows unread notifications only on first access (popup behavior).
+     */
+    private void showUnreadNotificationsOnce() {
+        if (notificationsShown) {
             return;
-        List<String> unread = notificationService.getUnreadNotifications(controller.getFieldManager().getUsername());
-        if (unread.isEmpty())
+        }
+        notificationsShown = true;
+
+        List<Notification> unread = controller.getUnreadNotifications();
+        if (unread.isEmpty()) {
             return;
+        }
+
         System.out.println("\n🔔 YOU HAVE " + unread.size() + " NEW NOTIFICATION(S):");
-        unread.forEach(msg -> System.out.println("  • " + msg));
-        notificationService.markAllAsRead(controller.getFieldManager().getUsername());
+        for (Notification n : unread) {
+            System.out.println("  • " + n.getTitle() + ": " + n.getMessage());
+        }
+        controller.markNotificationsAsRead();
+    }
+
+    /**
+     * Shows all notifications (can be called from menu).
+     */
+    private void showNotifications() {
+        List<Notification> unread = controller.getUnreadNotifications();
+        if (unread.isEmpty()) {
+            System.out.println("\n✓ No new notifications.");
+            return;
+        }
+        System.out.println("\n🔔 NOTIFICATIONS:");
+        for (Notification n : unread) {
+            System.out.println("  • " + n.getTitle() + ": " + n.getMessage());
+        }
+        controller.markNotificationsAsRead();
     }
 
     private int readInt(String prompt) {

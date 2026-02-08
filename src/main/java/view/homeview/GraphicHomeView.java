@@ -390,8 +390,8 @@ public class GraphicHomeView implements HomeView {
         }
 
         int totalPlayers = match.getSport().getRequiredPlayers();
+        int joined = ViewUtils.getCurrentParticipants(match);
         if (homeController.isViewingAsPlayer()) {
-            int joined = ViewUtils.getCurrentParticipants(match);
             content.getChildren().add(new Label(String.format("Players Joined: %d/%d", joined, totalPlayers)));
             ButtonType joinBtn = new ButtonType("Join Match", ButtonBar.ButtonData.OK_DONE);
             alert.getButtonTypes().setAll(joinBtn, ButtonType.CLOSE);
@@ -402,7 +402,7 @@ public class GraphicHomeView implements HomeView {
                 return null;
             });
         } else {
-            content.getChildren().add(new Label(String.format("Required Players: %d", totalPlayers)));
+            content.getChildren().add(new Label(String.format("Players Joined: %d/%d", joined, totalPlayers)));
             ButtonType inviteBtn = new ButtonType("Invite Player", ButtonBar.ButtonData.OTHER);
             ButtonType cancelBtn = new ButtonType("Cancel Match", ButtonBar.ButtonData.FINISH);
             alert.getButtonTypes().setAll(inviteBtn, cancelBtn, ButtonType.CLOSE);

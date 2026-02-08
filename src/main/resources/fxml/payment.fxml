@@ -85,7 +85,7 @@
                     <!-- Payment Inputs -->
                     <VBox spacing="20" styleClass="card" style="-fx-padding: 25;">
                         <Label text="Card Details" styleClass="title-4"/>
-                        
+
                         <VBox spacing="8">
                             <Label text="Card Number" styleClass="input-label"/>
                             <TextField fx:id="cardNumberField" promptText="0000 0000 0000 0000" styleClass="payment-input"/>

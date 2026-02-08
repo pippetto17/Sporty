@@ -195,14 +195,24 @@
                                 </HBox>
                             </VBox>
                         </GridPane>
+
+                        <!-- Notification Message -->
+                        <VBox fx:id="notificationBox" style="-fx-background-color: #f0f9ff; -fx-padding: 12; -fx-background-radius: 8; -fx-border-color: #3b82f6; -fx-border-radius: 8; -fx-border-width: 1;" spacing="5">
+                            <HBox spacing="8" alignment="CENTER_LEFT">
+                                <Label text="ℹ️" style="-fx-font-size: 16px;"/>
+                                <Label text="Field Manager Notified" style="-fx-font-weight: bold; -fx-text-fill: #1e40af; -fx-font-size: 13px;"/>
+                            </HBox>
+                            <Label text="Your match request has been sent to the field manager. You will be notified once it's approved."
+                                   wrapText="true" style="-fx-text-fill: #1e40af; -fx-font-size: 11px;"/>
+                        </VBox>
                     </VBox>
 
                     <!-- Footer -->
                     <VBox styleClass="recap-footer">
                         <Button fx:id="inviteButton" text="INVITE PLAYER" onAction="#handleInvite"
-                                styleClass="primary-action-button" maxWidth="INFINITY"/>
+                                styleClass="primary-action-button" maxWidth="Infinity"/>
                         <Button text="HOME" onAction="#handleHomeFromRecap"
-                                styleClass="secondary-action-button" maxWidth="INFINITY"/>
+                                styleClass="secondary-action-button" maxWidth="Infinity"/>
                     </VBox>
                 </VBox>
             </StackPane>

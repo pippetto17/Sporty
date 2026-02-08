@@ -1,11 +1,6 @@
 package view.factory;
 
-import controller.BookFieldController;
-import controller.FieldManagerController;
-import controller.HomeController;
-import controller.LoginController;
-import controller.OrganizeMatchController;
-import controller.PaymentController;
+import controller.*;
 import view.bookfieldview.BookFieldView;
 import view.bookfieldview.CLIBookFieldView;
 import view.fieldmanagerview.CLIFieldManagerView;

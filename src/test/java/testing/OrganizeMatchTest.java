@@ -7,12 +7,7 @@ import exception.AuthorizationException;
 import model.bean.MatchBean;
 import model.dao.DAOFactory;
 import model.dao.memory.MemoryDAOFactory;
-import model.domain.Field;
-import model.domain.Match;
-import model.domain.MatchStatus;
-import model.domain.Role;
-import model.domain.Sport;
-import model.domain.User;
+import model.domain.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
