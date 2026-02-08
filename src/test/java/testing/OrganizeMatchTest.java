@@ -17,9 +17,9 @@ import java.time.LocalTime;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Test per il caso d'uso "Organizza Partita"
- * Testa il flusso completo dall'organizzazione fino all'accettazione da parte
- * del field manager
+ * Test for the "Organize Match" use case
+ * Tests the complete flow from organization to acceptance by
+ * the field manager
  */
 class OrganizeMatchTest {
 
@@ -30,18 +30,18 @@ class OrganizeMatchTest {
 
     @BeforeEach
     void setUp() {
-        // Inizializza il DAO Factory in memoria per i test
+        // Initialize the in-memory DAO Factory for tests
         daoFactory = new MemoryDAOFactory();
 
-        // Crea un organizer di test
+        // Create a test organizer
         organizer = new User(1, "mario.rossi", "password123", "Mario", "Rossi", Role.ORGANIZER);
         daoFactory.getUserDAO().save(organizer);
 
-        // Crea un field manager di test
+        // Create a test field manager
         fieldManager = new User(2, "gestore.campo", "password456", "Luigi", "Verdi", Role.FIELD_MANAGER);
         daoFactory.getUserDAO().save(fieldManager);
 
-        // Crea un campo di test gestito dal field manager
+        // Create a test field managed by the field manager
         testField = new Field();
         testField.setId(1);
         testField.setName("Campo Sportivo Comunale");
@@ -55,75 +55,75 @@ class OrganizeMatchTest {
 
     @Test
     void testOrganizeMatchCompleteFlow() throws Exception {
-        // Step 1: L'organizzatore crea un controller per organizzare una partita
+        // Step 1: The organizer creates a controller to organize a match
         ApplicationController appController = new ApplicationController(daoFactory);
         OrganizeMatchController organizeController = new OrganizeMatchController(organizer, appController);
 
-        assertNotNull(organizeController, "Il controller dovrebbe essere creato correttamente");
+        assertNotNull(organizeController, "The controller should be created correctly");
         assertEquals(organizer, organizeController.getOrganizer(),
-                "L'organizer dovrebbe essere impostato correttamente");
+                "The organizer should be set correctly");
 
-        // Step 2: L'organizzatore imposta i dettagli della partita
+        // Step 2: The organizer sets the match details
         Sport sport = Sport.FOOTBALL_5;
         LocalDate date = LocalDate.now().plusDays(7);
         LocalTime time = LocalTime.of(18, 0);
         String city = "Roma";
         int additionalParticipants = 3;
 
-        // Valida i dettagli
+        // Validate the details
         assertDoesNotThrow(() -> {
             organizeController.validateMatchDetails(sport, date, time, city, additionalParticipants);
-        }, "I dettagli della partita dovrebbero essere validi");
+        }, "The match details should be valid");
 
-        // Imposta i dettagli nel bean
+        // Set the details in the bean
         organizeController.setMatchDetails(sport, date, time, city, additionalParticipants);
         MatchBean matchBean = organizeController.getCurrentMatchBean();
 
-        assertNotNull(matchBean, "Il bean della partita dovrebbe essere creato");
-        assertEquals(sport, matchBean.getSport(), "Lo sport dovrebbe essere impostato correttamente");
-        assertEquals(date, matchBean.getMatchDate(), "La data dovrebbe essere impostata correttamente");
-        assertEquals(time, matchBean.getMatchTime(), "L'orario dovrebbe essere impostato correttamente");
-        assertEquals(city, matchBean.getCity(), "La città dovrebbe essere impostata correttamente");
+        assertNotNull(matchBean, "The match bean should be created");
+        assertEquals(sport, matchBean.getSport(), "The sport should be set correctly");
+        assertEquals(date, matchBean.getMatchDate(), "The date should be set correctly");
+        assertEquals(time, matchBean.getMatchTime(), "The time should be set correctly");
+        assertEquals(city, matchBean.getCity(), "The city should be set correctly");
 
-        // Step 3: Seleziona il campo disponibile
+        // Step 3: Select the available field
         matchBean.setFieldId(testField.getId());
         matchBean.setFieldName(testField.getName());
 
-        // Step 4: Salva la partita (status = PENDING)
+        // Step 4: Save the match (status = PENDING)
         matchBean.setStatus(MatchStatus.PENDING);
         organizeController.saveMatch();
 
-        // Step 5: Verifica che la partita sia stata salvata con status PENDING
+        // Step 5: Verify that the match has been saved with PENDING status
         Match savedMatch = daoFactory.getMatchDAO().findById(matchBean.getMatchId());
-        assertNotNull(savedMatch, "La partita dovrebbe essere salvata nel database");
-        assertEquals(MatchStatus.PENDING, savedMatch.getStatus(), "La partita dovrebbe avere status PENDING");
-        assertEquals(organizer.getId(), savedMatch.getOrganizer().getId(), "L'organizzatore dovrebbe essere corretto");
-        assertEquals(testField.getId(), savedMatch.getField().getId(), "Il campo dovrebbe essere corretto");
+        assertNotNull(savedMatch, "The match should be saved in the database");
+        assertEquals(MatchStatus.PENDING, savedMatch.getStatus(), "The match should have PENDING status");
+        assertEquals(organizer.getId(), savedMatch.getOrganizer().getId(), "The organizer should be correct");
+        assertEquals(testField.getId(), savedMatch.getField().getId(), "The field should be correct");
 
-        // Step 6: Il field manager visualizza le richieste pendenti
+        // Step 6: The field manager views pending requests
         FieldManagerController fieldManagerController = new FieldManagerController(fieldManager, daoFactory);
         var pendingRequests = fieldManagerController.getPendingRequests();
 
-        assertFalse(pendingRequests.isEmpty(), "Dovrebbe esserci almeno una richiesta pendente");
+        assertFalse(pendingRequests.isEmpty(), "There should be at least one pending request");
         assertTrue(pendingRequests.stream()
                 .anyMatch(m -> m.getMatchId() == savedMatch.getId()),
-                "La partita creata dovrebbe essere nelle richieste pendenti");
+                "The created match should be in the pending requests");
 
-        // Step 7: Il field manager approva la partita
+        // Step 7: The field manager approves the match
         assertDoesNotThrow(() -> {
             fieldManagerController.approveMatch(savedMatch.getId());
-        }, "L'approvazione dovrebbe avvenire senza errori");
+        }, "Approval should happen without errors");
 
-        // Step 8: Verifica che la partita sia stata approvata
+        // Step 8: Verify that the match has been approved
         Match approvedMatch = daoFactory.getMatchDAO().findById(savedMatch.getId());
-        assertNotNull(approvedMatch, "La partita dovrebbe ancora esistere");
-        assertEquals(MatchStatus.APPROVED, approvedMatch.getStatus(), "La partita dovrebbe avere status APPROVED");
-        assertTrue(approvedMatch.isApproved(), "Il metodo isApproved() dovrebbe restituire true");
+        assertNotNull(approvedMatch, "The match should still exist");
+        assertEquals(MatchStatus.APPROVED, approvedMatch.getStatus(), "The match should have APPROVED status");
+        assertTrue(approvedMatch.isApproved(), "The isApproved() method should return true");
     }
 
     @Test
     void testOnlyOrganizerCanOrganizeMatch() {
-        // Un player non può organizzare partite
+        // A player cannot organize matches
         User player = new User(3, "player", "password", "Giovanni", "Bianchi", Role.PLAYER);
         daoFactory.getUserDAO().save(player);
 
@@ -131,16 +131,16 @@ class OrganizeMatchTest {
 
         assertThrows(AuthorizationException.class, () -> {
             new OrganizeMatchController(player, appController);
-        }, "Un player non dovrebbe poter creare un OrganizeMatchController");
+        }, "A player should not be able to create an OrganizeMatchController");
     }
 
     @Test
     void testFieldManagerCanOnlyApproveOwnFields() throws Exception {
-        // Crea un secondo field manager
+        // Create a second field manager
         User otherFieldManager = new User(4, "altro.gestore", "password", "Paolo", "Neri", Role.FIELD_MANAGER);
         daoFactory.getUserDAO().save(otherFieldManager);
 
-        // Crea una partita per il campo del primo field manager
+        // Create a match for the first field manager's field
         Match match = new Match();
         match.setOrganizer(organizer);
         match.setField(testField);
@@ -150,11 +150,11 @@ class OrganizeMatchTest {
         match.setStatus(MatchStatus.PENDING);
         daoFactory.getMatchDAO().save(match);
 
-        // Il secondo field manager non dovrebbe poter approvare partite del primo
+        // The second field manager should not be able to approve the first's matches
         FieldManagerController otherController = new FieldManagerController(otherFieldManager, daoFactory);
 
         assertThrows(AuthorizationException.class, () -> {
             otherController.approveMatch(match.getId());
-        }, "Un field manager non dovrebbe poter approvare partite di campi non suoi");
+        }, "A field manager should not be able to approve matches for fields they don't manage");
     }
 }

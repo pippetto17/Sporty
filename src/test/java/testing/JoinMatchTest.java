@@ -15,8 +15,8 @@ import java.time.LocalTime;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Test per il caso d'uso "Partecipa a Partita"
- * Testa il flusso di unione di un player a una partita esistente
+ * Test for the "Join Match" use case
+ * Tests the flow of a player joining an existing match
  */
 class JoinMatchTest {
 
@@ -27,18 +27,18 @@ class JoinMatchTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        // Inizializza il DAO Factory in memoria
+        // Initialize the in-memory DAO Factory
         daoFactory = new MemoryDAOFactory();
 
-        // Crea un player di test
+        // Create a test player
         player = new User(1, "player1", "password", "Marco", "Bianchi", Role.PLAYER);
         daoFactory.getUserDAO().save(player);
 
-        // Crea un organizer di test
+        // Create a test organizer
         organizer = new User(2, "organizer1", "password", "Luigi", "Rossi", Role.ORGANIZER);
         daoFactory.getUserDAO().save(organizer);
 
-        // Crea un field manager e un campo
+        // Create a field manager and a field
         User fieldManager = new User(3, "manager1", "password", "Paolo", "Verdi", Role.FIELD_MANAGER);
         daoFactory.getUserDAO().save(fieldManager);
 
@@ -52,7 +52,7 @@ class JoinMatchTest {
         field.setManager(fieldManager);
         daoFactory.getFieldDAO().save(field);
 
-        // Crea una partita approvata
+        // Create an approved match
         approvedMatch = new Match();
         approvedMatch.setOrganizer(organizer);
         approvedMatch.setField(field);
@@ -65,42 +65,42 @@ class JoinMatchTest {
 
     @Test
     void testPlayerCanJoinApprovedMatch() throws Exception {
-        // Verifica lo stato iniziale
-        assertEquals(5, approvedMatch.getMissingPlayers(), "Dovrebbero mancare 5 giocatori");
-        assertFalse(approvedMatch.isUserJoined(player.getId()), "Il player non dovrebbe essere già unito");
+        // Verify initial state
+        assertEquals(5, approvedMatch.getMissingPlayers(), "5 players should be missing");
+        assertFalse(approvedMatch.isUserJoined(player.getId()), "The player should not already be joined");
 
-        // Il player si unisce alla partita
+        // The player joins the match
         approvedMatch.addJoinedPlayer(player.getId());
 
-        // Verifica che il player sia stato aggiunto
-        assertTrue(approvedMatch.isUserJoined(player.getId()), "Il player dovrebbe essere unito alla partita");
-        assertEquals(4, approvedMatch.getMissingPlayers(), "Dovrebbero mancare 4 giocatori");
-        assertEquals(1, approvedMatch.getJoinedPlayersCount(), "Dovrebbe esserci 1 giocatore unito");
+        // Verify that the player has been added
+        assertTrue(approvedMatch.isUserJoined(player.getId()), "The player should be joined to the match");
+        assertEquals(4, approvedMatch.getMissingPlayers(), "4 players should be missing");
+        assertEquals(1, approvedMatch.getJoinedPlayersCount(), "There should be 1 joined player");
 
-        // Salva le modifiche
+        // Save the changes
         daoFactory.getMatchDAO().save(approvedMatch);
 
-        // Verifica persistenza
+        // Verify persistence
         Match savedMatch = daoFactory.getMatchDAO().findById(approvedMatch.getId());
-        assertTrue(savedMatch.isUserJoined(player.getId()), "Il player dovrebbe essere salvato nella partita");
+        assertTrue(savedMatch.isUserJoined(player.getId()), "The player should be saved in the match");
     }
 
     @Test
     void testPlayerCannotJoinMatchTwice() throws Exception {
-        // Il player si unisce alla partita
+        // The player joins the match
         approvedMatch.addJoinedPlayer(player.getId());
 
-        // Tentativo di unirsi di nuovo
+        // Attempt to join again
         ValidationException exception = assertThrows(ValidationException.class, () -> {
             approvedMatch.addJoinedPlayer(player.getId());
-        }, "Non dovrebbe essere possibile unirsi due volte");
+        }, "It should not be possible to join twice");
 
         assertEquals("User has already joined this match", exception.getMessage());
     }
 
     @Test
     void testCannotJoinFullMatch() throws Exception {
-        // Crea una partita con 0 posti liberi
+        // Create a match with 0 free spots
         Match fullMatch = new Match();
         fullMatch.setOrganizer(organizer);
         fullMatch.setField(approvedMatch.getField());
@@ -110,38 +110,38 @@ class JoinMatchTest {
         fullMatch.setStatus(MatchStatus.APPROVED);
         daoFactory.getMatchDAO().save(fullMatch);
 
-        // Tentativo di unirsi a una partita già piena
+        // Attempt to join an already full match
         ValidationException exception = assertThrows(ValidationException.class, () -> {
             fullMatch.addJoinedPlayer(player.getId());
-        }, "Non dovrebbe essere possibile unirsi a una partita piena");
+        }, "It should not be possible to join a full match");
 
         assertEquals("Match is full, cannot join", exception.getMessage());
     }
 
     @Test
     void testMultiplePlayersCanJoinMatch() throws Exception {
-        // Crea altri due giocatori
+        // Create two more players
         User player2 = new User(4, "player2", "password", "Anna", "Neri", Role.PLAYER);
         User player3 = new User(5, "player3", "password", "Luca", "Gialli", Role.PLAYER);
         daoFactory.getUserDAO().save(player2);
         daoFactory.getUserDAO().save(player3);
 
-        // Tre giocatori si uniscono alla partita
+        // Three players join the match
         approvedMatch.addJoinedPlayer(player.getId());
         approvedMatch.addJoinedPlayer(player2.getId());
         approvedMatch.addJoinedPlayer(player3.getId());
 
-        // Verifica
-        assertEquals(3, approvedMatch.getJoinedPlayersCount(), "Dovrebbero esserci 3 giocatori uniti");
-        assertEquals(2, approvedMatch.getMissingPlayers(), "Dovrebbero mancare 2 giocatori");
-        assertTrue(approvedMatch.isUserJoined(player.getId()), "Player 1 dovrebbe essere unito");
-        assertTrue(approvedMatch.isUserJoined(player2.getId()), "Player 2 dovrebbe essere unito");
-        assertTrue(approvedMatch.isUserJoined(player3.getId()), "Player 3 dovrebbe essere unito");
+        // Verify
+        assertEquals(3, approvedMatch.getJoinedPlayersCount(), "There should be 3 joined players");
+        assertEquals(2, approvedMatch.getMissingPlayers(), "2 players should be missing");
+        assertTrue(approvedMatch.isUserJoined(player.getId()), "Player 1 should be joined");
+        assertTrue(approvedMatch.isUserJoined(player2.getId()), "Player 2 should be joined");
+        assertTrue(approvedMatch.isUserJoined(player3.getId()), "Player 3 should be joined");
     }
 
     @Test
     void testHomeControllerShowsOnlyApprovedMatches() throws Exception {
-        // Crea una partita PENDING che non dovrebbe essere visibile
+        // Create a PENDING match that should not be visible
         Match pendingMatch = new Match();
         pendingMatch.setOrganizer(organizer);
         pendingMatch.setField(approvedMatch.getField());
@@ -151,38 +151,38 @@ class JoinMatchTest {
         pendingMatch.setStatus(MatchStatus.PENDING);
         daoFactory.getMatchDAO().save(pendingMatch);
 
-        // Il player visualizza le partite disponibili
+        // The player views available matches
         ApplicationController appController = new ApplicationController(daoFactory);
         HomeController homeController = new HomeController(player, appController, daoFactory);
 
         var availableMatches = homeController.getMatches();
 
-        // Verifica che solo la partita approvata sia visibile
-        assertFalse(availableMatches.isEmpty(), "Dovrebbero esserci partite disponibili");
+        // Verify that only the approved match is visible
+        assertFalse(availableMatches.isEmpty(), "There should be available matches");
         assertTrue(availableMatches.stream()
                 .anyMatch(m -> m.getMatchId() == approvedMatch.getId()),
-                "La partita approvata dovrebbe essere visibile");
+                "The approved match should be visible");
         assertFalse(availableMatches.stream()
                 .anyMatch(m -> m.getMatchId() == pendingMatch.getId()),
-                "La partita pendente NON dovrebbe essere visibile");
+                "The pending match should NOT be visible");
     }
 
     @Test
     void testPlayerCanSeeJoinedMatches() throws Exception {
-        // Il player si unisce alla partita
+        // The player joins the match
         approvedMatch.addJoinedPlayer(player.getId());
         daoFactory.getMatchDAO().save(approvedMatch);
 
-        // Il player visualizza le sue partite
+        // The player views their matches
         ApplicationController appController = new ApplicationController(daoFactory);
         HomeController homeController = new HomeController(player, appController, daoFactory);
 
         var joinedMatches = homeController.getJoinedMatches();
 
-        // Verifica
-        assertFalse(joinedMatches.isEmpty(), "Dovrebbe esserci almeno una partita a cui si è unito");
+        // Verify
+        assertFalse(joinedMatches.isEmpty(), "There should be at least one joined match");
         assertTrue(joinedMatches.stream()
                 .anyMatch(m -> m.getMatchId() == approvedMatch.getId()),
-                "La partita a cui si è unito dovrebbe essere nella lista");
+                "The joined match should be in the list");
     }
 }

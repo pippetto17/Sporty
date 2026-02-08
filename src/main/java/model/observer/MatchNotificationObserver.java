@@ -17,7 +17,7 @@ public class MatchNotificationObserver implements Observer {
     public void update() {
         // PULL: Get data from the observed Match (Subject)
         if (match.getField() == null || match.getField().getManager() == null) {
-            return; // Cannot notify if no field manager
+            return;
         }
 
         String fieldManagerUsername = match.getField().getManager().getUsername();

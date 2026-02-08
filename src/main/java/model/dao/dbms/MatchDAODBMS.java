@@ -127,17 +127,19 @@ public class MatchDAODBMS implements MatchDAO {
     @Override
     public List<Match> findByJoinedPlayer(int userId) {
         List<Match> matches = new ArrayList<>();
-        // Use LIKE for broader MySQL compatibility (works even without JSON functions)
+
         String query = "SELECT id, organizer_id, field_id, date, time, missing_players, status, joined_players " +
                 "FROM matches WHERE joined_players LIKE ?";
+
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            // Search for the user ID as a number in the JSON array
             String searchPattern = "%" + userId + "%";
             stmt.setString(1, searchPattern);
+
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
+
                     Match match = mapRowToMatch(rs);
-                    // Double-check that the user is actually in the list (not a substring match)
+
                     if (match.getJoinedPlayers().contains(userId)) {
                         matches.add(match);
                     }

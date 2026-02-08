@@ -118,7 +118,7 @@ public class FieldDAODBMS implements FieldDAO {
             stmt.setString(3, field.getAddress());
             stmt.setDouble(4, field.getPricePerHour());
             stmt.setInt(5, field.getSport().getCode());
-            // Extract ID from manager entity
+
             stmt.setInt(6, field.getManager() != null ? field.getManager().getId() : 0);
             int affectedRows = stmt.executeUpdate();
             if (affectedRows > 0) {
@@ -157,6 +157,6 @@ public class FieldDAODBMS implements FieldDAO {
                 rs.getString("address"),
                 rs.getDouble("price_per_hour"),
                 Sport.fromCode(rs.getInt("sport")),
-                manager); // Full entity instead of ID
+                manager);
     }
 }

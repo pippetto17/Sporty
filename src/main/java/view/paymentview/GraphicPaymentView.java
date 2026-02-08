@@ -105,8 +105,6 @@ public class GraphicPaymentView implements PaymentView {
                 cityLabel.setText(match.getCity() + " - " + match.getFieldAddress());
             if (dateLabel != null)
                 dateLabel.setText(String.format("%s @ %s", match.getMatchDate(), match.getMatchTime()));
-
-            // Legacy label optional update or removal
             if (matchInfoLabel != null)
                 matchInfoLabel.setVisible(false);
 
@@ -133,7 +131,6 @@ public class GraphicPaymentView implements PaymentView {
         if (totalLabel != null) {
             totalLabel.setText(String.format(CURRENCY_FORMAT, totalAmount));
         }
-        // Fallback or debug
         if (amountLabel != null) {
             amountLabel.setText(String.format("Cost per person: €%.2f | Total (%d shares): €%.2f",
                     costPerPerson, shares, totalAmount));

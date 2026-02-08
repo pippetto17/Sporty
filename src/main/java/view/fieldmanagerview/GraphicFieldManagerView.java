@@ -158,9 +158,8 @@ public class GraphicFieldManagerView implements FieldManagerView {
         loadData();
         Platform.runLater(this::showUnreadNotificationsOnce);
 
-        // Auto-open requests if pending
         if (!controller.getPendingRequests().isEmpty()) {
-            Platform.runLater(() -> showNotificationsDialog(0)); // 0 is the Requests tab index
+            Platform.runLater(() -> showNotificationsDialog(0));
         }
     }
 

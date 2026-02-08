@@ -13,8 +13,8 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Test per il sistema di autenticazione
- * Testa registrazione, login e autenticazione degli utenti
+ * Test for the authentication system
+ * Tests registration, login and user authentication
  */
 class AuthenticationTest {
 
@@ -23,35 +23,35 @@ class AuthenticationTest {
 
     @BeforeEach
     void setUp() {
-        // Inizializza il DAO Factory in memoria
+        // Initialize the in-memory DAO Factory
         daoFactory = new MemoryDAOFactory();
         loginController = new LoginController(daoFactory);
     }
 
     @Test
     void testUserRegistrationSuccess() {
-        // Crea un bean per la registrazione
+        // Create a bean for registration
         UserBean userBean = new UserBean();
         userBean.setUsername("nuovoutente");
         userBean.setPassword("password123");
 
-        // Registra l'utente come player
+        // Register the user as player
         assertDoesNotThrow(() -> {
             loginController.register(userBean, "Mario", "Rossi", Role.PLAYER.getCode());
-        }, "La registrazione dovrebbe avvenire senza errori");
+        }, "Registration should happen without errors");
 
-        // Verifica che l'utente sia stato salvato
+        // Verify that the user has been saved
         User savedUser = daoFactory.getUserDAO().findByUsername("nuovoutente");
-        assertNotNull(savedUser, "L'utente dovrebbe essere salvato nel database");
-        assertEquals("nuovoutente", savedUser.getUsername(), "Lo username dovrebbe corrispondere");
-        assertEquals("Mario", savedUser.getName(), "Il nome dovrebbe corrispondere");
-        assertEquals("Rossi", savedUser.getSurname(), "Il cognome dovrebbe corrispondere");
-        assertEquals(Role.PLAYER, savedUser.getRole(), "Il ruolo dovrebbe essere PLAYER");
+        assertNotNull(savedUser, "The user should be saved in the database");
+        assertEquals("nuovoutente", savedUser.getUsername(), "The username should match");
+        assertEquals("Mario", savedUser.getName(), "The name should match");
+        assertEquals("Rossi", savedUser.getSurname(), "The surname should match");
+        assertEquals(Role.PLAYER, savedUser.getRole(), "The role should be PLAYER");
     }
 
     @Test
     void testRegistrationWithDifferentRoles() {
-        // Registra un player
+        // Register a player
         UserBean player = new UserBean();
         player.setUsername("test_player_unique");
         player.setPassword("pass123");
@@ -59,7 +59,7 @@ class AuthenticationTest {
             loginController.register(player, "Anna", "Bianchi", Role.PLAYER.getCode());
         });
 
-        // Registra un organizer
+        // Register an organizer
         UserBean organizer = new UserBean();
         organizer.setUsername("test_organizer_unique");
         organizer.setPassword("pass456");
@@ -67,7 +67,7 @@ class AuthenticationTest {
             loginController.register(organizer, "Luigi", "Verdi", Role.ORGANIZER.getCode());
         });
 
-        // Registra un field manager
+        // Register a field manager
         UserBean manager = new UserBean();
         manager.setUsername("test_manager_unique");
         manager.setPassword("pass789");
@@ -75,7 +75,7 @@ class AuthenticationTest {
             loginController.register(manager, "Paolo", "Neri", Role.FIELD_MANAGER.getCode());
         });
 
-        // Verifica i ruoli
+        // Verify the roles
         assertEquals(Role.PLAYER, daoFactory.getUserDAO().findByUsername("test_player_unique").getRole());
         assertEquals(Role.ORGANIZER, daoFactory.getUserDAO().findByUsername("test_organizer_unique").getRole());
         assertEquals(Role.FIELD_MANAGER, daoFactory.getUserDAO().findByUsername("test_manager_unique").getRole());
@@ -83,7 +83,7 @@ class AuthenticationTest {
 
     @Test
     void testCannotRegisterDuplicateUsername() {
-        // Registra il primo utente
+        // Register the first user
         UserBean firstUser = new UserBean();
         firstUser.setUsername("samename");
         firstUser.setPassword("password1");
@@ -91,144 +91,144 @@ class AuthenticationTest {
             loginController.register(firstUser, "Primo", "Utente", Role.PLAYER.getCode());
         });
 
-        // Tentativo di registrare con lo stesso username
+        // Attempt to register with the same username
         UserBean duplicateUser = new UserBean();
         duplicateUser.setUsername("samename");
         duplicateUser.setPassword("password2");
 
         ValidationException exception = assertThrows(ValidationException.class, () -> {
             loginController.register(duplicateUser, "Secondo", "Utente", Role.PLAYER.getCode());
-        }, "Non dovrebbe essere possibile registrare username duplicati");
+        }, "It should not be possible to register duplicate usernames");
 
         assertTrue(exception.getMessage().contains("exists") || exception.getMessage().contains("esiste"),
-                "Il messaggio di errore dovrebbe indicare username già esistente");
+                "The error message should indicate username already exists");
     }
 
     @Test
     void testRegistrationValidatesEmptyFields() {
         UserBean userBean = new UserBean();
 
-        // Username vuoto
+        // Empty username
         userBean.setUsername("");
         userBean.setPassword("password");
         assertThrows(ValidationException.class, () -> {
             loginController.register(userBean, "Nome", "Cognome", Role.PLAYER.getCode());
-        }, "Username vuoto dovrebbe generare errore");
+        }, "Empty username should generate error");
 
-        // Password vuota
+        // Empty password
         userBean.setUsername("username");
         userBean.setPassword("");
         assertThrows(ValidationException.class, () -> {
             loginController.register(userBean, "Nome", "Cognome", Role.PLAYER.getCode());
-        }, "Password vuota dovrebbe generare errore");
+        }, "Empty password should generate error");
 
-        // Nome vuoto
+        // Empty name
         userBean.setPassword("password");
         assertThrows(ValidationException.class, () -> {
             loginController.register(userBean, "", "Cognome", Role.PLAYER.getCode());
-        }, "Nome vuoto dovrebbe generare errore");
+        }, "Empty name should generate error");
 
-        // Cognome vuoto
+        // Empty surname
         assertThrows(ValidationException.class, () -> {
             loginController.register(userBean, "Nome", "", Role.PLAYER.getCode());
-        }, "Cognome vuoto dovrebbe generare errore");
+        }, "Empty surname should generate error");
     }
 
     @Test
     void testLoginSuccess() throws Exception {
-        // Prima registra un utente
+        // First register a user
         User user = new User(1, "testuser", "testpass", "Test", "User", Role.PLAYER);
         daoFactory.getUserDAO().save(user);
 
-        // Esegue il login
+        // Perform login
         UserBean loginBean = new UserBean();
         loginBean.setUsername("testuser");
         loginBean.setPassword("testpass");
 
         UserBean result = loginController.login(loginBean);
 
-        // Verifica il risultato
-        assertNotNull(result, "Il login dovrebbe restituire un UserBean");
-        assertEquals("testuser", result.getUsername(), "Lo username dovrebbe corrispondere");
-        assertEquals("Test", result.getName(), "Il nome dovrebbe corrispondere");
-        assertEquals("User", result.getSurname(), "Il cognome dovrebbe corrispondere");
-        assertEquals(Role.PLAYER.getCode(), result.getRole(), "Il ruolo dovrebbe corrispondere");
+        // Verify the result
+        assertNotNull(result, "Login should return a UserBean");
+        assertEquals("testuser", result.getUsername(), "The username should match");
+        assertEquals("Test", result.getName(), "The name should match");
+        assertEquals("User", result.getSurname(), "The surname should match");
+        assertEquals(Role.PLAYER.getCode(), result.getRole(), "The role should match");
     }
 
     @Test
     void testLoginWithWrongPassword() throws Exception {
-        // Registra un utente
+        // Register a user
         User user = new User(1, "user1", "correctpass", "Nome", "Cognome", Role.PLAYER);
         daoFactory.getUserDAO().save(user);
 
-        // Tentativo di login con password sbagliata
+        // Attempt login with wrong password
         UserBean loginBean = new UserBean();
         loginBean.setUsername("user1");
         loginBean.setPassword("wrongpass");
 
         UserBean result = loginController.login(loginBean);
 
-        // Il login dovrebbe fallire
-        assertNull(result, "Il login con password errata dovrebbe restituire null");
+        // Login should fail
+        assertNull(result, "Login with wrong password should return null");
     }
 
     @Test
     void testLoginWithNonexistentUser() throws Exception {
-        // Tentativo di login con utente inesistente
+        // Attempt login with nonexistent user
         UserBean loginBean = new UserBean();
         loginBean.setUsername("nonexistent");
         loginBean.setPassword("password");
 
         UserBean result = loginController.login(loginBean);
 
-        // Il login dovrebbe fallire
-        assertNull(result, "Il login con utente inesistente dovrebbe restituire null");
+        // Login should fail
+        assertNull(result, "Login with nonexistent user should return null");
     }
 
     @Test
     void testLoginValidatesEmptyCredentials() {
         UserBean loginBean = new UserBean();
 
-        // Username vuoto
+        // Empty username
         loginBean.setUsername("");
         loginBean.setPassword("password");
         assertThrows(ValidationException.class, () -> {
             loginController.login(loginBean);
-        }, "Username vuoto dovrebbe generare errore");
+        }, "Empty username should generate error");
 
-        // Password vuota
+        // Empty password
         loginBean.setUsername("username");
         loginBean.setPassword("");
         assertThrows(ValidationException.class, () -> {
             loginController.login(loginBean);
-        }, "Password vuota dovrebbe generare errore");
+        }, "Empty password should generate error");
     }
 
     @Test
     void testCompleteRegistrationAndLoginFlow() throws Exception {
-        // Step 1: Registrazione
+        // Step 1: Registration
         UserBean registerBean = new UserBean();
         registerBean.setUsername("newplayer");
         registerBean.setPassword("securepass");
 
         assertDoesNotThrow(() -> {
             loginController.register(registerBean, "Giovanni", "Bianchi", Role.ORGANIZER.getCode());
-        }, "La registrazione dovrebbe completarsi con successo");
+        }, "Registration should complete successfully");
 
-        // Step 2: Login con le stesse credenziali
+        // Step 2: Login with the same credentials
         UserBean loginBean = new UserBean();
         loginBean.setUsername("newplayer");
         loginBean.setPassword("securepass");
 
         UserBean loggedInUser = loginController.login(loginBean);
 
-        // Verifica
-        assertNotNull(loggedInUser, "Il login dopo registrazione dovrebbe funzionare");
-        assertEquals("newplayer", loggedInUser.getUsername(), "Username corretto");
-        assertEquals("Giovanni", loggedInUser.getName(), "Nome corretto");
-        assertEquals("Bianchi", loggedInUser.getSurname(), "Cognome corretto");
-        assertEquals(Role.ORGANIZER.getCode(), loggedInUser.getRole(), "Il ruolo dovrebbe essere ORGANIZER");
+        // Verify
+        assertNotNull(loggedInUser, "Login after registration should work");
+        assertEquals("newplayer", loggedInUser.getUsername(), "Correct username");
+        assertEquals("Giovanni", loggedInUser.getName(), "Correct name");
+        assertEquals("Bianchi", loggedInUser.getSurname(), "Correct surname");
+        assertEquals(Role.ORGANIZER.getCode(), loggedInUser.getRole(), "The role should be ORGANIZER");
         assertTrue(new User(0, "", "", "", "", Role.fromCode(loggedInUser.getRole())).isOrganizer(),
-                "L'utente con ruolo ORGANIZER dovrebbe avere isOrganizer() = true");
+                "User with ORGANIZER role should have isOrganizer() = true");
     }
 }

@@ -21,7 +21,7 @@ public class CLIFieldManagerView implements FieldManagerView {
 
     @Override
     public void setApplicationController(ApplicationController appController) {
-        // No longer needed - notifications are handled via controller
+        // Intentionally empty
     }
 
     @Override

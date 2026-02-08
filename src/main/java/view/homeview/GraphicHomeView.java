@@ -225,7 +225,6 @@ public class GraphicHomeView implements HomeView {
         }
         imageHeader.getChildren().add(sportIcon);
 
-        // Add status badge for organizer view
         if (!homeController.isViewingAsPlayer() && match.getStatus() != null) {
             Region statusBadge = new Region();
             statusBadge.getStyleClass().add("status-badge");
@@ -498,7 +497,6 @@ public class GraphicHomeView implements HomeView {
 
         joinedMatchesSection.getChildren().addAll(headerBox, joinedMatchesContainer);
 
-        // Add to main content box (inject after available matches section)
         if (mainContentBox != null) {
             mainContentBox.getChildren().add(0, joinedMatchesSection);
         }

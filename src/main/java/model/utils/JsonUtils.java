@@ -25,7 +25,6 @@ public class JsonUtils {
             return new ArrayList<>();
         }
 
-        // Remove brackets and whitespace
         String content = json.replaceAll("[\\[\\]]", "").trim();
 
         if (content.isEmpty()) {
