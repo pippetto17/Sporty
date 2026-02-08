@@ -27,6 +27,6 @@ public class FileSystemDAOFactory implements DAOFactory {
 
     @Override
     public NotificationDAO getNotificationDAO() {
-        return new NotificationDAOMemory();
+        return dbmsDelegate.getNotificationDAO();
     }
 }

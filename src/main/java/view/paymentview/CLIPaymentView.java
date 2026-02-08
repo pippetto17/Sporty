@@ -20,7 +20,7 @@ public class CLIPaymentView implements PaymentView {
     }
 
     @Override
-    public void showError(String message) {
+    public void displayError(String message) {
         System.out.println("[ERRORE] " + message);
     }
 
@@ -52,7 +52,7 @@ public class CLIPaymentView implements PaymentView {
     }
 
     @Override
-    public void showSuccess(String message) {
+    public void displaySuccess(String message) {
         System.out.println("✓ " + message);
     }
 

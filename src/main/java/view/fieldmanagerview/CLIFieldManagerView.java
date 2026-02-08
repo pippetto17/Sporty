@@ -50,6 +50,46 @@ public class CLIFieldManagerView implements FieldManagerView {
         // Intentionally empty
     }
 
+    @Override
+    public void displayDashboard() {
+        printHeader();
+        printStats();
+    }
+
+    @Override
+    public void displayPendingRequests(List<MatchBean> requests) {
+        if (requests.isEmpty()) {
+            System.out.println("\n✓ No pending requests.");
+            return;
+        }
+        System.out.println("\n--- PENDING REQUESTS ---");
+        System.out.printf("%-8s %-15s %-15s %-15s %-12s %-12s%n", "ID", "FIELD", "ORGANIZER", "SPORT", "DATE", "TIME");
+        for (MatchBean m : requests) {
+            System.out.printf("[%-6d] %-15s %-15s %-15s %-12s %s%n",
+                    m.getMatchId(),
+                    truncate(m.getFieldName(), 15),
+                    truncate(m.getOrganizerName(), 15),
+                    truncate(m.getSport().name(), 15),
+                    m.getMatchDate(),
+                    m.getMatchTime());
+        }
+    }
+
+    @Override
+    public void displayNotifications() {
+        showNotifications();
+    }
+
+    @Override
+    public void displayError(String message) {
+        System.out.println("⚠ " + message);
+    }
+
+    @Override
+    public void displaySuccess(String message) {
+        System.out.println("✓ " + message);
+    }
+
     private void printHeader() {
         System.out.println("\n========================================");
         System.out.println("  FIELD MANAGER: " + controller.getFieldManager().getName() + " "
@@ -79,25 +119,9 @@ public class CLIFieldManagerView implements FieldManagerView {
 
     private void listPendingRequests() {
         try {
-            List<MatchBean> pending = controller.getPendingRequests();
-            if (pending.isEmpty()) {
-                System.out.println("\n✓ No pending requests.");
-                return;
-            }
-            System.out.println("\n--- PENDING REQUESTS ---");
-            System.out.printf("%-8s %-15s %-15s %-15s %-12s %-12s%n", "ID", "FIELD", "ORGANIZER", "SPORT", "DATE",
-                    "TIME");
-            for (MatchBean m : pending) {
-                System.out.printf("[%-6d] %-15s %-15s %-15s %-12s %s%n",
-                        m.getMatchId(),
-                        truncate(m.getFieldName(), 15),
-                        truncate(m.getOrganizerName(), 15),
-                        truncate(m.getSport().name(), 15),
-                        m.getMatchDate(),
-                        m.getMatchTime());
-            }
+            displayPendingRequests(controller.getPendingRequests());
         } catch (Exception e) {
-            System.out.println("Error fetching list: " + e.getMessage());
+            displayError("Error fetching list: " + e.getMessage());
         }
     }
 

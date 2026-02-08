@@ -178,10 +178,10 @@ public class MatchDAODBMS implements MatchDAO {
     }
 
     @Override
-    public int deleteExpiredMatches() {
+    public void deleteExpiredMatches() {
         String query = "DELETE FROM matches WHERE date < CURDATE()";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            return stmt.executeUpdate();
+            stmt.executeUpdate();
         } catch (SQLException e) {
             throw new DataAccessException("Error deleting expired matches", e);
         }

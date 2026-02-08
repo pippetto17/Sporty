@@ -138,13 +138,12 @@ public class MatchDAOFileSystem implements MatchDAO {
     }
 
     @Override
-    public int deleteExpiredMatches() {
+    public void deleteExpiredMatches() {
         List<Match> matches = loadMatches();
         LocalDate today = LocalDate.now();
         int initialSize = matches.size();
         matches.removeIf(m -> m.getDate() != null && m.getDate().isBefore(today));
         saveMatches(matches);
-        return initialSize - matches.size();
     }
 
     @Override

@@ -238,6 +238,16 @@ public class GraphicLoginView extends Application implements LoginView {
         messageLabel.setText(message);
     }
 
+    @Override
+    public void displayError(String message) {
+        displayLoginError(message);
+    }
+
+    @Override
+    public void displaySuccess(String message) {
+        displayLoginSuccess(message);
+    }
+
     private void showError(String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Error");

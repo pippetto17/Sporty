@@ -1,6 +1,5 @@
 package view.homeview;
 
-import controller.ApplicationController;
 import model.bean.MatchBean;
 import view.View;
 
@@ -13,13 +12,7 @@ public interface HomeView extends View {
 
     void displayMenu();
 
-    void setApplicationController(ApplicationController applicationController);
-
     void refreshMatches();
 
     void showMatchDetails(int matchId);
-
-    void displayError(String message);
-
-    void displaySuccess(String message);
 }

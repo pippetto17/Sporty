@@ -101,7 +101,7 @@ public class PaymentController {
 
     public void processPaymentFromView(PaymentBean paymentData) {
         if (paymentData == null) {
-            view.showError(Constants.ERROR_PAYMENT_INVALID);
+            view.displayError(Constants.ERROR_PAYMENT_INVALID);
             return;
         }
         double pricePerHour = getPricePerHour();
@@ -114,10 +114,10 @@ public class PaymentController {
             if (success) {
                 handlePaymentSuccess();
             } else {
-                view.showError(Constants.ERROR_PAYMENT_REJECTED);
+                view.displayError(Constants.ERROR_PAYMENT_REJECTED);
             }
         } catch (ValidationException e) {
-            view.showError(e.getMessage());
+            view.displayError(e.getMessage());
         }
     }
 
@@ -142,7 +142,7 @@ public class PaymentController {
     }
 
     private void handlePaymentSuccess() {
-        view.showSuccess(Constants.SUCCESS_PAYMENT);
+        view.displaySuccess(Constants.SUCCESS_PAYMENT);
         if (view instanceof GraphicPaymentView) {
             handleGraphicViewSuccess();
         } else {

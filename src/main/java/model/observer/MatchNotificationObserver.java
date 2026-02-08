@@ -4,11 +4,6 @@ import model.dao.NotificationDAO;
 import model.domain.Match;
 import model.domain.Notification;
 
-/**
- * Concrete Observer for Match notifications (GoF Observer - Pull Model).
- * When notified, pulls data from the Match (Subject) and persists a
- * Notification via DAO.
- */
 public class MatchNotificationObserver implements Observer {
     private final Match match;
     private final NotificationDAO notificationDAO;

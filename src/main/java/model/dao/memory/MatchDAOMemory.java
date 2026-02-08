@@ -78,14 +78,13 @@ public class MatchDAOMemory implements MatchDAO {
     }
 
     @Override
-    public int deleteExpiredMatches() {
+    public void deleteExpiredMatches() {
         LocalDate today = LocalDate.now();
         List<Integer> toDelete = matches.values().stream()
                 .filter(match -> match.getDate().isBefore(today))
                 .map(Match::getId)
                 .toList();
         toDelete.forEach(matches::remove);
-        return toDelete.size();
     }
 
     @Override

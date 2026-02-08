@@ -24,5 +24,5 @@ public interface MatchDAO {
 
     void delete(int id);
 
-    int deleteExpiredMatches();
+    void deleteExpiredMatches();
 }

@@ -1,8 +1,15 @@
 package view.fieldmanagerview;
 
-import controller.ApplicationController;
+import model.bean.MatchBean;
+
+import java.util.List;
+
 import view.View;
 
 public interface FieldManagerView extends View {
-    void setApplicationController(ApplicationController applicationController);
+    void displayDashboard();
+
+    void displayPendingRequests(List<MatchBean> requests);
+
+    void displayNotifications();
 }

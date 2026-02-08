@@ -103,6 +103,43 @@ public class GraphicFieldManagerView implements FieldManagerView {
             stage.close();
     }
 
+    @Override
+    public void displayDashboard() {
+        try {
+            var stats = controller.getDashboardData();
+            totalFieldsLabel.setText(String.valueOf(stats.totalFields()));
+            pendingRequestsLabel.setText(String.valueOf(stats.pendingRequests()));
+            todayBookingsLabel.setText(String.valueOf(stats.todayBookings()));
+            bookingsList.setAll(controller.getPendingRequests());
+        } catch (Exception e) {
+            displayError(e.getMessage());
+        }
+    }
+
+    @Override
+    public void displayPendingRequests(List<MatchBean> requests) {
+        bookingsList.setAll(requests);
+    }
+
+    @Override
+    public void displayNotifications() {
+        handleShowNotifications(1); // 1 = Alerts tab
+    }
+
+    @Override
+    public void displayError(String message) {
+        messageLabel.getStyleClass().removeAll(Constants.CSS_ERROR, Constants.CSS_SUCCESS, Constants.CSS_INFO);
+        messageLabel.getStyleClass().add(Constants.CSS_ERROR);
+        messageLabel.setText(message);
+    }
+
+    @Override
+    public void displaySuccess(String message) {
+        messageLabel.getStyleClass().removeAll(Constants.CSS_ERROR, Constants.CSS_SUCCESS, Constants.CSS_INFO);
+        messageLabel.getStyleClass().add(Constants.CSS_SUCCESS);
+        messageLabel.setText(message);
+    }
+
     @FXML
     private void initialize() {
         managerNameLabel.setText(
@@ -127,9 +164,6 @@ public class GraphicFieldManagerView implements FieldManagerView {
         }
     }
 
-    /**
-     * Shows unread notifications as popup only on first access.
-     */
     private void showUnreadNotificationsOnce() {
         if (notificationsShown) {
             return;
@@ -171,9 +205,6 @@ public class GraphicFieldManagerView implements FieldManagerView {
     }
 
     @FXML
-    private void handleShowNotifications() {
-        handleShowNotifications(0);
-    }
 
     private void handleShowNotifications(int initialTab) {
         Dialog<Void> dialog = new Dialog<>();
@@ -264,9 +295,9 @@ public class GraphicFieldManagerView implements FieldManagerView {
             controller.approveMatch(m.getMatchId());
             requestsBox.getChildren().remove(row);
             loadData();
-            showMessage("Request approved!", false);
+            displaySuccess("Request approved!");
         } catch (Exception ex) {
-            showMessage("Error approving: " + ex.getMessage(), true);
+            displayError("Error approving: " + ex.getMessage());
         }
     }
 
@@ -275,9 +306,9 @@ public class GraphicFieldManagerView implements FieldManagerView {
             controller.rejectMatch(m.getMatchId());
             requestsBox.getChildren().remove(row);
             loadData();
-            showMessage("Request rejected", false);
+            displaySuccess("Request rejected");
         } catch (Exception ex) {
-            showMessage("Error rejecting: " + ex.getMessage(), true);
+            displayError("Error rejecting: " + ex.getMessage());
         }
     }
 
@@ -301,15 +332,7 @@ public class GraphicFieldManagerView implements FieldManagerView {
     }
 
     private void loadData() {
-        try {
-            var stats = controller.getDashboardData();
-            totalFieldsLabel.setText(String.valueOf(stats.totalFields()));
-            pendingRequestsLabel.setText(String.valueOf(stats.pendingRequests()));
-            todayBookingsLabel.setText(String.valueOf(stats.todayBookings()));
-            bookingsList.setAll(controller.getPendingRequests());
-        } catch (Exception e) {
-            showMessage(e.getMessage(), true);
-        }
+        displayDashboard();
     }
 
     @FXML
@@ -319,10 +342,10 @@ public class GraphicFieldManagerView implements FieldManagerView {
             return;
         try {
             controller.approveMatch(selected.getMatchId());
-            showMessage("Match approved!", false);
+            displaySuccess("Match approved!");
             loadData();
         } catch (Exception e) {
-            showMessage("Approval failed: " + e.getMessage(), true);
+            displayError("Approval failed: " + e.getMessage());
         }
     }
 
@@ -333,27 +356,27 @@ public class GraphicFieldManagerView implements FieldManagerView {
             return;
         try {
             controller.rejectMatch(selected.getMatchId());
-            showMessage("Match rejected", false);
+            displaySuccess("Match rejected");
             loadData();
         } catch (Exception e) {
-            showMessage("Rejection failed: " + e.getMessage(), true);
+            displayError("Rejection failed: " + e.getMessage());
         }
     }
 
     @FXML
     private void handleRefresh() {
         loadData();
-        showMessage("Dashboard refreshed", false);
+        displaySuccess("Dashboard refreshed");
     }
 
     @FXML
     private void handleManageFields() {
-        showMessage("Feature disabled", true);
+        displayError("Feature disabled");
     }
 
     @FXML
     private void handleAddField() {
-        showMessage("Feature disabled", true);
+        displayError("Feature disabled");
     }
 
     @FXML
@@ -378,11 +401,5 @@ public class GraphicFieldManagerView implements FieldManagerView {
         alert.setContentText(content);
         ViewUtils.applyStylesheets(alert.getDialogPane());
         return alert;
-    }
-
-    private void showMessage(String msg, boolean isError) {
-        messageLabel.getStyleClass().removeAll(Constants.CSS_ERROR, Constants.CSS_SUCCESS, Constants.CSS_INFO);
-        messageLabel.getStyleClass().add(isError ? Constants.CSS_ERROR : Constants.CSS_SUCCESS);
-        messageLabel.setText(msg);
     }
 }

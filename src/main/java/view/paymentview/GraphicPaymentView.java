@@ -189,7 +189,7 @@ public class GraphicPaymentView implements PaymentView {
     }
 
     @Override
-    public void showSuccess(String message) {
+    public void displaySuccess(String message) {
         Platform.runLater(() -> {
             errorLabel.setStyle("-fx-text-fill: green;");
             errorLabel.setText(message);
@@ -219,7 +219,7 @@ public class GraphicPaymentView implements PaymentView {
         errorLabel.setStyle("");
         PaymentBean data = collectPaymentData(maxAvailableShares);
         if (data == null) {
-            showError("Please fill all payment fields.");
+            displayError("Please fill all payment fields.");
             return;
         }
         if (controller != null) {
@@ -241,7 +241,7 @@ public class GraphicPaymentView implements PaymentView {
     }
 
     @Override
-    public void showError(String message) {
+    public void displayError(String message) {
         Platform.runLater(() -> {
             errorLabel.setStyle("-fx-text-fill: red;");
             errorLabel.setText(message);

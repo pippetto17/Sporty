@@ -138,4 +138,14 @@ public class CLILoginView implements LoginView {
     public void displayLoginError(String message) {
         System.out.println("\n✗ Error: " + message);
     }
+
+    @Override
+    public void displayError(String message) {
+        displayLoginError(message);
+    }
+
+    @Override
+    public void displaySuccess(String message) {
+        displayLoginSuccess(message);
+    }
 }
