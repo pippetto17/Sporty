@@ -374,13 +374,11 @@ public class GraphicFieldManagerView implements FieldManagerView {
 
     @FXML
     private void handleManageFields() {
-        // TODO: Implement field management feature in future release
         displayError("Feature disabled");
     }
 
     @FXML
     private void handleAddField() {
-        // TODO: Implement add field feature in future release
         displayError("Feature disabled");
     }
 
