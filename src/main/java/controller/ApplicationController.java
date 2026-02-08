@@ -14,6 +14,11 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.logging.Logger;
 
+/**
+ * Main application controller managing navigation between views.
+ * Implements a stack-based navigation pattern for view management.
+ * Coordinates between controllers, views, and DAOs using the Factory pattern.
+ */
 public class ApplicationController {
     private static final Logger logger = Logger.getLogger(ApplicationController.class.getName());
     private final Deque<View> viewStack = new ArrayDeque<>();
@@ -27,6 +32,9 @@ public class ApplicationController {
         this.daoFactory = daoFactory;
     }
 
+    /**
+     * Starts the application by initializing configuration and navigating to login.
+     */
     public void start() {
         ApplicationConfiguration config = ApplicationConfiguration.create();
         this.daoFactory = config.getDaoFactory();
@@ -41,6 +49,13 @@ public class ApplicationController {
         pushView(view);
     }
 
+    /**
+     * Navigates to the home view for the authenticated user.
+     * Routes to field manager dashboard or player home based on role.
+     *
+     * @param userBean the authenticated user bean
+     * @throws ValidationException if user data is invalid
+     */
     public void navigateToHome(UserBean userBean) throws ValidationException {
         User user = new User(
                 userBean.getId(),

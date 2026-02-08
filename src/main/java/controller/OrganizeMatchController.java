@@ -15,6 +15,11 @@ import java.util.stream.Collectors;
 
 import static model.utils.MapsAPI.ITALIAN_CITIES;
 
+/**
+ * Controller for organizing new matches.
+ * Handles the workflow of creating a match, including field selection,
+ * date/time scheduling, and payment processing.
+ */
 public class OrganizeMatchController {
     private final User organizer;
     private final ApplicationController applicationController;
@@ -23,6 +28,13 @@ public class OrganizeMatchController {
     private MatchBean currentMatchBean;
     private String preferredCity;
 
+    /**
+     * Constructs a new OrganizeMatchController for the given organizer.
+     *
+     * @param organizer             the user organizing the match
+     * @param applicationController the main application controller
+     * @throws AuthorizationException if the user is not an organizer
+     */
     public OrganizeMatchController(User organizer, ApplicationController applicationController)
             throws AuthorizationException {
         if (!organizer.isOrganizer()) {
@@ -37,6 +49,10 @@ public class OrganizeMatchController {
         this.currentMatchBean.setOrganizerName(organizer.getName() + " " + organizer.getSurname());
     }
 
+    /**
+     * Initializes the match organization workflow.
+     * Determines the organizer's preferred city based on previous matches.
+     */
     public void initializeOrganizeMatch() {
         try {
             List<MatchBean> previousMatches = matchDAO.findByOrganizer(organizer.getId())

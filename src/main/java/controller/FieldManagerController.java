@@ -20,6 +20,10 @@ import model.utils.Constants;
 
 import java.util.List;
 
+/**
+ * Controller for field manager operations.
+ * Manages field listings, match approvals/rejections, and notifications.
+ */
 public class FieldManagerController {
     private static final String ERROR_NOT_OWNER = Constants.ERROR_NOT_FIELD_OWNER;
     private final User fieldManager;
@@ -28,6 +32,13 @@ public class FieldManagerController {
     private final NotificationDAO notificationDAO;
     private final UserDAO userDAO;
 
+    /**
+     * Constructs a new FieldManagerController for the specified field manager.
+     *
+     * @param fieldManager the field manager user
+     * @param daoFactory   the factory to create DAO instances
+     * @throws ValidationException if the user is not a field manager
+     */
     public FieldManagerController(User fieldManager, DAOFactory daoFactory)
             throws ValidationException {
         if (!fieldManager.isFieldManager()) {
@@ -41,6 +52,11 @@ public class FieldManagerController {
         this.matchDAO.deleteExpiredMatches();
     }
 
+    /**
+     * Retrieves all unread notifications for the field manager.
+     *
+     * @return list of unread notification beans
+     */
     public List<NotificationBean> getUnreadNotifications() {
         return notificationDAO.findUnreadByUsername(fieldManager.getUsername())
                 .stream()

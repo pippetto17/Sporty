@@ -13,6 +13,10 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
+/**
+ * Controller for booking fields for matches.
+ * Handles field search, availability checking, and field selection.
+ */
 public class BookFieldController {
     private final ApplicationController applicationController;
     private final FieldDAO fieldDAO;
@@ -21,6 +25,12 @@ public class BookFieldController {
     private FieldBean selectedField;
     private boolean standaloneMode;
 
+    /**
+     * Constructs a new BookFieldController with the given match context.
+     *
+     * @param applicationController the main application controller
+     * @param matchBean             the match bean containing match details
+     */
     public BookFieldController(ApplicationController applicationController, MatchBean matchBean) {
         this.applicationController = applicationController;
         this.fieldDAO = applicationController.getDaoFactory().getFieldDAO();
@@ -46,6 +56,11 @@ public class BookFieldController {
         currentMatchBean.setPricePerHour(field.getPricePerHour());
     }
 
+    /**
+     * Searches for available fields matching the current match parameters.
+     *
+     * @return list of available field beans
+     */
     public List<FieldBean> searchAvailableFields() {
         if (currentMatchBean == null) {
             return List.of();

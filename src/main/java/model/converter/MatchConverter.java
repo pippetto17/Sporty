@@ -7,10 +7,23 @@ import model.domain.Field;
 import model.domain.Match;
 import model.domain.User;
 
+/**
+ * Converter utility for transforming between Match domain entities and
+ * MatchBean data transfer objects.
+ * Implements the BCE (Boundary-Control-Entity) pattern for proper layer
+ * separation.
+ */
 public class MatchConverter {
     private MatchConverter() {
     }
 
+    /**
+     * Converts a MatchBean to a Match domain entity.
+     *
+     * @param matchBean the match bean to convert
+     * @return the Match entity, or null if matchBean is null
+     * @throws DataAccessException if match data is invalid
+     */
     public static Match toEntity(MatchBean matchBean) {
         if (matchBean == null) {
             return null;
@@ -35,6 +48,13 @@ public class MatchConverter {
         return match;
     }
 
+    /**
+     * Converts a Match domain entity to a MatchBean.
+     * Note: Field-related data (city, sport, price) must be enriched separately.
+     *
+     * @param match the match entity to convert
+     * @return the MatchBean, or null if match is null
+     */
     public static MatchBean toBean(Match match) {
         if (match == null) {
             return null;

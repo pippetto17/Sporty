@@ -19,6 +19,12 @@ import view.homeview.HomeView;
 import java.time.LocalDate;
 import java.util.List;
 
+/**
+ * Controller for the home view, managing match listing, filtering, and
+ * navigation.
+ * Handles both player and organizer perspectives with role-switching
+ * capability.
+ */
 public class HomeController {
     private final User currentUser;
     private final ApplicationController applicationController;
@@ -28,6 +34,13 @@ public class HomeController {
     private boolean viewAsPlayer;
     private HomeView homeView;
 
+    /**
+     * Constructs a new HomeController for the specified user.
+     *
+     * @param user                  the current logged-in user
+     * @param applicationController the main application controller for navigation
+     * @param daoFactory            the factory to create DAO instances
+     */
     public HomeController(User user, ApplicationController applicationController, DAOFactory daoFactory) {
         this.currentUser = user;
         this.applicationController = applicationController;
@@ -60,6 +73,14 @@ public class HomeController {
         }
     }
 
+    /**
+     * Retrieves matches based on the current view mode (player or organizer).
+     * Players see approved matches they haven't joined yet.
+     * Organizers see their own organized matches.
+     *
+     * @return list of enriched match beans
+     * @throws DataAccessException if database access fails
+     */
     public List<MatchBean> getMatches() {
         try {
             List<MatchBean> matches;
@@ -112,6 +133,14 @@ public class HomeController {
         }
     }
 
+    /**
+     * Filters matches by sport, city, and/or date.
+     *
+     * @param sport the sport type to filter by (null for all sports)
+     * @param city  the city to filter by (null or empty for all cities)
+     * @param date  the date to filter by (null for all dates)
+     * @return filtered list of match beans
+     */
     public List<MatchBean> filterMatches(Sport sport, String city, LocalDate date) {
         return getMatches().stream()
                 .filter(match -> sport == null || match.getSport() == sport)
@@ -128,6 +157,12 @@ public class HomeController {
         applicationController.navigateToOrganizeMatch(currentUser);
     }
 
+    /**
+     * Initiates the flow to join a match, navigating to payment.
+     *
+     * @param matchId the ID of the match to join
+     * @throws ValidationException if the match is not found
+     */
     public void joinMatch(int matchId) throws ValidationException {
         MatchBean matchBean = getMatchById(matchId);
         if (matchBean == null) {

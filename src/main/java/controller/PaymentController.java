@@ -23,6 +23,13 @@ import view.paymentview.PaymentView;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Controller for payment processing in different contexts.
+ * Supports three modes: standard match payment, field booking payment, and join
+ * match payment.
+ * Integrates with the Observer pattern to notify relevant parties of match
+ * creation.
+ */
 public class PaymentController {
     private static final Logger logger = Logger.getLogger(PaymentController.class.getName());
     private final ApplicationController applicationController;
