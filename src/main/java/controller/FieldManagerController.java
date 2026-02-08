@@ -5,7 +5,9 @@ import exception.ValidationException;
 import model.bean.FieldBean;
 import model.bean.MatchBean;
 import model.converter.FieldConverter;
+import model.bean.NotificationBean;
 import model.converter.MatchConverter;
+import model.converter.NotificationConverter;
 import model.dao.DAOFactory;
 import model.dao.FieldDAO;
 import model.dao.MatchDAO;
@@ -13,7 +15,6 @@ import model.dao.NotificationDAO;
 import model.dao.UserDAO;
 import model.domain.Match;
 import model.domain.MatchStatus;
-import model.domain.Notification;
 import model.domain.User;
 import model.utils.Constants;
 
@@ -40,8 +41,11 @@ public class FieldManagerController {
         this.matchDAO.deleteExpiredMatches();
     }
 
-    public List<Notification> getUnreadNotifications() {
-        return notificationDAO.findUnreadByUsername(fieldManager.getUsername());
+    public List<NotificationBean> getUnreadNotifications() {
+        return notificationDAO.findUnreadByUsername(fieldManager.getUsername())
+                .stream()
+                .map(NotificationConverter::toBean)
+                .toList();
     }
 
     public void markNotificationsAsRead() {

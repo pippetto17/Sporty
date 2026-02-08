@@ -20,7 +20,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import model.bean.MatchBean;
-import model.domain.Notification;
+import model.bean.NotificationBean;
 import model.utils.Constants;
 import view.ViewUtils;
 
@@ -170,7 +170,7 @@ public class GraphicFieldManagerView implements FieldManagerView {
         }
         notificationsShown = true;
 
-        List<Notification> unread = controller.getUnreadNotifications();
+        List<NotificationBean> unread = controller.getUnreadNotifications();
         if (unread.isEmpty()) {
             updateNotificationButton(0);
             return;
@@ -182,7 +182,7 @@ public class GraphicFieldManagerView implements FieldManagerView {
         alert.setHeaderText("🔔 You have " + unread.size() + " new notification(s)!");
 
         StringBuilder content = new StringBuilder();
-        for (Notification n : unread) {
+        for (NotificationBean n : unread) {
             content.append("• ").append(n.getTitle()).append("\n  ").append(n.getMessage()).append("\n\n");
         }
         alert.setContentText(content.toString());
@@ -233,18 +233,18 @@ public class GraphicFieldManagerView implements FieldManagerView {
         Tab alertsTab = new Tab("Alerts");
         VBox alertsBox = new VBox(10);
         alertsBox.setPadding(new javafx.geometry.Insets(10));
-        List<Notification> unread = controller.getUnreadNotifications();
+        List<NotificationBean> unread = controller.getUnreadNotifications();
         populateAlertsBox(alertsBox, unread);
         alertsTab.setContent(new ScrollPane(alertsBox));
         return alertsTab;
     }
 
-    private void populateAlertsBox(VBox alertsBox, List<Notification> unread) {
+    private void populateAlertsBox(VBox alertsBox, List<NotificationBean> unread) {
         if (unread.isEmpty()) {
             alertsBox.getChildren().add(new Label("No new notifications."));
             return;
         }
-        for (Notification note : unread) {
+        for (NotificationBean note : unread) {
             Label l = new Label("🔔 " + note.getTitle() + ": " + note.getMessage());
             l.setWrapText(true);
             alertsBox.getChildren().add(l);

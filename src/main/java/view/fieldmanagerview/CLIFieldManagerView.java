@@ -3,7 +3,7 @@ package view.fieldmanagerview;
 import controller.ApplicationController;
 import controller.FieldManagerController;
 import model.bean.MatchBean;
-import model.domain.Notification;
+import model.bean.NotificationBean;
 import model.utils.Constants;
 
 import java.util.List;
@@ -190,13 +190,13 @@ public class CLIFieldManagerView implements FieldManagerView {
         }
         notificationsShown = true;
 
-        List<Notification> unread = controller.getUnreadNotifications();
+        List<NotificationBean> unread = controller.getUnreadNotifications();
         if (unread.isEmpty()) {
             return;
         }
 
         System.out.println("\n🔔 YOU HAVE " + unread.size() + " NEW NOTIFICATION(S):");
-        for (Notification n : unread) {
+        for (NotificationBean n : unread) {
             System.out.println("  • " + n.getTitle() + ": " + n.getMessage());
         }
         controller.markNotificationsAsRead();
@@ -206,13 +206,13 @@ public class CLIFieldManagerView implements FieldManagerView {
      * Shows all notifications (can be called from menu).
      */
     private void showNotifications() {
-        List<Notification> unread = controller.getUnreadNotifications();
+        List<NotificationBean> unread = controller.getUnreadNotifications();
         if (unread.isEmpty()) {
             System.out.println("\n✓ No new notifications.");
             return;
         }
         System.out.println("\n🔔 NOTIFICATIONS:");
-        for (Notification n : unread) {
+        for (NotificationBean n : unread) {
             System.out.println("  • " + n.getTitle() + ": " + n.getMessage());
         }
         controller.markNotificationsAsRead();

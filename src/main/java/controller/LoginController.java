@@ -2,6 +2,7 @@ package controller;
 
 import exception.ValidationException;
 import model.bean.UserBean;
+import model.converter.UserConverter;
 import model.dao.DAOFactory;
 import model.dao.UserDAO;
 import model.domain.Role;
@@ -22,13 +23,7 @@ public class LoginController {
         if (user == null) {
             return null;
         }
-        UserBean resultBean = new UserBean();
-        resultBean.setId(user.getId());
-        resultBean.setUsername(user.getUsername());
-        resultBean.setName(user.getName());
-        resultBean.setSurname(user.getSurname());
-        resultBean.setRole(user.getRole().getCode());
-        return resultBean;
+        return UserConverter.toBean(user);
     }
 
     public void register(UserBean userBean, String name, String surname, int role) throws ValidationException {

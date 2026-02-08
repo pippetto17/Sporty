@@ -5,6 +5,7 @@ import exception.ValidationException;
 import model.bean.MatchBean;
 import model.bean.UserBean;
 import model.converter.MatchConverter;
+import model.converter.UserConverter;
 import model.dao.DAOFactory;
 import model.dao.FieldDAO;
 import model.dao.MatchDAO;
@@ -42,13 +43,7 @@ public class HomeController {
     }
 
     public UserBean getCurrentUser() {
-        UserBean bean = new UserBean();
-        bean.setId(currentUser.getId());
-        bean.setUsername(currentUser.getUsername());
-        bean.setName(currentUser.getName());
-        bean.setSurname(currentUser.getSurname());
-        bean.setRole(currentUser.getRole().getCode());
-        return bean;
+        return UserConverter.toBean(currentUser);
     }
 
     public String getUserRoleName() {
