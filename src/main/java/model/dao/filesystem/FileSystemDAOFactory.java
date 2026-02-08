@@ -1,7 +1,6 @@
 package model.dao.filesystem;
 
 import model.dao.*;
-import model.dao.memory.NotificationDAOMemory;
 
 public class FileSystemDAOFactory implements DAOFactory {
     private final DAOFactory dbmsDelegate;

@@ -1,10 +1,9 @@
 package view.fieldmanagerview;
 
 import model.bean.MatchBean;
+import view.View;
 
 import java.util.List;
-
-import view.View;
 
 public interface FieldManagerView extends View {
     void displayDashboard();
