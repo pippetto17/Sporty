@@ -20,18 +20,6 @@
         <mysql.version>8.0.33</mysql.version>
         <gson.version>2.10.1</gson.version>
         <junit.version>5.10.1</junit.version>
-        <sonar.coverage.exclusions>
-            **/view/**/*.java,
-            **/org/example/*.java,
-            **/bean/*.java,
-            **/dao/*.java,
-            **/factory/*.java,
-            **/exception/*.java,
-            **/converter/*.java,
-            **/utils/*.java,
-            **/domain/DemoDataInitializer.java,
-            **/Main.java
-        </sonar.coverage.exclusions>
         <sonar.organization>pippetto17</sonar.organization>
     </properties>
 
