@@ -350,84 +350,86 @@ public class GraphicOrganizeMatchView implements OrganizeMatchView {
                 showError(Constants.ERROR_MATCHBEAN_NULL);
                 return;
             }
-
-            if (inputContainer != null) {
-                inputContainer.setVisible(false);
-                inputContainer.setManaged(false);
-            }
-
-            messageLabel.setVisible(false);
-            messageLabel.setManaged(false);
-
-            Sport sport = matchBean.getSport();
-            applySportTheme(sport);
-
-            recapSportLabel.setText(sport != null ? sport.getDisplayName() : "N/A");
-            recapDateLabel.setText(matchBean.getMatchDate() != null ? matchBean.getMatchDate().toString() : "N/A");
-            recapTimeLabel.setText(matchBean.getMatchTime() != null ? matchBean.getMatchTime().toString() : "N/A");
-            recapCityLabel.setText(matchBean.getCity());
-
-            String statusText = matchBean.getStatus() != null ? matchBean.getStatus().getDisplayName() : "Pending";
-            recapStatusLabel.setText(statusText);
-
-            boolean isPending = matchBean.getStatus() != null && matchBean.getStatus().toString().equals("Pending");
-            if (isPending) {
-                recapStatusLabel.setStyle("-fx-text-fill: #f59e0b;");
-            } else {
-                recapStatusLabel.setStyle("-fx-text-fill: #10b981;");
-            }
-
-            if (notificationBox != null) {
-                notificationBox.setVisible(isPending);
-                notificationBox.setManaged(isPending);
-            }
-
-            recapBox.setVisible(true);
-            recapBox.setManaged(true);
+            hideInputContainer();
+            populateRecapFields(matchBean);
+            applySportTheme(matchBean.getSport());
+            configureStatusDisplay(matchBean);
+            showRecapBox();
         });
     }
 
+    private void hideInputContainer() {
+        if (inputContainer != null) {
+            inputContainer.setVisible(false);
+            inputContainer.setManaged(false);
+        }
+        messageLabel.setVisible(false);
+        messageLabel.setManaged(false);
+    }
+
+    private void populateRecapFields(MatchBean matchBean) {
+        Sport sport = matchBean.getSport();
+        recapSportLabel.setText(sport != null ? sport.getDisplayName() : "N/A");
+        recapDateLabel.setText(matchBean.getMatchDate() != null ? matchBean.getMatchDate().toString() : "N/A");
+        recapTimeLabel.setText(matchBean.getMatchTime() != null ? matchBean.getMatchTime().toString() : "N/A");
+        recapCityLabel.setText(matchBean.getCity());
+    }
+
+    private void configureStatusDisplay(MatchBean matchBean) {
+        String statusText = matchBean.getStatus() != null ? matchBean.getStatus().getDisplayName() : "Pending";
+        recapStatusLabel.setText(statusText);
+
+        boolean isPending = matchBean.getStatus() != null && matchBean.getStatus().toString().equals("Pending");
+        recapStatusLabel.setStyle(isPending ? "-fx-text-fill: #f59e0b;" : "-fx-text-fill: #10b981;");
+
+        if (notificationBox != null) {
+            notificationBox.setVisible(isPending);
+            notificationBox.setManaged(isPending);
+        }
+    }
+
+    private void showRecapBox() {
+        recapBox.setVisible(true);
+        recapBox.setManaged(true);
+    }
+
     private void applySportTheme(Sport sport) {
-        if (recapHeader == null)
-            return;
+        if (recapHeader == null) return;
 
         recapHeader.getStyleClass().removeIf(style -> style.startsWith("sport-"));
+        SportTheme theme = getSportTheme(sport);
+        recapHeader.getStyleClass().add(theme.styleClass);
+        loadRecapImage(theme.imagePath);
+    }
 
-        String styleClass = "sport-default";
-        String imagePath = Constants.IMAGE_MEDAL_PATH;
+    private SportTheme getSportTheme(Sport sport) {
+        if (sport == null) return new SportTheme("sport-default", Constants.IMAGE_MEDAL_PATH);
 
-        if (sport != null) {
-            switch (sport) {
-                case FOOTBALL_5, FOOTBALL_8, FOOTBALL_11:
-                    styleClass = "sport-soccer";
-                    imagePath = Constants.IMAGE_FOOTBALL_PATH;
-                    break;
-                case BASKETBALL:
-                    styleClass = "sport-basket";
-                    imagePath = Constants.IMAGE_BASKETBALL_PATH;
-                    break;
-                case TENNIS_SINGLE, TENNIS_DOUBLE:
-                    styleClass = "sport-tennis";
-                    imagePath = Constants.IMAGE_TENNIS_PATH;
-                    break;
-                case PADEL_SINGLE, PADEL_DOUBLE:
-                    styleClass = "sport-padel";
-                    imagePath = Constants.IMAGE_PADEL_PATH;
-                    break;
-                default:
-                    break;
-            }
+        return switch (sport) {
+            case FOOTBALL_5, FOOTBALL_8, FOOTBALL_11 -> new SportTheme("sport-soccer", Constants.IMAGE_FOOTBALL_PATH);
+            case BASKETBALL -> new SportTheme("sport-basket", Constants.IMAGE_BASKETBALL_PATH);
+            case TENNIS_SINGLE, TENNIS_DOUBLE -> new SportTheme("sport-tennis", Constants.IMAGE_TENNIS_PATH);
+            case PADEL_SINGLE, PADEL_DOUBLE -> new SportTheme("sport-padel", Constants.IMAGE_PADEL_PATH);
+            default -> new SportTheme("sport-default", Constants.IMAGE_MEDAL_PATH);
+        };
+    }
+
+    private void loadRecapImage(String imagePath) {
+        if (recapImage == null) return;
+
+        try {
+            recapImage.setImage(new Image(getClass().getResourceAsStream(imagePath)));
+        } catch (Exception e) {
+            logger.warning("Could not load image: " + imagePath);
         }
+    }
 
-        recapHeader.getStyleClass().add(styleClass);
-
-        if (recapImage != null) {
-            try {
-                Image img = new Image(getClass().getResourceAsStream(imagePath));
-                recapImage.setImage(img);
-            } catch (Exception e) {
-                logger.warning("Could not load image: " + imagePath);
-            }
+    private static class SportTheme {
+        final String styleClass;
+        final String imagePath;
+        SportTheme(String styleClass, String imagePath) {
+            this.styleClass = styleClass;
+            this.imagePath = imagePath;
         }
     }
 
