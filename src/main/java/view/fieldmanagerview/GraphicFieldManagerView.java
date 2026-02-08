@@ -123,7 +123,7 @@ public class GraphicFieldManagerView implements FieldManagerView {
 
     @Override
     public void displayNotifications() {
-        handleShowNotifications(1); // 1 = Alerts tab
+        showNotificationsDialog(1);
     }
 
     @Override
@@ -160,7 +160,7 @@ public class GraphicFieldManagerView implements FieldManagerView {
 
         // Auto-open requests if pending
         if (!controller.getPendingRequests().isEmpty()) {
-            Platform.runLater(() -> handleShowNotifications(0)); // 0 is the Requests tab index
+            Platform.runLater(() -> showNotificationsDialog(0)); // 0 is the Requests tab index
         }
     }
 
@@ -205,8 +205,11 @@ public class GraphicFieldManagerView implements FieldManagerView {
     }
 
     @FXML
+    private void handleShowNotifications() {
+        showNotificationsDialog(1);
+    }
 
-    private void handleShowNotifications(int initialTab) {
+    private void showNotificationsDialog(int initialTab) {
         Dialog<Void> dialog = new Dialog<>();
         dialog.setTitle("Notification Center");
         dialog.setHeaderText("Notifications & Requests");
@@ -371,11 +374,13 @@ public class GraphicFieldManagerView implements FieldManagerView {
 
     @FXML
     private void handleManageFields() {
+        // TODO: Implement field management feature in future release
         displayError("Feature disabled");
     }
 
     @FXML
     private void handleAddField() {
+        // TODO: Implement add field feature in future release
         displayError("Feature disabled");
     }
 

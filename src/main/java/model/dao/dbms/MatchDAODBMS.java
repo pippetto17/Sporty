@@ -188,15 +188,14 @@ public class MatchDAODBMS implements MatchDAO {
     }
 
     private Match mapRowToMatch(ResultSet rs) throws SQLException {
-
         int organizerId = rs.getInt("organizer_id");
         int fieldId = rs.getInt("field_id");
 
         UserDAODBMS userDAO = new UserDAODBMS(connection);
         FieldDAODBMS fieldDAO = new FieldDAODBMS(connection);
 
-        User organizer = userDAO.findById(organizerId);
-        Field field = fieldDAO.findById(fieldId);
+        User organizer = organizerId != 0 ? userDAO.findById(organizerId) : null;
+        Field field = fieldId != 0 ? fieldDAO.findById(fieldId) : null;
 
         Match match = new Match(
                 rs.getInt("id"),
@@ -207,7 +206,6 @@ public class MatchDAODBMS implements MatchDAO {
                 rs.getInt("missing_players"),
                 MatchStatus.fromCode(rs.getInt("status")));
 
-        // Parse joined_players from JSON
         String joinedPlayersJson = rs.getString("joined_players");
         if (joinedPlayersJson != null) {
             match.setJoinedPlayers(JsonUtils.jsonToList(joinedPlayersJson));

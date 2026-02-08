@@ -111,7 +111,7 @@ public class Match extends Subject {
     }
 
     public List<Integer> getJoinedPlayers() {
-        return joinedPlayers;
+        return List.copyOf(joinedPlayers);
     }
 
     public void setJoinedPlayers(List<Integer> joinedPlayers) {

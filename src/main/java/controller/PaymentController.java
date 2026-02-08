@@ -1,6 +1,9 @@
 package controller;
 
 import exception.ValidationException;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.util.Duration;
 import model.bean.FieldBean;
 import model.bean.MatchBean;
 import model.bean.PaymentBean;
@@ -151,14 +154,10 @@ public class PaymentController {
     }
 
     private void handleGraphicViewSuccess() {
-        new Thread(() -> {
-            try {
-                Thread.sleep(Constants.PAYMENT_SUCCESS_DELAY_MS);
-                javafx.application.Platform.runLater(this::closeAndNavigateBack);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-        }).start();
+        Timeline timeline = new Timeline(new KeyFrame(
+                Duration.millis(Constants.PAYMENT_SUCCESS_DELAY_MS),
+                event -> closeAndNavigateBack()));
+        timeline.play();
     }
 
     private void closeAndNavigateBack() {

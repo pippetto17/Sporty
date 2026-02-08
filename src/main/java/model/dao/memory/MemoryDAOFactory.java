@@ -3,23 +3,28 @@ package model.dao.memory;
 import model.dao.*;
 
 public class MemoryDAOFactory implements DAOFactory {
+    private final UserDAO userDAO = new UserDAOMemory();
+    private final MatchDAO matchDAO = new MatchDAOMemory();
+    private final FieldDAO fieldDAO = new FieldDAOMemory();
+    private final NotificationDAO notificationDAO = new NotificationDAOMemory();
+
     @Override
     public UserDAO getUserDAO() {
-        return new UserDAOMemory();
+        return userDAO;
     }
 
     @Override
     public MatchDAO getMatchDAO() {
-        return new MatchDAOMemory();
+        return matchDAO;
     }
 
     @Override
     public FieldDAO getFieldDAO() {
-        return new FieldDAOMemory();
+        return fieldDAO;
     }
 
     @Override
     public NotificationDAO getNotificationDAO() {
-        return new NotificationDAOMemory();
+        return notificationDAO;
     }
 }
